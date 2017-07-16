@@ -6,7 +6,7 @@
 PLATNAME := $(shell uname)
 
 OBJS	=	scanner.o \
-		parse.o \
+		parser.o \
 		errors.o
 
 OBJS1	=	main.o
@@ -35,7 +35,7 @@ scanner.c: scanner.flex parser.h scanner.h
 	flex -o scanner.c scanner.flex
 
 main.o: main.c $(OBJS)
-parse.o: parse.c errors.h
+parser.o: parser.c errors.h
 errors.o: errors.c errors.h
 
 clean:

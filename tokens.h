@@ -1,8 +1,8 @@
 /*
  *  Tokens that the lexer will return.
  */
-#ifndef _PARSER_H_
-#define _PARSER_H_
+#ifndef _TOKENS_H_
+#define _TOKENS_H_
 
 enum
 {
@@ -66,4 +66,4 @@ enum
     DUMMY,
 } _token_t;
 
-#endif /* !_PARSER_H_  */
+#endif /* !_TOKENS_H_  */

@@ -683,9 +683,9 @@ char *yytext;
 #include <string.h>
 #include <errno.h>
 
-//#include "errors.h"
-#include "parser.h"
-//#include "tokens.h"
+#include "errors.h"
+//#include "parser.h"
+#include "tokens.h"
 
 // string buffer to get token from
 static char strbuf[1024*64];
@@ -1277,129 +1277,129 @@ YY_RULE_SETUP
 case 53:
 YY_RULE_SETUP
 #line 122 "scanner.flex"
-{ return '-'; }
+{ strncpy(strbuf, "-", sizeof(strbuf)); return '-'; }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 123 "scanner.flex"
-{ return '+'; }
+{ strncpy(strbuf, "+", sizeof(strbuf)); return '+'; }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 124 "scanner.flex"
-{ return '='; }
+{ strncpy(strbuf, "=", sizeof(strbuf)); return '='; }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 125 "scanner.flex"
-{ return '/'; }
+{ strncpy(strbuf, "/", sizeof(strbuf)); return '/'; }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 126 "scanner.flex"
-{ return '*'; }
+{ strncpy(strbuf, "*", sizeof(strbuf)); return '*'; }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 127 "scanner.flex"
-{ return '%'; }
+{ strncpy(strbuf, "%%", sizeof(strbuf)); return '%'; }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 128 "scanner.flex"
-{ return '&'; }
+{ strncpy(strbuf, "&", sizeof(strbuf)); return '&'; }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 129 "scanner.flex"
-{ return '|'; }
+{ strncpy(strbuf, "|", sizeof(strbuf)); return '|'; }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
 #line 130 "scanner.flex"
-{ return '@'; }
+{ strncpy(strbuf, "@", sizeof(strbuf)); return '@'; }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
 #line 131 "scanner.flex"
-{ return '$'; }
+{ strncpy(strbuf, "$", sizeof(strbuf)); return '$'; }
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
 #line 132 "scanner.flex"
-{ return '^'; }
+{ strncpy(strbuf, "^", sizeof(strbuf)); return '^'; }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
 #line 133 "scanner.flex"
-{ return '~'; }
+{ strncpy(strbuf, "~", sizeof(strbuf)); return '~'; }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 134 "scanner.flex"
-{ return '?'; }
+{ strncpy(strbuf, "?", sizeof(strbuf)); return '?'; }
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
 #line 135 "scanner.flex"
-{ return '.'; }
+{ strncpy(strbuf, ".", sizeof(strbuf)); return '.'; }
 	YY_BREAK
 /* Other operators */
 case 67:
 YY_RULE_SETUP
 #line 138 "scanner.flex"
-{ return ','; }
+{ strncpy(strbuf, ",", sizeof(strbuf)); return ','; }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
 #line 139 "scanner.flex"
-{ return ';'; }
+{ strncpy(strbuf, ";", sizeof(strbuf)); return ';'; }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
 #line 140 "scanner.flex"
-{ return ':'; }
+{ strncpy(strbuf, ":", sizeof(strbuf)); return ':'; }
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
 #line 141 "scanner.flex"
-{ return '['; }
+{ strncpy(strbuf, "[", sizeof(strbuf)); return '['; }
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
 #line 142 "scanner.flex"
-{ return ']'; }
+{ strncpy(strbuf, "]", sizeof(strbuf)); return ']'; }
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
 #line 143 "scanner.flex"
-{ return '{'; }
+{ strncpy(strbuf, "{", sizeof(strbuf)); return '{'; }
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
 #line 144 "scanner.flex"
-{ return '}'; }
+{ strncpy(strbuf, "}", sizeof(strbuf)); return '}'; }
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
 #line 145 "scanner.flex"
-{ return '('; }
+{ strncpy(strbuf, "(", sizeof(strbuf)); return '('; }
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
 #line 146 "scanner.flex"
-{ return ')'; }
+{ strncpy(strbuf, ")", sizeof(strbuf)); return ')'; }
 	YY_BREAK
 /* constructed tokens */
 case 76:
 YY_RULE_SETUP
 #line 149 "scanner.flex"
-{ strncpy(strbuf, yytext, sizeof(strbuf)); yylval.str = strdup(strbuf); return SYMBOL_TOK; }
+{ strncpy(strbuf, yytext, sizeof(strbuf)); return SYMBOL_TOK; }
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
 #line 150 "scanner.flex"
-{ strncpy(strbuf, yytext, sizeof(strbuf)); yylval.str = strdup(strbuf); return COMPLEX_TOK; }
+{ strncpy(strbuf, yytext, sizeof(strbuf)); return COMPLEX_TOK; }
 	YY_BREAK
 /* recognize and ignore a C comments */
 case 78:
@@ -1414,37 +1414,31 @@ YY_RULE_SETUP
 #line 157 "scanner.flex"
 {
         strncpy(strbuf, yytext, sizeof(strbuf));
-        //yylval.inum = strtol(strbuf, NULL, 10);
-        yylval.str = strdup(strbuf);
         return SNUM_TOK;
     }
 	YY_BREAK
 /* recognize an unsigned number */
 case 80:
 YY_RULE_SETUP
-#line 165 "scanner.flex"
+#line 163 "scanner.flex"
 {
         strncpy(strbuf, yytext, sizeof(strbuf));
-        //yylval.unum = strtol(strbuf, NULL, 16);
-        yylval.str = strdup(strbuf);
         return UNUM_TOK;
     }
 	YY_BREAK
 /* recognize a float */
 case 81:
 YY_RULE_SETUP
-#line 173 "scanner.flex"
+#line 169 "scanner.flex"
 {
         strncpy(strbuf, yytext, sizeof(strbuf));
-        //yylval.fnum = strtod(strbuf, NULL);
-        yylval.str = strdup(strbuf);
         return FNUM_TOK;
     }
 	YY_BREAK
 /* double quoted strings have escapes managed */
 case 82:
 YY_RULE_SETUP
-#line 181 "scanner.flex"
+#line 175 "scanner.flex"
 {
         bidx = 0;
         memset(buffer, 0, sizeof(buffer));
@@ -1453,11 +1447,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 187 "scanner.flex"
+#line 181 "scanner.flex"
 {
         strncpy(strbuf, buffer, sizeof(strbuf));
         BEGIN(INITIAL);
-        yylval.str = strdup(strbuf);
         return QSTRG_TOK;
     }
 	YY_BREAK
@@ -1465,78 +1458,78 @@ YY_RULE_SETUP
 /* <DQUOTES>\"[ \t]*\\[ \t]*\n$ { printf("here2\n"); name_stack->line_no ++; } */
 case 84:
 YY_RULE_SETUP
-#line 196 "scanner.flex"
+#line 189 "scanner.flex"
 { append_char('\n'); }
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 197 "scanner.flex"
+#line 190 "scanner.flex"
 { append_char('\r'); }
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 198 "scanner.flex"
+#line 191 "scanner.flex"
 { append_char('\t'); }
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 199 "scanner.flex"
+#line 192 "scanner.flex"
 { append_char('\b'); }
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 200 "scanner.flex"
+#line 193 "scanner.flex"
 { append_char('\f'); }
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 201 "scanner.flex"
+#line 194 "scanner.flex"
 { append_char('\v'); }
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 202 "scanner.flex"
+#line 195 "scanner.flex"
 { append_char('\\'); }
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 203 "scanner.flex"
+#line 196 "scanner.flex"
 { append_char('\"'); }
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 204 "scanner.flex"
+#line 197 "scanner.flex"
 { append_char('\''); }
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 205 "scanner.flex"
+#line 198 "scanner.flex"
 { append_char('\?'); }
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 206 "scanner.flex"
+#line 199 "scanner.flex"
 { append_char(yytext[1]); }
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 207 "scanner.flex"
+#line 200 "scanner.flex"
 { append_char((char)strtol(yytext+1, 0, 8));  }
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 208 "scanner.flex"
+#line 201 "scanner.flex"
 { append_char((char)strtol(yytext+2, 0, 16));  }
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 209 "scanner.flex"
+#line 202 "scanner.flex"
 { append_str(yytext); }
 	YY_BREAK
 /* single quoted strings are absolute literals */
 case 98:
 YY_RULE_SETUP
-#line 213 "scanner.flex"
+#line 206 "scanner.flex"
 {
         bidx = 0;
         memset(buffer, 0, sizeof(buffer));
@@ -1546,32 +1539,30 @@ YY_RULE_SETUP
 /*<SQUOTES>\'[ \t]*\\[ \t]*\n { name_stack->line_no ++; } */
 case 99:
 YY_RULE_SETUP
-#line 220 "scanner.flex"
+#line 213 "scanner.flex"
 { append_str(yytext); }
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 221 "scanner.flex"
+#line 214 "scanner.flex"
 { append_str(yytext); }
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 222 "scanner.flex"
+#line 215 "scanner.flex"
 {
         strncpy(strbuf, buffer, sizeof(strbuf));
         BEGIN(INITIAL);
-        yylval.str = strdup(strbuf);
         return QSTRG_TOK;
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(SQUOTES):
 case YY_STATE_EOF(DQUOTES):
-#line 229 "scanner.flex"
+#line 221 "scanner.flex"
 {
 
-        //debug(0, "closing file \"%s\"", name_stack->name);
-        printf("closing file \"%s\"\n", name_stack->name);
+        show_debug_msg(0, "closing file \"%s\"", name_stack->name);
         fprintf(stderr, "There were %d errors found.\n", num_errors);
         _file_name_stack *name = name_stack->next;
         free(name_stack->name);
@@ -1589,10 +1580,10 @@ case YY_STATE_EOF(DQUOTES):
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 248 "scanner.flex"
+#line 239 "scanner.flex"
 ECHO;
 	YY_BREAK
-#line 1596 "scanner.c"
+#line 1587 "scanner.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2554,7 +2545,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 248 "scanner.flex"
+#line 239 "scanner.flex"
 
 
 
@@ -2562,26 +2553,20 @@ void open_file(char *fname) {
 
     _file_name_stack *name;
 
-    //debug(0, "opening file: \"%s\"", fname);
-    printf("opening file: \"%s\"\n", fname);
+    show_debug_msg(0, "opening file: \"%s\"", fname);
     if(NULL == (name = calloc(1, sizeof(_file_name_stack))))
-        //scanner_error("cannot allocate memory for file stack");
-        printf("cannot allocate memory for file stack");
+        fatal_error("cannot allocate memory for file stack");
 
     if(NULL == (name->name = strdup(fname)))
-        //scanner_error("cannot allocate memory for file stack name");
-        printf("cannot allocate memory for file stack name");
+        fatal_error("cannot allocate memory for file stack name");
 
     name->next = name_stack;
     name->line_no = 1;
     name_stack = name;
 
     yyin = fopen(fname, "r");
-    if(NULL == yyin) {
-        //scanner_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
-        printf("cannot open the input file: \"%s\": %s\n", fname, strerror(errno));
-        exit(1);
-    }
+    if(NULL == yyin)
+        fatal_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
 
     yypush_buffer_state(yy_create_buffer(yyin,YY_BUF_SIZE));
 }
@@ -2611,7 +2596,7 @@ int get_token(void) {
     int retv = yylex();
     if(0 == retv)
         memset(strbuf, 0, sizeof(strbuf));
-    printf("%d: ", retv);
+    //printf("%d: ", retv);
     return retv;
 }
 

@@ -5,9 +5,9 @@
 #include <string.h>
 #include <errno.h>
 
-//#include "errors.h"
-#include "parser.h"
-//#include "tokens.h"
+#include "errors.h"
+//#include "parser.h"
+#include "tokens.h"
 
 // string buffer to get token from
 static char strbuf[1024*64];
@@ -215,7 +215,6 @@ static void append_str(char *str) {
 <SQUOTES>\' {
         strncpy(strbuf, buffer, sizeof(strbuf));
         BEGIN(INITIAL);
-        yylval.str = strdup(strbuf);
         return QSTRG_TOK;
     }
 
@@ -245,10 +244,10 @@ void open_file(char *fname) {
 
     show_debug_msg(0, "opening file: \"%s\"", fname);
     if(NULL == (name = calloc(1, sizeof(_file_name_stack))))
-        show_fatal_error("cannot allocate memory for file stack");
+        fatal_error("cannot allocate memory for file stack");
 
     if(NULL == (name->name = strdup(fname)))
-        show_fatal_error("cannot allocate memory for file stack name");
+        fatal_error("cannot allocate memory for file stack name");
 
     name->next = name_stack;
     name->line_no = 1;
@@ -256,7 +255,7 @@ void open_file(char *fname) {
 
     yyin = fopen(fname, "r");
     if(NULL == yyin)
-        show_fatal_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
+        fatal_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
 
     yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
 }

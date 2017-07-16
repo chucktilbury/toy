@@ -9,6 +9,7 @@
 #include "scanner.h"
 #include "tokens.h"
 #include "errors.h"
+#include "parser.h"
 
 // need a concept of a symbol table context.
 // need to add the stuff to get the file index
@@ -53,7 +54,7 @@ int phase1_parse_all(const char *fname)
         }
     }
 
-    if(errors != 0)
+    if(get_num_errors() != 0)
         return PHASE1_FAILED;
     else
         return PHASE1_SUCCESS;
@@ -107,7 +108,7 @@ int get_class_parameter_list(void)
 
     // get the class input parameter list
     if(get_generic_parameter_list(/* where to save it */))
-        show_fatal_error("cannot parse class parameter list");
+        fatal_error("cannot parse class parameter list");
 
     token = get_token();
     if(token != ')')
@@ -162,7 +163,7 @@ int do_class(void)
     // first token must be a simple name
     int token = get_token();
 
-    if(token == SYMBOL_NAME)
+    if(token == SYMBOL_TOK)
     {
         // create the class symbol context connected to the symbol
     }
@@ -174,14 +175,14 @@ int do_class(void)
     }
 
     if(get_class_parameter_input_list())
-        show_fatal_error("pass1: cannot parse input parameters");
+        fatal_error("pass1: cannot parse input parameters");
 
     if(get_class_parameter_output_list())
-        show_fatal_error("pass1: cannot parse output parameters");
+        fatal_error("pass1: cannot parse output parameters");
 
     // get the symbols for the class
     if(get_class_body())
-        show_fatal_error("pass1: cannot parse class body");
+        fatal_error("pass1: cannot parse class body");
 
     return PHASE1_SUCCESS;   // success
 }
