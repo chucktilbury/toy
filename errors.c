@@ -32,13 +32,13 @@ void set_debug_level(int level)
  *  A level of 0 indicates that it should be shown when the minimum level is
  *  enabled.
  */
-void show_debug_msg(int level, char *fmt, ...)
+void show_debug_msg(const char* func, int line, int level, char *fmt, ...)
 {
     if(level > debug_level)
     {
         va_list args;
 
-        fprintf(outs, "DEBUG: ");
+        fprintf(outs, "DEBUG: %s: %d: ",func, line);
         va_start(args, fmt);
         vfprintf(outs, fmt, args);
         va_end(args);

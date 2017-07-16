@@ -11,10 +11,10 @@ OBJS	=	scanner.o \
 
 OBJS1	=	main.o
 
-TARGET	=	toy
+TARGET	=	toi
 
 CARGS	=	-Wall
-DEBUG	=	-g -DTRACE
+DEBUG	=	-g -DTRACE -DDEBUGGING
 HEADERS	=	$(OBJS:.o=.h)
 
 ifeq ($(PLATNAME), Linux)

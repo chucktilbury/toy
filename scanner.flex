@@ -220,7 +220,7 @@ static void append_str(char *str) {
 
 <<EOF>> {
 
-        show_debug_msg(0, "closing file \"%s\"", name_stack->name);
+        DEBUG(0, "closing file \"%s\"", name_stack->name);
         fprintf(stderr, "There were %d errors found.\n", num_errors);
         _file_name_stack *name = name_stack->next;
         free(name_stack->name);
@@ -242,7 +242,7 @@ void open_file(char *fname) {
 
     _file_name_stack *name;
 
-    show_debug_msg(0, "opening file: \"%s\"", fname);
+    DEBUG(0, "opening file: \"%s\"", fname);
     if(NULL == (name = calloc(1, sizeof(_file_name_stack))))
         fatal_error("cannot allocate memory for file stack");
 

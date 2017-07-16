@@ -4,11 +4,15 @@
 
 #include "scanner.h"
 #include "parser.h"
+#include "errors.h"
 
 int main(int argc, char **argv) {
 
-    open_file(argv[1]);
-    yyparse();
+    init_errors(stdout);
+    //open_file(argv[1]);
+    open_file("test1.txt");
+    phase1_parse_all();
+    //yyparse();
     //printf("number of lines = %d\n", get_line_number());
     return 0;
 }

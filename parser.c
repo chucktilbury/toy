@@ -28,36 +28,28 @@ int resolve_for_class_name(char *name)
     return PHASE1_SUCCESS;   // class found.
 }
 
-/*
- *  When this is entered, the scanner is already init and the file that is to
- *  be parsed is already identified, but not opened.
- */
-int phase1_parse_all(const char *fname)
+int do_generic_import(void)
 {
-    int finished = 0;
-    int token;
+    DEBUG(0, "entering");
+    return 0;
+}
 
-    open_file(fname);
+int get_generic_parameter_list(void)
+{
+    DEBUG(0, "entering");
+    return 0;
+}
 
-    while(!finished)
-    {
-        token = get_token();
-        switch(token)
-        {
-            case INCLUDE_TOK: finished = do_include(); break;
-            case CLASS_TOK: finished = do_class(); break;
-            default:
-                finished = 1;
-                show_syntax_error("expected include or class but got \'%s\'", token_to_str(token));
-                return PHASE1_FAILED;
-            break;
-        }
-    }
+int get_class_parameter_input_list(void)
+{
+    DEBUG(0, "entering");
+    return 0;
+}
 
-    if(get_num_errors() != 0)
-        return PHASE1_FAILED;
-    else
-        return PHASE1_SUCCESS;
+int get_class_parameter_output_list(void)
+{
+    DEBUG(0, "entering");
+    return 0;
 }
 
 /*
@@ -152,6 +144,7 @@ int get_class_body(void)
     return PHASE1_SUCCESS;
 }
 
+
 /*
  *  class name(name, name, name) { class_body }
  *
@@ -186,4 +179,39 @@ int do_class(void)
 
     return PHASE1_SUCCESS;   // success
 }
+
+
+/*
+ *  When this is entered, the scanner is already init and the file that is to
+ *  be parsed is already identified, but not opened.
+ */
+//int phase1_parse_all(const char *fname)
+int phase1_parse_all(void)
+{
+    int finished = 0;
+    int token;
+
+    //open_file(fname);
+
+    while(!finished)
+    {
+        token = get_token();
+        switch(token)
+        {
+            case INCLUDE_TOK: finished = do_include(); break;
+            case CLASS_TOK: finished = do_class(); break;
+            default:
+                finished = 1;
+                show_syntax_error("expected include or class but got \'%s\'", token_to_str(token));
+                return PHASE1_FAILED;
+            break;
+        }
+    }
+
+    if(get_num_errors() != 0)
+        return PHASE1_FAILED;
+    else
+        return PHASE1_SUCCESS;
+}
+
 
