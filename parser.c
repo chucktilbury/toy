@@ -198,7 +198,7 @@ int phase1_parse_all(void)
         token = get_token();
         switch(token)
         {
-            case INCLUDE_TOK: finished = do_include(); break;
+            case IMPORT_TOK: finished = do_include(); break;
             case CLASS_TOK: finished = do_class(); break;
             default:
                 finished = 1;

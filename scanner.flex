@@ -64,7 +64,7 @@ static void append_str(char *str) {
 "nothing"       { strncpy(strbuf, "NOTHING_TOK", sizeof(strbuf)); return NOTHING_TOK; }
 "true"          { strncpy(strbuf, "TRUE_TOK", sizeof(strbuf)); return TRUE_TOK; }
 "false"         { strncpy(strbuf, "FALSE_TOK", sizeof(strbuf)); return FALSE_TOK; }
-"include"       { strncpy(strbuf, "INCLUDE_TOK", sizeof(strbuf)); return INCLUDE_TOK; }
+"import"        { strncpy(strbuf, "IMPORT_TOK", sizeof(strbuf)); return IMPORT_TOK; }
 "var"           { strncpy(strbuf, "VAR_TOK", sizeof(strbuf)); return VAR_TOK; }
 "class"         { strncpy(strbuf, "CLASS_TOK", sizeof(strbuf)); return CLASS_TOK; }
 "method"        { strncpy(strbuf, "METHOD_TOK", sizeof(strbuf)); return METHOD_TOK; }

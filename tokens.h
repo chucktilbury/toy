@@ -9,7 +9,7 @@ enum
     NOTHING_TOK = 300,
     TRUE_TOK,
     FALSE_TOK,
-    INCLUDE_TOK,
+    IMPORT_TOK,
     VAR_TOK,
     CLASS_TOK,
     METHOD_TOK,
