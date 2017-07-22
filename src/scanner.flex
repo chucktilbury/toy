@@ -283,8 +283,10 @@ int get_token(void) {
 
     strbuf[0] = 0;
     int retv = yylex();
+
     if(0 == retv)
         memset(strbuf, 0, sizeof(strbuf));
     //printf("%d: ", retv);
+
     return retv;
 }

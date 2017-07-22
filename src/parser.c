@@ -11,6 +11,8 @@
 #include "errors.h"
 #include "parser.h"
 
+#include "toy.h"
+
 // need a concept of a symbol table context.
 // need to add the stuff to get the file index
 // need to add resolver module
@@ -30,26 +32,26 @@ int resolve_for_class_name(char *name)
 
 int do_generic_import(void)
 {
-    DEBUG(0, "entering");
-    return 0;
+    DEBUG(9, "entering");
+    return PHASE1_SUCCESS;
 }
 
 int get_generic_parameter_list(void)
 {
-    DEBUG(0, "entering");
-    return 0;
+    DEBUG(9, "entering");
+    return PHASE1_SUCCESS;
 }
 
 int get_class_parameter_input_list(void)
 {
-    DEBUG(0, "entering");
-    return 0;
+    DEBUG(9, "entering");
+    return PHASE1_SUCCESS;
 }
 
 int get_class_parameter_output_list(void)
 {
-    DEBUG(0, "entering");
-    return 0;
+    DEBUG(9, "entering");
+    return PHASE1_SUCCESS;
 }
 
 /*
@@ -59,6 +61,8 @@ int get_class_parameter_output_list(void)
  */
 int do_include(void)
 {
+    DEBUG(9, "entering");
+
     // next token must be either symbol_tok or complex_tok
     int token = get_token();
     switch(token)
@@ -89,6 +93,8 @@ int do_include(void)
  */
 int get_class_parameter_list(void)
 {
+    DEBUG(9, "entering");
+
     int token;
 
     token = get_token();
@@ -119,6 +125,8 @@ int get_class_parameter_list(void)
  */
 int get_class_body(void)
 {
+    DEBUG(9, "entering");
+
     int token;
     int finished = 0;
 
@@ -132,6 +140,7 @@ int get_class_body(void)
     // read the class body and save it
     while(!finished)
     {
+        finished = 1;
     }
 
     token = get_token();
@@ -153,6 +162,8 @@ int get_class_body(void)
  */
 int do_class(void)
 {
+    DEBUG(9, "entering");
+
     // first token must be a simple name
     int token = get_token();
 
@@ -167,11 +178,8 @@ int do_class(void)
         return PHASE1_FAILED;   // do not continue
     }
 
-    if(get_class_parameter_input_list())
+    if(get_class_parameter_list())
         fatal_error("pass1: cannot parse input parameters");
-
-    if(get_class_parameter_output_list())
-        fatal_error("pass1: cannot parse output parameters");
 
     // get the symbols for the class
     if(get_class_body())
@@ -188,6 +196,8 @@ int do_class(void)
 //int phase1_parse_all(const char *fname)
 int phase1_parse_all(void)
 {
+    DEBUG(9, "entering");
+
     int finished = 0;
     int token;
 
@@ -196,6 +206,7 @@ int phase1_parse_all(void)
     while(!finished)
     {
         token = get_token();
+
         switch(token)
         {
             case IMPORT_TOK: finished = do_include(); break;

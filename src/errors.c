@@ -10,7 +10,7 @@
 static int errors = 0;
 static int warnings = 0;
 static FILE *outs= NULL;
-static int debug_level = -1; // no debugging info shown
+static int debug_level = -1; // all debugging info shown
 
 void init_errors(FILE *stream)
 {
@@ -30,9 +30,11 @@ void set_debug_level(int level)
 /*
  *  level is a number 0 - 9 that indicates whether a message should be shown.
  *  A level of 0 indicates that it should be shown when the minimum level is
- *  enabled.
+ *  enabled. A higher debug level number indicates fewer messages. A lower level
+ *  to this function indicates a greater liklyhood that the message will be
+ *  shown.
  */
-void show_debug_msg(const char* func, int line, int level, char *fmt, ...)
+int show_debug_msg(const char* func, int line, int level, char *fmt, ...)
 {
     if(level > debug_level)
     {
@@ -44,6 +46,8 @@ void show_debug_msg(const char* func, int line, int level, char *fmt, ...)
         va_end(args);
         fprintf(outs, "\n");
     }
+
+    return 0;
 }
 
 void show_info_msg(char *fmt, ...)

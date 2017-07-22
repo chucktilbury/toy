@@ -1,6 +1,6 @@
 
 # this is a comment
-include blart;
+import blart;
 
-class() {
+class backon () {
 }

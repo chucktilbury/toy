@@ -9,7 +9,7 @@ void fatal_error(char *fmt, ...);
 int get_num_errors(void);
 int get_num_warnings(void);
 void set_debug_level(int level);
-void show_debug_msg(const char *, int, int, char *, ...);
+int show_debug_msg(const char *, int, int, char *, ...);
 void show_info_msg(char *fmt, ...);
 
 #ifdef DEBUGGING
@@ -18,5 +18,12 @@ void show_info_msg(char *fmt, ...);
 #define DEBUG(l, s, ...)
 #endif
 
+#ifdef DEBUGGING
+#  define PHASE1_SUCCESS  (DEBUG(9, "leaving"))? 0:1
+#  define PHASE1_FAILED   (DEBUG(9, "leaving"))? 1:0
+#else
+#  define PHASE1_SUCCESS  0
+#  define PHASE1_FAILED   1
+#endif
 
 #endif /* _ERRORS_H_ */
