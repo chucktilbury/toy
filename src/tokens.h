@@ -62,7 +62,7 @@ enum
     SNUM_TOK,
     UNUM_TOK,
     FNUM_TOK,
-    EOF_TOK,
+    EOI_TOK,
     DUMMY,
 } _token_t;
 

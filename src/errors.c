@@ -9,22 +9,21 @@
 // globals that count errors.
 static int errors = 0;
 static int warnings = 0;
+static int fatal_errors = 0;
 static FILE *outs= NULL;
-static int debug_level = -1; // all debugging info shown
 
-void init_errors(FILE *stream)
-{
-    errors = 0;
-    warnings = 0;
-    if(stream == NULL)
-        outs = stderr;
-    else
-        outs = stream;
-}
+#ifdef DEBUGGING
+static int debug_level = -1; // -1 = all debugging info shown
+static char indent_level = 0;
 
 void set_debug_level(int level)
 {
     debug_level = level;
+}
+
+int get_debug_level(int level)
+{
+    return debug_level;
 }
 
 /*
@@ -36,11 +35,15 @@ void set_debug_level(int level)
  */
 int show_debug_msg(const char* func, int line, int level, char *fmt, ...)
 {
+    va_list args;
+    int i;
+
     if(level > debug_level)
     {
-        va_list args;
-
-        fprintf(outs, "DEBUG: %s: %d: ",func, line);
+        fprintf(outs, "DEBUG: ");
+        for(i = 0; i < indent_level; i++)
+            fprintf(outs, " ");
+        fprintf(outs, "%s: %d: ",func, line);
         va_start(args, fmt);
         vfprintf(outs, fmt, args);
         va_end(args);
@@ -48,6 +51,55 @@ int show_debug_msg(const char* func, int line, int level, char *fmt, ...)
     }
 
     return 0;
+}
+
+int show_enter_msg(const char* func)
+{
+    int i;
+
+    if(9 > debug_level)
+    {
+        fprintf(outs, "ENTER: ");
+        for(i = 0; i < indent_level; i++)
+            fprintf(outs, " ");
+        fprintf(outs, "%s\n",func);
+
+        indent_level++;
+    }
+    return 0;
+}
+
+int show_leave_msg(const char* func, int line, char *fmt, ...)
+{
+    va_list args;
+    int i;
+
+    if(9 > debug_level)
+    {
+        indent_level--;
+        fprintf(outs, "LEAVE: ");
+        for(i = 0; i < indent_level; i++)
+            fprintf(outs, " ");
+        fprintf(outs, "%s: %d: ",func, line);
+        va_start(args, fmt);
+        vfprintf(outs, fmt, args);
+        va_end(args);
+        fprintf(outs, "\n");
+    }
+
+    return 0;
+}
+
+#endif
+
+void init_errors(FILE *stream)
+{
+    errors = 0;
+    warnings = 0;
+    if(stream == NULL)
+        outs = stderr;
+    else
+        outs = stream;
 }
 
 void show_info_msg(char *fmt, ...)
@@ -89,6 +141,7 @@ void fatal_error(char *fmt, ...)
 {
     va_list args;
 
+    fatal_errors++;
     fprintf(outs, "Fatal error: %s: %d: ", get_file_name(), get_line_number());
     va_start(args, fmt);
     vfprintf(outs, fmt, args);
@@ -106,4 +159,9 @@ int get_num_warnings(void)
 int get_num_errors(void)
 {
     return errors;
+}
+
+void show_result(void)
+{
+    printf("errors: %d, warnings: %d\n", errors, warnings);
 }

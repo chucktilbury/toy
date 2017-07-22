@@ -6,20 +6,29 @@
 #include "parser.h"
 #include "errors.h"
 
-int main(int argc, char **argv) {
+int run_parser(char *fname)
+{
+    int retv;
+    ENTER();
+
+    open_file(fname);
+    retv = phase1_parse_all();
+
+    DEBUG(9, "total number of lines = %d", get_total_lines());
+
+
+    if(retv)
+        return PHASE1_FAILED;
+    else
+        return PHASE1_SUCCESS;
+}
+
+int main(int argc, char **argv)
+{
 
     init_errors(stdout);
-    //open_file(argv[1]);
-    open_file("../tests/test1.txt");
-    phase1_parse_all();
-    //yyparse();
-    //printf("number of lines = %d\n", get_line_number());
-    return 0;
+    atexit(show_result);
+
+    return run_parser("../tests/test1.txt");
 }
 
-/*
-void yyerror(const char* s) {
-    fprintf(stderr, "Parse error: %s\n", s);
-    exit(1);
-}
-*/

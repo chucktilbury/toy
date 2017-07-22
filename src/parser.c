@@ -11,7 +11,7 @@
 #include "errors.h"
 #include "parser.h"
 
-#include "toy.h"
+#include "toi.h"
 
 // need a concept of a symbol table context.
 // need to add the stuff to get the file index
@@ -24,33 +24,41 @@ char *token_to_str(int tok)
     return "blart";
 }
 
-int resolve_for_class_name(char *name)
+int resolve_for_class_name(const char *name)
 {
+    ENTER();
     printf("resolving class name: %s\n", name);
     return PHASE1_SUCCESS;   // class found.
 }
 
-int do_generic_import(void)
+/*
+ *  The symbol and the symbol context for parameters.
+ */
+int do_generic_import(const char *sym)
 {
-    DEBUG(9, "entering");
+    ENTER();
+    DEBUG(9, "importing file for \"%s\"", sym);
+    // open the file and begin a parse session on it from the root with the
+    // symbol_context provided.
+
     return PHASE1_SUCCESS;
 }
 
 int get_generic_parameter_list(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
     return PHASE1_SUCCESS;
 }
 
-int get_class_parameter_input_list(void)
+int get_method_parameter_input_list(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
     return PHASE1_SUCCESS;
 }
 
-int get_class_parameter_output_list(void)
+int get_method_parameter_output_list(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
     return PHASE1_SUCCESS;
 }
 
@@ -59,18 +67,18 @@ int get_class_parameter_output_list(void)
  *
  *  Enters phase1_parse_all() recursively.
  */
-int do_include(void)
+int do_import(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
 
     // next token must be either symbol_tok or complex_tok
     int token = get_token();
     switch(token)
     {
         case SYMBOL_TOK:
-        case COMPLEX_TOK: do_generic_import(/* where to save it */); break;
+        case COMPLEX_TOK: do_generic_import(get_tok_str()); break;
         default:
-            show_syntax_error("expected a simple file name or a path but fot \'%s\'", get_tok_str());
+            show_syntax_error("expected a simple file name or a path but got \'%s\'", get_tok_str());
             return PHASE1_FAILED;
         break;
     }
@@ -93,7 +101,7 @@ int do_include(void)
  */
 int get_class_parameter_list(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
 
     int token;
 
@@ -125,7 +133,7 @@ int get_class_parameter_list(void)
  */
 int get_class_body(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
 
     int token;
     int finished = 0;
@@ -162,7 +170,7 @@ int get_class_body(void)
  */
 int do_class(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
 
     // first token must be a simple name
     int token = get_token();
@@ -196,12 +204,10 @@ int do_class(void)
 //int phase1_parse_all(const char *fname)
 int phase1_parse_all(void)
 {
-    DEBUG(9, "entering");
+    ENTER();
 
     int finished = 0;
     int token;
-
-    //open_file(fname);
 
     while(!finished)
     {
@@ -209,8 +215,10 @@ int phase1_parse_all(void)
 
         switch(token)
         {
-            case IMPORT_TOK: finished = do_include(); break;
+            case IMPORT_TOK: finished = do_import(); break;
             case CLASS_TOK: finished = do_class(); break;
+            // this is the only place where EOI_TOK is not an error.
+            case EOI_TOK: finished++; break;
             default:
                 finished = 1;
                 show_syntax_error("expected include or class but got \'%s\'", token_to_str(token));

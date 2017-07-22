@@ -22,6 +22,7 @@ typedef struct _file_name_stack {
 static char buffer[1024*64];
 static int bidx = 0;
 static _file_name_stack *name_stack;
+static int total_lines = 1;
 int num_errors = 0; // global updated by parser
 
 // these funcs support the string scanner
@@ -57,7 +58,7 @@ static void append_str(char *str) {
 %%
 
     /* overhead */
-\n           {name_stack->line_no ++; yylineno++; }
+\n           {name_stack->line_no ++; yylineno++; total_lines++;}
 [ \t\r]       {}
 
     /* keywords */
@@ -151,7 +152,7 @@ static void append_str(char *str) {
 
     /* recognize and ignore a C comments */
 
-#.*\n {name_stack->line_no ++; yylineno++;}
+#.*\n {name_stack->line_no ++; yylineno++; total_lines++;}
 
     /* recognize an integer */
 [0-9]+    {
@@ -221,7 +222,7 @@ static void append_str(char *str) {
 <<EOF>> {
 
         DEBUG(0, "closing file \"%s\"", name_stack->name);
-        fprintf(stderr, "There were %d errors found.\n", num_errors);
+        //fprintf(stderr, "There were %d errors found.\n", num_errors);
         _file_name_stack *name = name_stack->next;
         free(name_stack->name);
         free(name_stack);
@@ -279,13 +280,22 @@ const char *get_tok_str(void) {
     return strbuf;
 }
 
-int get_token(void) {
+int get_total_lines(void)
+{
+    return total_lines;
+}
+
+int get_token(void)
+{
 
     strbuf[0] = 0;
     int retv = yylex();
 
     if(0 == retv)
+    {
         memset(strbuf, 0, sizeof(strbuf));
+        retv = EOI_TOK;
+    }
     //printf("%d: ", retv);
 
     return retv;
