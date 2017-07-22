@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
 
     init_errors(stdout);
     //open_file(argv[1]);
-    open_file("test1.txt");
+    open_file("../tests/test1.txt");
     phase1_parse_all();
     //yyparse();
     //printf("number of lines = %d\n", get_line_number());
