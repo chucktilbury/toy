@@ -47,6 +47,7 @@ int do_generic_import(const char *sym)
 int get_generic_parameter_list(void)
 {
     ENTER();
+
     return PHASE1_SUCCESS;
 }
 
@@ -232,5 +233,3 @@ int phase1_parse_all(void)
     else
         return PHASE1_SUCCESS;
 }
-
-

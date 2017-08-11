@@ -239,16 +239,19 @@ static void append_str(char *str) {
 
 %%
 
-void open_file(char *fname) {
+int _open_file(char *fname) {
 
     _file_name_stack *name;
 
     DEBUG(0, "opening file: \"%s\"", fname);
     if(NULL == (name = calloc(1, sizeof(_file_name_stack))))
-        fatal_error("cannot allocate memory for file stack");
+        return -1;
 
     if(NULL == (name->name = strdup(fname)))
-        fatal_error("cannot allocate memory for file stack name");
+    {
+        free(name);
+        return -2;
+    }
 
     name->next = name_stack;
     name->line_no = 1;
@@ -256,36 +259,39 @@ void open_file(char *fname) {
 
     yyin = fopen(fname, "r");
     if(NULL == yyin)
-        fatal_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
+        //fatal_error("cannot open the input file: \"%s\": %s", fname, strerror(errno));
+        return -3;
 
     yypush_buffer_state(yy_create_buffer(yyin, YY_BUF_SIZE));
+
+    return 0;
 }
 
 // Tracking and global interface
-char *get_file_name(void) {
+char *_get_file_name(void) {
     if(NULL != name_stack)
         return name_stack->name;
     else
         return "no name";
 }
 
-int get_line_number(void) {
+int _get_line_number(void) {
     if(NULL != name_stack)
         return name_stack->line_no;
     else
         return -1;
 }
 
-const char *get_tok_str(void) {
+const char *_get_tok_str(void) {
     return strbuf;
 }
 
-int get_total_lines(void)
+int _get_total_lines(void)
 {
     return total_lines;
 }
 
-int get_token(void)
+int _get_token(void)
 {
 
     strbuf[0] = 0;
@@ -294,7 +300,7 @@ int get_token(void)
     if(0 == retv)
     {
         memset(strbuf, 0, sizeof(strbuf));
-        retv = EOI_TOK;
+        //retv = EOI_TOK;
     }
     //printf("%d: ", retv);
 

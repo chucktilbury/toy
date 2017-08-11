@@ -5,8 +5,7 @@
 ################################################################################
 PLATNAME := $(shell uname)
 
-OBJS	=	scanner.o \
-		parser.o \
+OBJS	=	parser.o \
 		errors.o
 
 OBJS1	=	main.o
@@ -24,15 +23,18 @@ else ifeq ($(PLATNAME), MSYS_NT-6.1)
 endif
 
 .c.o:
-	gcc $(CARGS) $(DEBUG) -c $< -o $@
+	g++ $(CARGS) $(DEBUG) -c $< -o $@
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS1) $(OBJS) $(HEADERS)
-	gcc $(CARGS) $(DEBUG) $(OBJS1) $(OBJS) -o $(TARGET) $(LIBS)
+	g++ $(CARGS) $(DEBUG) $(OBJS1) $(OBJS) -o $(TARGET) $(LIBS)
 
 scanner.c: scanner.flex parser.h scanner.h
 	flex -o scanner.c scanner.flex
+
+scanner.o: scanner.c scanner.h
+	gcc $(CARGS) $(DEBUG) -c scanner.o scanner.c
 
 main.o: main.c $(OBJS)
 parser.o: parser.c errors.h

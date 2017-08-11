@@ -5,7 +5,9 @@
 #include "scanner.h"
 #include "parser.h"
 #include "errors.h"
+#include "logger.h"
 
+/*
 int run_parser(char *fname)
 {
     int retv;
@@ -32,3 +34,16 @@ int main(int argc, char **argv)
     return run_parser("../tests/test1.txt");
 }
 
+*/
+
+int main(void)
+{
+    //Logger logger = Logger();
+    PUSH_LOG_LEVEL(10);
+    ENTER();
+
+    Scanner scanner = Scanner();
+    scanner.open_file("../tests/test1.txt");
+
+    RETURN(0, "no error");
+}

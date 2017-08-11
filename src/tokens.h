@@ -4,7 +4,7 @@
 #ifndef _TOKENS_H_
 #define _TOKENS_H_
 
-enum
+typedef enum
 {
     NOTHING_TOK = 300,
     TRUE_TOK,
