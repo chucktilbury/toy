@@ -31,7 +31,7 @@ int main(void)
 
     try
     {
-        scanner.open_file("Text-1.txt");
+        scanner.open_file("../tests/test1.txt");
         while(scanner.get_token());
     }
     catch(ParserException& e)

@@ -6,39 +6,32 @@
 PLATNAME := $(shell uname)
 
 OBJS	=	parser.o \
-		errors.o
-
-OBJS1	=	main.o
+			filestack.o \
+			main.o \
+			symtab.o \
+			token.o \
+			scanner.o
 
 TARGET	=	toi
 
 CARGS	=	-Wall
-DEBUG	=	-g -DTRACE -DDEBUGGING
-HEADERS	=	$(OBJS:.o=.h)
+DEBUG	=	-g -DTRACE -DLOGGING
+HEADERS	=	errors.h logger.h
 
-ifeq ($(PLATNAME), Linux)
-	LIBS	=	-ll -ly
-else ifeq ($(PLATNAME), MSYS_NT-6.1)
-	LIBS	=	-L/c/MinGW/msys/1.0/lib -lfl -ly
-endif
-
-.c.o:
+.cpp.o:
 	g++ $(CARGS) $(DEBUG) -c $< -o $@
 
 all: $(TARGET)
 
-$(TARGET): $(OBJS1) $(OBJS) $(HEADERS)
-	g++ $(CARGS) $(DEBUG) $(OBJS1) $(OBJS) -o $(TARGET) $(LIBS)
+$(TARGET): $(OBJS) $(HEADERS)
+	g++ $(CARGS) $(DEBUG) $(OBJS) -o $(TARGET) $(LIBS)
 
-scanner.c: scanner.flex parser.h scanner.h
-	flex -o scanner.c scanner.flex
-
-scanner.o: scanner.c scanner.h
-	gcc $(CARGS) $(DEBUG) -c scanner.o scanner.c
-
-main.o: main.c $(OBJS)
-parser.o: parser.c errors.h
-errors.o: errors.c errors.h
+main.o: main.cpp $(HEADERS)
+parser.o: parser.cpp parser.h $(HEADERS)
+filestack.o: filestack.cpp filestack.h $(HEADERS)
+scanner.o: scanner.cpp scanner.h $(HEADERS)
+symtab.o: symtab.cpp token.h $(HEADERS)
+token.o: token.cpp token.h $(HEADERS)
 
 clean:
-	-rm -f scanner.c parse.h $(OBJS1) $(OBJS) $(TARGET)
+	-rm -f $(OBJS) $(TARGET)
