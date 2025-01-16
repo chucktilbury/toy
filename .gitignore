@@ -1,3 +1,11 @@
+toy
+parser.c
+parser.h
+parser.output
+scanner.c
+scanner.h
+*.deps
+
 # Prerequisites
 *.d
 

@@ -20,4 +20,5 @@ Missing features.
 * Data strucutres. No user defined types.
 * Multiple files. The entire program must be in one file.
 * Pointers. 
+* Bitwise operations.
 
