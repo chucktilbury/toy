@@ -13,7 +13,7 @@ OBJS	=	parser.o \
 DEBUG	=	-g
 OPT 	= 	$(DEBUG) -std=c11 -Wall -Wextra -Wpedantic -pedantic
 
-all: $(TARGET)
+all: $(TARGET) Makefile
 
 %.o: %.c
 	@echo "build $@"
