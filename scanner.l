@@ -22,6 +22,7 @@
 "filew"     { return FILEW; }
 "filerw"    { return FILERW; }
 "nothing"   { return NOTHING; }
+"noth"      { return NOTHING; }
 "if"        { return IF; }
 "else"      { return ELSE; }
 "while"     { return WHILE; }

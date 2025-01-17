@@ -8,6 +8,7 @@ OBJS	=	parser.o \
 		main.o \
 		errors.o \
 		memory.o \
+		hash.o \
 		pointer_list.o
 
 DEBUG	=	-g

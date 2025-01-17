@@ -72,6 +72,7 @@ program_item_list
 program_item
     : data_definition {}
     | func_definition {}
+    | func_body {}
     ;
 
 type_name
@@ -84,6 +85,11 @@ type_name
     | FILEW {}
     | FILERW {}
     | NOTHING {}
+    ;
+
+formatted_string
+    : STRING_LIT expression_list_param {}
+    | STRING_LIT {}
     ;
 
 data_declaration
@@ -145,10 +151,25 @@ func_body_elem
     | ifelse_statement {}
     | tryexcept_statement {}
     | raise_statement {}
-    | PRINT OPAREN expression_list CPAREN {}
-    | TRACE OPAREN expression_list CPAREN {}
-    | RETURN OPAREN expression CPAREN {}
-    | EXIT OPAREN expression CPAREN {}
+    | return_statement {}
+    | exit_statement {}
+    | print_statement {}
+    | TRACE expression_list_param {}
+    ;
+
+print_statement
+    : PRINT expression_list_param {}
+    | PRINT {}
+    ;
+
+exit_statement
+    : EXIT expression_param {}
+    | EXIT {}
+    ;
+
+return_statement
+    : RETURN expression_param {}
+    | RETURN {}
     ;
 
 tryexcept_statement
@@ -201,8 +222,7 @@ else_clause
     ;
 
 while_clause
-    : WHILE OPAREN expression CPAREN {}
-    | WHILE OPAREN CPAREN {}
+    : WHILE expression_list_param {}
     | WHILE {}
     ;
 
@@ -222,10 +242,10 @@ assignment
 literal_value
     : IDENTIFIER {}
     | INTEGER_LIT {}
-    | STRING_LIT {}
+    | FLOAT_LIT {}
+    | formatted_string {}
     | list_reference {}
     | func_reference {}
-    | FLOAT_LIT {}
     ;
 
 list_reference
@@ -251,12 +271,7 @@ list_ref_param_list
     ;
 
 func_reference
-    : IDENTIFIER func_ref_params {}
-    ;
-
-func_ref_params
-    : OPAREN CPAREN {}
-    | OPAREN expression_list CPAREN {}
+    : IDENTIFIER expression_list_param {}
     ;
 
 expression
@@ -284,6 +299,17 @@ expression_list
     : expression {}
     | expression_list COMMA expression {}
     ;
+
+expression_list_param
+    : OPAREN expression_list CPAREN {}
+    | OPAREN CPAREN {}
+    ;
+
+expression_param
+    : OPAREN expression CPAREN {}
+    | OPAREN CPAREN {}
+    ;
+
 %%
 
 void yyerror(const char* s) {
