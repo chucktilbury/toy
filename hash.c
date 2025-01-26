@@ -21,7 +21,7 @@
  * tombstones.
  *
  * Test build string:
- * clang -Wall -Wextra -DTEST_HASH -g -o t hash.c memory.c errors.c
+ * clang -Wall -Wextra -g -o t hash.c memory.c errors.c
  */
 
 #include <assert.h>
@@ -34,6 +34,7 @@
 #include "hash.h"
 #include "memory.h"
 
+// #define TEST_HASH
 
 static uint32_t hash_func(const char* key) {
 
@@ -85,8 +86,8 @@ static int find_slot(hash_table_t* tab, const char* key) {
 
 static void rehash_table(hash_table_t* tab) {
 
-    if(tab->count * 1.75 > tab->cap) {
-        int oldcap          = tab->cap;
+    if(tab->count * 1.75 >= tab->cap) {
+        int oldcap            = tab->cap;
         _hash_node_t** oldtab = tab->table;
         tab->cap <<= 1; // double the capacity
         tab->tombstones = 0;
@@ -110,7 +111,7 @@ hash_table_t* create_hashtable(void) {
     hash_table_t* tab = _ALLOC_DS(hash_table_t);
 
     tab->count = 0;
-    tab->cap   = 0x01 << 3;
+    tab->cap   = 0x01 << 2;
 
     tab->table = _ALLOC_ARRAY(_hash_node_t*, tab->cap);
 
@@ -134,42 +135,48 @@ void destroy_hashtable(hash_table_t* table) {
     }
 }
 
-void insert_hashtable(hash_table_t* table, const char* key, void* data) {
+int insert_hashtable(hash_table_t* table, const char* key, void* data) {
 
     rehash_table(table);
 
     int slot = find_slot(table, key);
-    if(slot < 0)
-        return;
+    if(slot < 0) {
+        // printf("cannot find slot for key: \"%s\"\n", key);
+        return -1;
+    }
 
     // help me, obi wan optimizer, you are my only hope
     if(table->table[slot] != NULL) {
         if(table->table[slot]->key != NULL) {
             // printf("cannot store duplicate key: \"%s\"\n", key);
-            return;
+            return 0;
         }
     }
     else {
         table->table[slot] = _ALLOC_DS(_hash_node_t);
     }
 
-    table->table[slot]->key = _COPY_STRING(key);
+    table->table[slot]->key  = _COPY_STRING(key);
     table->table[slot]->data = data;
 
-    return;
+    // printf("inserted key: %s:%p in %p\n", key, (void*)data, (void*)table);
+    return 1;
 }
 
-void* find_hashtable(hash_table_t* tab, const char* key) {
+int find_hashtable(hash_table_t* tab, const char* key, void** data) {
 
+    *data    = NULL;
     int slot = find_slot(tab, key);
 
     if(tab->table[slot] != NULL && tab->table[slot]->key != NULL) {
         if(strcmp(tab->table[slot]->key, key) == 0) {
-            return tab->table[slot]->data;
+            *data = tab->table[slot]->data;
+            // printf("key = %s\n", key);
+            return 1;
         }
     }
 
-    return NULL;
+    return 0;
 }
 
 void remove_hashtable(hash_table_t* tab, const char* key) {
@@ -179,7 +186,7 @@ void remove_hashtable(hash_table_t* tab, const char* key) {
     if((tab->table[slot] != NULL) && (tab->table[slot]->key != NULL)) {
         if(strcmp(tab->table[slot]->key, key) == 0) {
             _FREE(tab->table[slot]->key);
-            tab->table[slot]->key  = NULL;
+            tab->table[slot]->key = NULL;
             tab->count--;
             tab->tombstones++;
         }
@@ -207,11 +214,19 @@ void dump_hashtable(hash_table_t* tab) {
  */
 #ifdef TEST_HASH
 
-const char* slist[] = {
-    "asdf", "1234", "weiuyer", "asdasd", "oiuoiu",
-    "098098", "(*&(*&", "}{P}{P}{", "KSDKJH", "OIUO***&*",
-    NULL
-};
+const char* get_file_name(void) {
+    return "nofile";
+}
+int get_line_no(void) {
+    return -1;
+}
+int get_col_no(void) {
+    return -1;
+}
+
+
+const char* slist[] = { "asdf",   "1234",     "weiuyer", "asdasd",    "oiuoiu", "098098",
+                        "(*&(*&", "}{P}{P}{", "KSDKJH",  "OIUO***&*", NULL };
 
 int main(void) {
 
@@ -220,9 +235,30 @@ int main(void) {
     for(int i = 0; slist[i] != NULL; i++)
         insert_hashtable(tab, slist[i], (void*)slist[i]);
 
-    printf("find: slist[1] = %s = %s\n", slist[1], (const char*)find_hashtable(tab, slist[1]));
-    printf("find: slist[0] = %s = %s\n", slist[0], (const char*)find_hashtable(tab, slist[0]));
-    printf("find: slist[7] = %s = %s\n", slist[7], (const char*)find_hashtable(tab, slist[7]));
+    void* str;
+    int num = 0;
+
+    for(num = 0; slist[num] != NULL; num++) {
+        if(find_hashtable(tab, slist[num], &str)) {
+            printf("find: slist[%d] = %s = %s\n", num, slist[num], (const char*)str);
+        }
+    }
+
+    insert_hashtable(tab, "pookey", NULL);
+    if(find_hashtable(tab, "pookey", &str)) {
+        printf("find: slist[\"pookey\"] = %s\n", (const char*)str ? "data" : "NULL");
+    }
+    else {
+        printf("pookey not found\n");
+    }
+
+    if(find_hashtable(tab, "snark", &str)) {
+        printf("find: slist[\"snark\"] = %s\n", (const char*)str ? "data" : "NULL");
+    }
+    else {
+        printf("snark not found\n");
+    }
+
 
     dump_hashtable(tab);
     destroy_hashtable(tab);

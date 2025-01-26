@@ -1,0 +1,8 @@
+; this tests expressions a little bit
+
+int somefunc(int a, int b, int c) {
+
+    int d = (1+2)/3
+
+    return(d)
+}

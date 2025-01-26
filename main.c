@@ -5,11 +5,13 @@
 #include <stdbool.h>
 #include <string.h>
 #include <errno.h>
+#include "errors.h"
+#include "fileio.h"
 
 // #include "errors.h"
 // #include "pointer_list.h"
+#include "ast.h"
 #include "parser.h"
-#include "scanner.h"
 
 int main(int argc, char** argv) {
 
@@ -18,15 +20,12 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    FILE* fp = fopen(argv[1], "r");
-    if(fp == NULL) {
-        fprintf(stderr, "error: %s cannot open input file: %s: %s", argv[0], argv[1], strerror(errno));
-        return 1;
-    }
+    open_file(argv[1]);
 
-    yyset_in(fp);
     yyparse();
 
+    if(!get_errors())
+        traverse_ast(NULL, NULL);
 
     return 0;
 }

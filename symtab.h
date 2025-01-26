@@ -1,6 +1,8 @@
 #ifndef _SYMTAB_H_
 #define _SYMTAB_H_
 
+#include <stdint.h>
+
 #include "hash.h"
 
 typedef enum {

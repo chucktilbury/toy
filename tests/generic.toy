@@ -1,15 +1,35 @@
 
 
 # comments are good
+; this file is just generic syntax tests to check the raw parser.
+
 list ploot
+string foobart = "something.toy"
 
-int doodah() {
+import "something.toy"
+; import "something.toy"()
+; import "something.toy"(123, 123, 123)
 
-int plart = sdf[1]
+nothing doodah(int plart, float zoop) {
+int plart = sdf[asd[1]]
     int plart = qwer[1][finky(asd[asdf])]
 }
 
+; this is equvent to the a "main" function
 {
 
-    int plart = asdf(qwer, oier)
+    int plart = asdf(qwer, oier(1, 2, 3))
+    IF(not 1 == 2) {
+        printf("foo bar"(1, 2, 3))
+    }
+    else (123) { printf() }
+    else {
+        print("bar foo"(3, 4, 5), 123) ; this is a comment
+    }
+
+    asd[1] = 123 + 234
+
+    if(plart) {
+        printf("spoof")
+    }
 }

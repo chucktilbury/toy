@@ -9,6 +9,8 @@ OBJS	=	parser.o \
 		errors.o \
 		memory.o \
 		hash.o \
+		symtab.o \
+		ast.o \
 		pointer_list.o
 
 DEBUG	=	-g
@@ -30,7 +32,7 @@ $(TARGET): $(OBJS) $(DEPS)
 
 scanner.h scanner.c: scanner.l
 	@echo "build scanner.l"
-	$(HIDE)flex scanner.l
+	$(HIDE)flex -i scanner.l
 
 parser.h parser.c: parser.y
 	@echo "build parser.y"
