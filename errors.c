@@ -11,12 +11,12 @@ static int errors = 0;
 #define FIND_ATTRIB(node, name, ptr) find_hashtable(node->table, #name, &ptr)
 
 #define GET_ATTRIB(node, name, ptr)                                  \
-do {                                                             \
-    if(!FIND_ATTRIB(node, name, ptr))                            \
-        FATAL("improper node format: \"%s\" not found", #name);  \
+    do {                                                             \
+        if(!FIND_ATTRIB(node, name, ptr))                            \
+            FATAL("improper node format: \"%s\" not found", #name);  \
         else if(ptr == NULL)                                         \
             FATAL("improper node format: \"%s\" is invalid", #name); \
-} while(0)
+    } while(0)
 
 void fatal_error(const char* fmt, ...) {
 

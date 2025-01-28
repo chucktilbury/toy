@@ -65,7 +65,7 @@ ast_node_t* root_node = NULL;
         }                                                           \
     } while(0)
 
-//#define TRACE_AST_STATE
+// #define TRACE_AST_STATE
 
 #ifdef TRACE_AST_STATE
 static int depth      = 0;
@@ -146,9 +146,9 @@ static int num_states = 0;
 #define TRACE_STRING(name)
 #define TRACE_FLAG(name)
 #define TRACE_INT(name)
-#define ENTER(name)      \
-    do {           \
-        PRE_STATE; \
+#define ENTER(name) \
+    do {            \
+        PRE_STATE;  \
     } while(0)
 
 #define RETURN      \

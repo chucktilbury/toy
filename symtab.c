@@ -304,7 +304,7 @@ void create_symtab(void) {
 symbol_t* find_symbol(const char* name) {
 
     void* ptr;
-    symbol_t* sym = NULL;
+    symbol_t* sym       = NULL;
     sym_context_t* tctx = context;
 
     while(true) {

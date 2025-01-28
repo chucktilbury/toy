@@ -10,6 +10,7 @@ OBJS	=	parser.o \
 		memory.o \
 		hash.o \
 		symtab.o \
+		sym_reference.o \
 		ast.o \
 		pointer_list.o
 
@@ -27,6 +28,8 @@ FORMAT	=	main.c \
 		symtab.h \
 		ast.c \
 		ast.h \
+		sym_reference.c \
+		sym_reference.h \
 		pointer_list.c \
 		pointer_list.h
 

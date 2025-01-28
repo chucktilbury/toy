@@ -1,10 +1,10 @@
 
 #include <stdio.h>
-//#include <stdlib.h>
+// #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-//#include <string.h>
-//#include <errno.h>
+// #include <string.h>
+// #include <errno.h>
 #include "errors.h"
 #include "fileio.h"
 
@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
 
     if(!get_errors()) {
         create_symtab();
-        //traverse_ast(NULL, NULL);
+        // traverse_ast(NULL, NULL);
     }
 
     return 0;
