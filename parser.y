@@ -1122,7 +1122,7 @@ expression_param
 
 void yyerror(const char* s) {
 
-    syntax_error("%s", s);
+    parser_syntax_error("%s", s);
 }
 
 const char* tokenToStr(int tok) {

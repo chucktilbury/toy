@@ -6,13 +6,16 @@
 list ploot
 string foobart = "something.toy"
 
-import "something.toy"
+import "tests/something.toy"
+; Making this a formatted string will be implemented after the symbol table
+; is working.
 ; import "something.toy"()
 ; import "something.toy"(123, 123, 123)
 
 nothing doodah(int plart, float zoop) {
-int plart = sdf[asd[1]]
-    int plart = qwer[1][finky(asd[asdf])]
+
+    int plart = sdf[asd[1]]
+    int flarp = qwer[1][finky(asd[asdf])]
 }
 
 ; this is equvent to the a "main" function
@@ -27,7 +30,7 @@ int plart = sdf[asd[1]]
         print("bar foo"(3, 4, 5), 123) ; this is a comment
     }
 
-    asd[1] = 123 + 234
+    asd[1] = 123 + 234;
 
     if(plart) {
         printf("spoof")

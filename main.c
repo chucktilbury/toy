@@ -1,10 +1,10 @@
 
 #include <stdio.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include <string.h>
-#include <errno.h>
+//#include <string.h>
+//#include <errno.h>
 #include "errors.h"
 #include "fileio.h"
 
@@ -12,6 +12,7 @@
 // #include "pointer_list.h"
 #include "ast.h"
 #include "parser.h"
+#include "symtab.h"
 
 int main(int argc, char** argv) {
 
@@ -24,8 +25,10 @@ int main(int argc, char** argv) {
 
     yyparse();
 
-    if(!get_errors())
-        traverse_ast(NULL, NULL);
+    if(!get_errors()) {
+        create_symtab();
+        //traverse_ast(NULL, NULL);
+    }
 
     return 0;
 }

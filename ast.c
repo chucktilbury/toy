@@ -65,7 +65,7 @@ ast_node_t* root_node = NULL;
         }                                                           \
     } while(0)
 
-#define TRACE_AST_STATE
+//#define TRACE_AST_STATE
 
 #ifdef TRACE_AST_STATE
 static int depth      = 0;
@@ -110,7 +110,9 @@ static int num_states = 0;
     do {                                                                                       \
         ASSERT(node != NULL, "");                                                              \
         ASSERT(node->type == name, "node type = %s (%d)", node_type_to_str(node), node->type); \
-        fprintf(stdout, "%*sENTER: %s\n", depth, "", __func__);                                \
+        void* ptr;                                                                             \
+        GET_ATTRIB(line_no, ptr);                                                              \
+        fprintf(stdout, "%*sENTER: %s (%d)\n", depth, "", __func__, *(int*)ptr);               \
         depth += DINC;                                                                         \
         num_states++;                                                                          \
         PRE_STATE;                                                                             \
@@ -144,7 +146,7 @@ static int num_states = 0;
 #define TRACE_STRING(name)
 #define TRACE_FLAG(name)
 #define TRACE_INT(name)
-#define ENTER      \
+#define ENTER(name)      \
     do {           \
         PRE_STATE; \
     } while(0)
@@ -157,7 +159,7 @@ static int num_states = 0;
 
 #define START
 
-#define FINISH RETURN
+#define FINISH return
 
 #endif
 

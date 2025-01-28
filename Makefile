@@ -16,6 +16,20 @@ OBJS	=	parser.o \
 DEBUG	=	-g
 OPT 	= 	$(DEBUG) -std=c11 -Wall -Wextra -Wpedantic -pedantic
 
+FORMAT	=	main.c \
+		errors.c \
+		errors.h \
+		memory.c \
+		memory.h \
+		hash.c \
+		hash.h \
+		symtab.c \
+		symtab.h \
+		ast.c \
+		ast.h \
+		pointer_list.c \
+		pointer_list.h
+
 all: $(TARGET) Makefile
 
 %.o: %.c
@@ -49,3 +63,6 @@ clean:
 	@echo "clean"
 	@rm -f scanner.c scanner.h parser.c parser.h parser.output \
 		$(TARGET) $(OBJS) $(DEPS)
+
+format:
+	clang-format --verbose -i $(FORMAT)
