@@ -3,7 +3,7 @@
 # comments are good
 ; this file is just generic syntax tests to check the raw parser.
 
-list ploot
+int ploot
 string foobart = "something.toy"
 
 import "tests/something.toy"
@@ -16,6 +16,7 @@ nothing doodah(int plart, float zoop) {
 
     int plart = sdf[asd[1]]
     int flarp = qwer[1][finky(asd[asdf])]
+    int fart
 }
 
 ; this is equvent to the a "main" function
@@ -30,9 +31,11 @@ nothing doodah(int plart, float zoop) {
         print("bar foo"(3, 4, 5), 123) ; this is a comment
     }
 
+    { as = ewr }
     asd[1] = 123 + 234;
 
     if(plart) {
         printf("spoof")
+        while {        yield(1)}
     }
 }

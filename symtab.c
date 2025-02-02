@@ -13,7 +13,7 @@
 #include "ast.h"
 #include "errors.h"
 #include "pointer_list.h"
-// #include "parser.h"
+#include "parser.h"
 
 const char* tokenToStr(int);
 
@@ -48,17 +48,21 @@ static const int depth_inc = 4;
         depth += depth_inc;              \
     } while(0)
 
-#define RETURN                            \
+#define RETURN(...)                       \
     do {                                  \
         depth -= depth_inc;               \
         printf("%*sRETURN: ", depth, ""); \
         printf("%s\n", __func__);         \
+        return __VA_ARGS__;               \
     } while(0)
 
 #else
 #define TRACE(...)
 #define ENTER
-#define RETURN return
+#define RETURN(...)         \
+    do {                    \
+        return __VA_ARGS__; \
+    } while(0)
 #endif
 
 static inline symbol_t* create_symbol(void) {
@@ -70,10 +74,51 @@ static inline symbol_t* create_symbol(void) {
 static inline void add_symbol(symbol_t* sym) {
 
     if(!insert_hashtable(context->table, sym->name, sym))
-        node_syntax_error(sym->node, "attempt to define duplicate name in context: %s", sym->name);
+        node_syntax_error(sym->val.node, "attempt to define duplicate name in context: %s", sym->name);
 }
 
-static void create_func_symbol(ast_node_t* node) {
+static inline void push_sym_context(void) {
+
+    TRACE("PUSH SYMBOLIC CONTEXT");
+#ifdef TRACE_SYMTAB
+    depth += depth_inc;
+#endif
+
+    sym_context_t* ptr;
+
+    ptr        = _ALLOC_DS(sym_context_t);
+    ptr->table = create_hashtable();
+
+    if(context != NULL)
+        context->child = ptr;
+    ptr->parent = context;
+    context     = ptr;
+}
+
+static inline sym_context_t* pop_sym_context(void) {
+
+#ifdef TRACE_SYMTAB
+    depth -= depth_inc;
+#endif
+    TRACE("POP SYMBOLIC CONTEXT");
+
+    ASSERT(context != NULL, "symbolic context stack underrun");
+    context = context->parent;
+
+    return context;
+}
+
+static inline sym_context_t* peek_sym_context(void) {
+
+    ENTER;
+
+    if(context == NULL)
+        context = symtab;
+
+    RETURN(context);
+}
+
+static inline void create_func_symbol(ast_node_t* node) {
 
     ENTER;
 
@@ -94,14 +139,14 @@ static void create_func_symbol(ast_node_t* node) {
     TRACE("type = %s", tokenToStr(*(int*)ptr));
 
     symbol_t* sym    = create_symbol();
-    sym->node        = node;
+    sym->val.node    = node;
     sym->symbol_type = SYM_FUNC;
     sym->data_type   = *(int*)ptr;
     sym->is_const    = true;
     sym->is_init     = true;
     // save the original name. the decorated name is in sym->name below
-    sym->val.text = func_name;
-    add_symbol(sym);
+    sym->val.text              = func_name;
+    sym_context_t* old_context = context;
 
     GET_ATTRIB(node, func_params, ptr);
     ast_node_t* func_params = (ast_node_t*)ptr;
@@ -120,7 +165,7 @@ static void create_func_symbol(ast_node_t* node) {
     // Add the function name to the context and create a new one
     // for the parameters.
     TRACE("symbolic context for the function parameters");
-    push_sym_context(NULL);
+    push_sym_context();
 
     int mark = 0;
     ast_node_t* data_declaration;
@@ -159,11 +204,14 @@ static void create_func_symbol(ast_node_t* node) {
     strncat(dec_buf, "_FUNC", sizeof(dec_buf) - strlen(dec_buf) - 7);
     sym->name = _COPY_STRING(dec_buf);
     TRACE("decorated function name: %s", dec_buf);
+    // now that we know the name ...
+    if(!insert_hashtable(old_context->table, sym->name, sym))
+        node_syntax_error(sym->node, "attempt to define duplicate name in context: %s", sym->name);
 
-    RETURN;
+    RETURN();
 }
 
-static void create_data_symbol(ast_node_t* node) {
+static inline void create_data_symbol(ast_node_t* node) {
 
     ENTER;
 
@@ -201,7 +249,52 @@ static void create_data_symbol(ast_node_t* node) {
 
     add_symbol(sym);
 
-    RETURN;
+    RETURN();
+}
+
+static inline void create_exception_symbol(ast_node_t* node) {
+
+    ENTER;
+
+    void* ptr;
+    GET_ATTRIB(node, mname, ptr);
+    const char* name = (const char*)ptr;
+
+    push_sym_context();
+    symbol_t* sym    = create_symbol();
+    sym->node        = node;
+    sym->symbol_type = SYM_DATA;
+    sym->data_type   = STRING_LIT;
+    sym->is_const    = true;
+    sym->is_init     = true;
+    sym->name        = _COPY_STRING(name);
+
+    add_symbol(sym);
+
+    RETURN();
+}
+
+static inline void create_except_id(ast_node_t* node) {
+
+    ENTER;
+
+    void* ptr;
+    GET_ATTRIB(node, IDENTIFIER, ptr);
+    const char* name = (const char*)ptr;
+
+    symbol_t* sym    = create_symbol();
+    sym->node        = node;
+    sym->symbol_type = SYM_EXCEPT;
+    sym->data_type   = INTEGER;
+    sym->is_const    = true;
+    sym->is_init     = true;
+    sym->name        = _COPY_STRING(name);
+
+    // add it to the root context
+    if(!insert_hashtable(symtab->table, sym->name, sym))
+        node_syntax_error(sym->node, "attempt to define duplicate exception name: %s", sym->name);
+
+    RETURN();
 }
 
 static void pre(ast_node_t* node) {
@@ -212,7 +305,7 @@ static void pre(ast_node_t* node) {
         case AST_FUNC_BODY:
         case AST_LOOP_BODY:
             TRACE("symbolic context for function or loop body");
-            push_sym_context(NULL);
+            push_sym_context();
             break;
 
         case AST_DATA_DEFINITION:
@@ -223,6 +316,17 @@ static void pre(ast_node_t* node) {
         case AST_FUNC_DEFINITION:
             TRACE("function definition");
             create_func_symbol(node);
+            break;
+
+        case AST_FINAL_EXCEPT_CLAUSE:
+        case AST_EXCEPT_SEGMENT:
+            TRACE("except segment");
+            create_exception_symbol(node);
+            break;
+
+        case AST_EXCEPT_ID:
+            TRACE("create exception ID");
+            create_except_id(node);
             break;
 
         default:
@@ -246,79 +350,35 @@ static void post(ast_node_t* node) {
             pop_sym_context();
             break;
 
+        case AST_FINAL_EXCEPT_CLAUSE:
+        case AST_EXCEPT_SEGMENT:
+            TRACE("end of exception segment");
+            pop_sym_context();
+            break;
+
         default:
             break;
     }
 }
 
-void push_sym_context(sym_context_t* ctx) {
-
-    TRACE("PUSH SYMBOLIC CONTEXT");
-    depth += depth_inc;
-
-    sym_context_t* ptr;
-
-    if(ctx == NULL) {
-        ptr        = _ALLOC_DS(sym_context_t);
-        ptr->table = create_hashtable();
-    }
-    else
-        ptr = ctx;
-
-    if(context != NULL)
-        context->child = ptr;
-    ptr->parent = context;
-    context     = ptr;
-}
-
-sym_context_t* pop_sym_context(void) {
-
-    depth -= depth_inc;
-    TRACE("POP SYMBOLIC CONTEXT");
-
-    ASSERT(context != NULL, "symbolic context stack underrun");
-    context = context->parent;
-
-    return context;
-}
-
-sym_context_t* peek_sym_context(void) {
+sym_context_t* create_symtab(void) {
 
     ENTER;
-    RETURN;
-    return context;
-}
 
-void create_symtab(void) {
+    if(!get_errors()) {
+        push_sym_context();          // create the root context
+        symtab = peek_sym_context(); // init the global pointer to it
 
-    ENTER;
-    push_sym_context(NULL);
-    symtab = peek_sym_context();
+        //traverse_ast(pre, post);
+        traverse_ast(NULL, NULL);
 
-    traverse_ast(pre, post);
-
-    pop_sym_context();
-    RETURN;
-}
-
-symbol_t* find_symbol(const char* name) {
-
-    void* ptr;
-    symbol_t* sym       = NULL;
-    sym_context_t* tctx = context;
-
-    while(true) {
-        if(find_hashtable(tctx->table, name, &ptr)) {
-            sym = (symbol_t*)ptr;
-            break;
-        }
-        else {
-            tctx = tctx->parent;
-            if(tctx == NULL)
-                break;
-        }
+        pop_sym_context();
     }
 
-    // return NULL if the symbol was not found
-    return sym;
+    RETURN(symtab);
+}
+
+sym_context_t* get_symtab(void) {
+
+    return symtab;
 }

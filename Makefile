@@ -3,35 +3,29 @@ HIDE	=	@
 TARGET	=	toy
 DEPS	=	$(TARGET).deps
 CC 	= 	clang
-OBJS	=	parser.o \
-		scanner.o \
-		main.o \
+OBJS	=	tokens.o \
+		fileio.o \
 		errors.o \
 		memory.o \
 		hash.o \
-		symtab.o \
-		sym_reference.o \
 		ast.o \
 		pointer_list.o
+
+# 		symtab.o
+#		sym_reference.o
+
+
+GEN	=	parser.o \
+		scanner.o
+
+SPEC	=	main.o
+
+ALL_OBJ	=	$(OBJS) $(GEN) $(SPEC)
 
 DEBUG	=	-g
 OPT 	= 	$(DEBUG) -std=c11 -Wall -Wextra -Wpedantic -pedantic
 
-FORMAT	=	main.c \
-		errors.c \
-		errors.h \
-		memory.c \
-		memory.h \
-		hash.c \
-		hash.h \
-		symtab.c \
-		symtab.h \
-		ast.c \
-		ast.h \
-		sym_reference.c \
-		sym_reference.h \
-		pointer_list.c \
-		pointer_list.h
+FORMAT	=	$(OBJS:%.o=%.c) $(OBJS:%.o=%.h)
 
 all: $(TARGET) Makefile
 
@@ -39,13 +33,13 @@ all: $(TARGET) Makefile
 	@echo "build $@"
 	$(HIDE)$(CC) -c $(OPT) $< -o $@
 
-$(DEPS): $(OBJS:%.o=%.c)
+$(DEPS): $(ALL_OBJ:%.o=%.c)
 	@echo "make depends"
 	$(HIDE)$(CC) -MM $^ > $(DEPS)
 
-$(TARGET): $(OBJS) $(DEPS)
+$(TARGET): $(ALL_OBJ) $(DEPS)
 	@echo "make $(TARGET)"
-	$(HIDE)$(CC) $(OPT) -o $@ $(OBJS)
+	$(HIDE)$(CC) $(OPT) -o $@ $(ALL_OBJ)
 
 scanner.h scanner.c: scanner.l
 	@echo "build scanner.l"
@@ -68,4 +62,5 @@ clean:
 		$(TARGET) $(OBJS) $(DEPS)
 
 format:
-	clang-format --verbose -i $(FORMAT)
+	@echo "format code"
+	@clang-format -i $(FORMAT)

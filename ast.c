@@ -65,7 +65,7 @@ ast_node_t* root_node = NULL;
         }                                                           \
     } while(0)
 
-// #define TRACE_AST_STATE
+#define TRACE_AST_STATE
 
 #ifdef TRACE_AST_STATE
 static int depth      = 0;
@@ -78,32 +78,68 @@ static int num_states = 0;
         fprintf(stdout, "\n");                    \
     } while(0)
 
-#define TRACE_TOKEN(name)                                \
-    do {                                                 \
-        void* data;                                      \
-        GET_ATTRIB(name, data);                          \
-        TRACE("%s: %s", #name, tokenToStr(*(int*)data)); \
+#define TRACE_TOKEN(name)                                                                                      \
+    do {                                                                                                       \
+        void* data;                                                                                            \
+        GET_ATTRIB(name, data);                                                                                \
+        token_t* tok = (token_t*)data;                                                                         \
+        switch(tok->type) {                                                                                    \
+            case STRING_LIT:                                                                                   \
+            case IDENTIFIER:                                                                                   \
+                TRACE("token: %s: %s: %s: %s", #name, tokenToStr(tok->type), tok->raw, tok->val.text);         \
+                break;                                                                                         \
+            case FLOAT_LIT:                                                                                    \
+                TRACE("token: %s: %s: %s: %lf", #name, tokenToStr(tok->type), tok->raw, tok->val.float_lit);   \
+                break;                                                                                         \
+            case INTEGER_LIT:                                                                                  \
+                TRACE("token: %s: %s: %s: %ld", #name, tokenToStr(tok->type), tok->raw, tok->val.integer_lit); \
+                break;                                                                                         \
+        }                                                                                                      \
     } while(0)
 
-#define TRACE_STRING(name)                         \
-    do {                                           \
-        void* data;                                \
-        GET_ATTRIB(name, data);                    \
-        TRACE("%s: %s", #name, (const char*)data); \
+#define TRACE_TERMINAL(name)                                     \
+    do {                                                         \
+        void* data;                                              \
+        GET_ATTRIB(name, data);                                  \
+        TRACE("terminal: %s: %s", #name, tokenToStr(*(int*)data)); \
     } while(0)
 
-#define TRACE_FLAG(name)                                          \
-    do {                                                          \
-        void* data;                                               \
-        GET_ATTRIB(name, data);                                   \
-        TRACE("%s: %s", #name, *((int*)data) ? "TRUE" : "FALSE"); \
+#define TRACE_STRING(name)                        \
+    do {                                          \
+        void* data;                               \
+        GET_ATTRIB(name, data);                   \
+        token_t* tok = (token_t*)data;            \
+        TRACE("string: %s: %s", #name, tok->raw); \
     } while(0)
 
-#define TRACE_INT(name)                      \
-    do {                                     \
-        void* data;                          \
-        GET_ATTRIB(name, data);              \
-        TRACE("%s: %d", #name, *(int*)data); \
+#define TRACE_BOOL(name)                                                \
+    do {                                                                \
+        void* data;                                                     \
+        GET_ATTRIB(name, data);                                         \
+        TRACE("bool: %s: %s", #name, *((int*)data) ? "TRUE" : "FALSE"); \
+    } while(0)
+
+#define TRACE_NUM(name)                              \
+    do {                                             \
+        void* data;                                  \
+        GET_ATTRIB(name, data);                      \
+        TRACE("number: %s: %d", #name, *(int*)data); \
+    } while(0)
+
+#define TRACE_INT(name)                                                           \
+    do {                                                                          \
+        void* data;                                                               \
+        GET_ATTRIB(name, data);                                                   \
+        token_t* tok = (token_t*)data;                                            \
+        TRACE("integer_lit: %s: %s: %ld", #name, tok->raw, tok->val.integer_lit); \
+    } while(0)
+
+#define TRACE_FLOAT(name)                                                    \
+    do {                                                                     \
+        void* data;                                                          \
+        GET_ATTRIB(name, data);                                              \
+        token_t* tok = (token_t*)data;                                       \
+        TRACE("float_lit: %s: %s: %f", #name, tok->raw, tok->val.float_lit); \
     } while(0)
 
 #define ENTER(name)                                                                            \
@@ -143,8 +179,11 @@ static int num_states = 0;
 #else
 #define TRACE(...)
 #define TRACE_TOKEN(name)
+#define TRACE_TERMINAL(name)
 #define TRACE_STRING(name)
-#define TRACE_FLAG(name)
+#define TRACE_BOOL(name)
+#define TRACE_NUM(name)
+#define TRACE_FLOAT(name)
 #define TRACE_INT(name)
 #define ENTER(name) \
     do {            \
@@ -183,6 +222,7 @@ static void loop_body_elem(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
 static void func_body_elem(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void trace_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void print_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
+static void for_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void exit_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void return_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void tryexcept_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -219,6 +259,7 @@ static void dict_init(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(a
 static void list_init(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void dict_init_item(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static void dict_init_item_list(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
+static void exception_identifier(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 
 
 static void program(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
@@ -262,6 +303,9 @@ static void program_item(ast_node_t* node, void (*pre)(ast_node_t*), void (*post
         case AST_IMPORT_STATEMENT:
             // do nothing
             break;
+        case AST_EXCEPT_ID:
+            exception_identifier(ptr, pre, post);
+            break;
         default:
             FATAL("unknown node type %d", type);
     }
@@ -272,7 +316,7 @@ static void type_name(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(a
 
     ENTER(AST_TYPE_NAME);
 
-    TRACE_TOKEN(type);
+    TRACE_TOKEN(token);
 
     RETURN;
 }
@@ -283,7 +327,7 @@ static void formatted_string(ast_node_t* node, void (*pre)(ast_node_t*), void (*
 
     TRAVERSE_OPTION_OBJ(expression_list_param);
 
-    TRACE_STRING(STRING_LIT);
+    TRACE_STRING(token);
 
     RETURN;
 }
@@ -294,8 +338,8 @@ static void data_declaration(ast_node_t* node, void (*pre)(ast_node_t*), void (*
     ENTER(AST_DATA_DECLARATION);
 
     TRAVERSE_OBJ(type_name);
-    TRACE_STRING(IDENTIFIER);
-    TRACE_FLAG(is_const);
+    TRACE_STRING(token);
+    TRACE_BOOL(is_const);
 
     RETURN;
 }
@@ -316,7 +360,7 @@ static void data_definition(ast_node_t* node, void (*pre)(ast_node_t*), void (*p
     void* type;
     GET_ATTRIB(type, type);
     TRACE("type = %d", *(int*)type);
-    TRACE_FLAG(is_init);
+    TRACE_BOOL(is_init);
 
     switch(*(int*)type) {
         case 0:
@@ -356,7 +400,7 @@ static void func_params(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)
 
     ENTER(AST_FUNC_PARAMS);
 
-    TRAVERSE_OBJ(data_declaration_list);
+    TRAVERSE_OPTION_OBJ(data_declaration_list);
 
     RETURN;
 }
@@ -375,7 +419,8 @@ static void func_name(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(a
     ENTER(AST_FUNC_NAME);
 
     TRAVERSE_OBJ(type_name);
-    TRACE_STRING(IDENTIFIER);
+    TRACE_STRING(token);
+    TRACE_BOOL(is_iter);
 
     RETURN;
 }
@@ -411,7 +456,8 @@ static void loop_body_diffs(ast_node_t* node, void (*pre)(ast_node_t*), void (*p
 
     ENTER(AST_LOOP_BODY_DIFFS);
 
-    TRACE_TOKEN(type);
+    TRACE_TERMINAL(type);
+    TRAVERSE_OPTION_OBJ(expression);
 
     RETURN;
 }
@@ -476,6 +522,9 @@ static void func_body_elem(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
         case AST_RETURN_STATEMENT:
             return_statement(ptr, pre, post);
             break;
+        case AST_FOR_STATEMENT:
+            for_statement(ptr, pre, post);
+            break;
         case AST_EXIT_STATEMENT:
             exit_statement(ptr, pre, post);
             break;
@@ -484,6 +533,9 @@ static void func_body_elem(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
             break;
         case AST_TRACE_STATEMENT:
             trace_statement(ptr, pre, post);
+            break;
+        case AST_FUNC_BODY:
+            func_body(ptr, pre, post);
             break;
         default:
             FATAL("unknown node type %d", type);
@@ -510,11 +562,23 @@ static void print_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*p
     RETURN;
 }
 
+static void for_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
+
+    ENTER(AST_FOR_STATEMENT);
+
+    TRAVERSE_OPTION_OBJ(type_name);
+    TRACE_TOKEN(token);
+    TRAVERSE_OBJ(expression);
+    TRAVERSE_OBJ(func_body);
+
+    RETURN;
+}
+
 static void exit_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
 
     ENTER(AST_EXIT_STATEMENT);
 
-    TRAVERSE_OPTION_OBJ(expression_param);
+    TRAVERSE_OBJ(expression_param);
 
     RETURN;
 }
@@ -551,8 +615,8 @@ static void except_segment(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
 
     ENTER(AST_EXCEPT_SEGMENT);
 
-    TRACE_STRING("ename");
-    TRACE_STRING("mname");
+    TRACE_TOKEN("ename");
+    TRACE_TOKEN("mname");
     TRAVERSE_OBJ(func_body);
 
     RETURN;
@@ -571,7 +635,7 @@ static void final_except_clause(ast_node_t* node, void (*pre)(ast_node_t*), void
 
     ENTER(AST_FINAL_EXCEPT_CLAUSE);
 
-    TRACE_STRING("mname");
+    TRACE_TOKEN("mname");
     TRAVERSE_OBJ(func_body);
 
     RETURN;
@@ -592,7 +656,7 @@ static void raise_statement(ast_node_t* node, void (*pre)(ast_node_t*), void (*p
     ENTER(AST_RAISE_STATEMENT);
 
     TRAVERSE_OBJ(formatted_string);
-    TRACE_STRING("ename");
+    TRACE_TOKEN("ename");
 
     RETURN;
 }
@@ -727,7 +791,7 @@ static void assignment_left(ast_node_t* node, void (*pre)(ast_node_t*), void (*p
     }
 #ifdef TRACE_AST_STATE
     else {
-        TRACE_STRING(IDENTIFIER);
+        TRACE_STRING(token);
     }
 #endif
 
@@ -748,27 +812,7 @@ static void raw_value(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(a
 
     ENTER(AST_RAW_VALUE);
 
-#ifdef TRACE_AST_STATE
-    void* ptr = NULL;
-    GET_ATTRIB(type, ptr);
-    int type = *(int*)ptr;
-    GET_ATTRIB(value, ptr);
-
-
-    switch(type) {
-        case IDENTIFIER:
-            TRACE("identifier: %s", (const char*)ptr);
-            break;
-        case INTEGER_LIT:
-            TRACE("integer literal: %ld", *(int64_t*)ptr);
-            break;
-        case FLOAT_LIT:
-            TRACE("float literal: %lf", *(double*)ptr);
-            break;
-        default:
-            FATAL("unknown node type in %d", type);
-    }
-#endif
+    TRACE_TOKEN(token);
 
     RETURN;
 }
@@ -809,7 +853,7 @@ static void list_reference(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
 
     ENTER(AST_LIST_REFERENCE);
 
-    TRACE_STRING(IDENTIFIER);
+    TRACE_STRING(token);
     TRAVERSE_OBJ(list_ref_param_list);
 
     RETURN;
@@ -823,28 +867,28 @@ static void list_ref_value(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
     GET_ATTRIB(type, ptr);
     int type = *(int*)ptr;
 
-    switch(type) {
-        case 0:
-            TRACE_STRING(IDENTIFIER);
-            break;
-        case 1:
-            TRACE_INT(INTEGER_LIT);
-            break;
-        case 2:
-            TRACE_STRING(STRING_LIT);
-            break;
-        case 3:
-            TRAVERSE_OBJ(list_reference);
-            break;
-        case 4:
-            TRAVERSE_OBJ(func_reference);
-            break;
-        case 5:
-            TRAVERSE_OBJ(list_ref_param);
-            break;
-        default:
-            FATAL("unknown node type in %d", type);
+    if(type) {
+        switch(type) {
+            case 1:
+                GET_ATTRIB(node, ptr);
+                list_reference(ptr, pre, post);
+                break;
+            case 2:
+                GET_ATTRIB(node, ptr);
+                func_reference(ptr, pre, post);
+                break;
+            case 3:
+                GET_ATTRIB(node, ptr);
+                list_ref_param(ptr, pre, post);
+                break;
+            default:
+                FATAL("unknown state: %d", type);
+        }
     }
+#ifdef TRACE_AST_STATE
+    else
+        TRACE_TOKEN(token);
+#endif
 
     RETURN;
 }
@@ -872,7 +916,7 @@ static void func_reference(ast_node_t* node, void (*pre)(ast_node_t*), void (*po
     ENTER(AST_FUNC_REFERENCE);
 
     TRAVERSE_OBJ(expression_list_param);
-    TRACE_STRING(IDENTIFIER);
+    TRACE_STRING(token);
 
     RETURN;
 }
@@ -886,7 +930,9 @@ static void expression(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(
         expr_primary(data, pre, post);
     else {
         GET_ATTRIB(oper, data);
-        if(*(int*)data == NOT_OPER || *(int*)data == UNARY_MINUS_OPER) {
+        token_t* tok = (token_t*)data;
+
+        if(tok->type == NOT_OPER || tok->type == SUB_OPER) {
             GET_ATTRIB(right, data);
             expression(data, pre, post);
 
@@ -969,6 +1015,16 @@ static void dict_init_item_list(ast_node_t* node, void (*pre)(ast_node_t*), void
     RETURN;
 }
 
+static void exception_identifier(ast_node_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
+
+    ENTER(AST_EXCEPT_ID);
+
+    TRACE_STRING(IDENTIFIER);
+
+    RETURN;
+}
+
+
 ast_node_t* create_ast_node(ast_type_t type) {
 
     ast_node_t* node = _ALLOC_DS(ast_node_t);
@@ -1044,6 +1100,7 @@ const char* node_type_to_str(ast_node_t* node) {
             (type == AST_FUNC_BODY_ELEM)        ? "AST_FUNC_BODY_ELEM" :
             (type == AST_TRACE_STATEMENT)       ? "AST_TRACE_STATEMENT" :
             (type == AST_PRINT_STATEMENT)       ? "AST_PRINT_STATEMENT" :
+            (type == AST_FOR_STATEMENT)         ? "AST_FOR_STATEMENT" :
             (type == AST_EXIT_STATEMENT)        ? "AST_EXIT_STATEMENT" :
             (type == AST_RETURN_STATEMENT)      ? "AST_RETURN_STATEMENT" :
             (type == AST_TRYEXCEPT_STATEMENT)   ? "AST_TRYEXCEPT_STATEMENT" :
@@ -1103,6 +1160,7 @@ const char* node_type_to_name(ast_node_t* node) {
             (type == AST_FUNC_BODY_ELEM)        ? "func_body_elem" :
             (type == AST_TRACE_STATEMENT)       ? "trace_statement" :
             (type == AST_PRINT_STATEMENT)       ? "print_statement" :
+            (type == AST_FOR_STATEMENT)         ? "for_statement" :
             (type == AST_EXIT_STATEMENT)        ? "exit_statement" :
             (type == AST_RETURN_STATEMENT)      ? "return_statement" :
             (type == AST_TRYEXCEPT_STATEMENT)   ? "tryexcept_statement" :

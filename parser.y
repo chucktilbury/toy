@@ -31,24 +31,25 @@ extern ast_node_t* root_node;
 
 %}
 
+%code requires {
+#include <stdint.h>
+#include "ast.h"
+#include "tokens.h"
+}
+
 %union {
-    const char* text;
-    int64_t integer_lit;
-    double float_lit;
-    int type;
+    token_t* token;
     ast_node_t* node;
 };
 
-%token <text> IDENTIFIER
-%token <text> STRING_LIT
-%token <integer_lit> INTEGER_LIT
-%token <float_lit> FLOAT_LIT
-%token <type> INTEGER FLOAT STRING LIST HASH NOTHING
+%token <token> IDENTIFIER STRING_LIT INTEGER_LIT FLOAT_LIT
+%token <token> INTEGER FLOAT STRING LIST HASH NOTHING
+%token <token> EQU_OPER NEQ_OPER LTE_OPER GTE_OPER LT_OPER
+%token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
+%token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
 
-%token IF ELSE WHILE DO TRY EXCEPT RAISE IMPORT
-%token EQU_OPER NEQ_OPER LTE_OPER GTE_OPER LT_OPER GT_OPER UNARY_MINUS_OPER
-%token NOT_OPER OR_OPER AND_OPER
-%token BREAK CONTINUE RETURN PRINT TRACE EXIT CONST
+%token IF ELSE WHILE DO TRY EXCEPT RAISE IMPORT YIELD FOR IN
+%token BREAK CONTINUE RETURN PRINT TRACE EXIT CONST ITERATOR
 
 %nterm <node> program program_item_list program_item type_name formatted_string
 %nterm <node> import_statement data_declaration func_name assignment_left
@@ -63,7 +64,7 @@ extern ast_node_t* root_node;
 %nterm <node> expr_primary list_reference list_ref_value list_ref_param
 %nterm <node> list_ref_param_list func_reference expression expression_list
 %nterm <node> expression_list_param expression_param list_init dict_init
-%nterm <node> dict_init_item dict_init_item_list
+%nterm <node> dict_init_item dict_init_item_list exception_identifier for_statement
 
 
     // %define lr.type canonical-lr
@@ -79,9 +80,9 @@ extern ast_node_t* root_node;
 %left AND_OPER
 %left EQU_OPER NEQ_OPER
 %left LTE_OPER GTE_OPER LT_OPER GT_OPER
-%left '+' '-'
-%left '*' '/' '%'
-%right '^'
+%left ADD_OPER SUB_OPER
+%left MUL_OPER DIV_OPER MOD_OPER
+%right POW_OPER
 
 %%
 
@@ -106,14 +107,10 @@ program_item_list
     ;
 
 import_statement
-    /*
-    Note that this should be a formatted string, but the logic to format a
-    string is not in place yet, so it's a string literal.
-    */
     : IMPORT STRING_LIT {
         TRACE("program_item:import_statement");
         // not a part of the AST
-        open_file($2);
+        open_file($2->val.text);
     }
     ;
 
@@ -146,33 +143,48 @@ program_item
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
         add_ast_node_attrib($$, "node", $1);
     }
+    | exception_identifier {
+        TRACE("program_item:exception identifier");
+        $$ = create_ast_node(AST_PROGRAM_ITEM);
+        ast_type_t type = AST_EXCEPT_ID;
+        add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
+        add_ast_node_attrib($$, "node", $1);
+    }
+    ;
+
+exception_identifier
+    : EXCEPT IDENTIFIER {
+        TRACE("exception_identifier: %s", $2);
+        $$ = create_ast_node(AST_EXCEPT_ID);
+        add_ast_node_attrib($$, "token", $2);
+    }
     ;
 
 type_name
     : INTEGER {
         TRACE("type_name:INTEGER");
         $$ = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib($$, "type", _COPY_DS(&$1, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | FLOAT {
         TRACE("type_name:FLOAT");
         $$ = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib($$, "type",  _COPY_DS(&$1, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | STRING {
         TRACE("type_name:STRING");
         $$ = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib($$, "type",  _COPY_DS(&$1, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | LIST {
         TRACE("type_name:LIST");
         $$ = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib($$, "type",  _COPY_DS(&$1, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | HASH {
         TRACE("type_name:HASH");
         $$ = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib($$, "type",  _COPY_DS(&$1, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     ;
 
@@ -181,12 +193,12 @@ formatted_string
         TRACE("formatted_string:expression_list_param %s", $1);
         $$ = create_ast_node(AST_FORMATTED_STRING);
         add_ast_node_attrib($$, "expression_list_param",  $2);
-        add_ast_node_attrib($$, "STRING_LIT", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
     }
     | STRING_LIT {
         TRACE("formatted_string:nothing %s", $1);
         $$ = create_ast_node(AST_FORMATTED_STRING);
-        add_ast_node_attrib($$, "STRING_LIT",  _COPY_STRING($1));
+        add_ast_node_attrib($$, "token",  $1);
     }
     ;
 
@@ -195,7 +207,7 @@ data_declaration
         TRACE("data_declaration: %s", $2);
         $$ = create_ast_node(AST_DATA_DECLARATION);
         add_ast_node_attrib($$, "type_name", $1);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($2));
+        add_ast_node_attrib($$, "token", $2);
         int flag = 0;
         add_ast_node_attrib($$, "is_const", _COPY_DS(&flag, int));
     }
@@ -203,7 +215,7 @@ data_declaration
         TRACE("data_declaration: %s", $3);
         $$ = create_ast_node(AST_DATA_DECLARATION);
         add_ast_node_attrib($$, "type_name", $2);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($3));
+        add_ast_node_attrib($$, "token", $3);
         int flag = 1;
         add_ast_node_attrib($$, "is_const", _COPY_DS(&flag, int));
     }
@@ -265,16 +277,28 @@ func_name
     : type_name IDENTIFIER {
         TRACE("func_name: type_name %s", $2);
         $$ = create_ast_node(AST_FUNC_NAME);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($2));
+        add_ast_node_attrib($$, "token", $2);
         add_ast_node_attrib($$, "type_name", $1);
+        int flag = 0;
+        add_ast_node_attrib($$, "is_iter", _COPY_DS(&flag, int));
+    }
+    | ITERATOR type_name IDENTIFIER {
+        TRACE("func_name: type_name %s", $2);
+        $$ = create_ast_node(AST_FUNC_NAME);
+        add_ast_node_attrib($$, "token", $3);
+        add_ast_node_attrib($$, "type_name", $2);
+        int flag = 1;
+        add_ast_node_attrib($$, "is_iter", _COPY_DS(&flag, int));
     }
     | NOTHING IDENTIFIER {
         TRACE("func_name: NOTHING %s", $2);
         $$ = create_ast_node(AST_FUNC_NAME);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($2));
+        add_ast_node_attrib($$, "token", $2);
         ast_node_t* type = create_ast_node(AST_TYPE_NAME);
-        add_ast_node_attrib(type, "type", _COPY_DS(&$1, int));
+        add_ast_node_attrib(type, "token", $1);
         add_ast_node_attrib($$, "type_name", type);
+        int flag = 0;
+        add_ast_node_attrib($$, "is_iter", _COPY_DS(&flag, int));
     }
     ;
 
@@ -297,17 +321,12 @@ func_params
     | '(' ')' {
         TRACE("func_params: bare");
         $$ = create_ast_node(AST_FUNC_PARAMS);
-        add_ast_node_attrib($$, "data_declaration_list", NULL);
+        //add_ast_node_attrib($$, "data_declaration_list", NULL);
     }
     ;
 
 func_body
-    : '{' '}' {
-        TRACE("func_body: empty");
-        $$ = create_ast_node(AST_FUNC_BODY);
-        add_ast_node_attrib($$, "func_body_list", NULL);
-    }
-    | '{' func_body_list '}' {
+    : '{' func_body_list '}' {
         TRACE("func_body: with body");
         $$ = create_ast_node(AST_FUNC_BODY);
         add_ast_node_attrib($$, "func_body_list", $2);
@@ -364,6 +383,13 @@ loop_body_diffs
         $$ = create_ast_node(AST_LOOP_BODY_DIFFS);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
     }
+    | YIELD '(' expression ')' {
+        TRACE("loop_body_diffs:YIELD");
+        int type = YIELD;
+        $$ = create_ast_node(AST_LOOP_BODY_DIFFS);
+        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+        add_ast_node_attrib($$, "expression", $3);
+    }
     ;
 
 loop_body_elem
@@ -419,6 +445,13 @@ func_body_elem
         add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
     }
+    | for_statement {
+        TRACE("func_body_elem:for_statement");
+        ast_type_t type = AST_FOR_STATEMENT;
+        $$ = create_ast_node(AST_FUNC_BODY_ELEM);
+        add_ast_node_attrib($$, "node", $1);
+        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+    }
     | ifelse_statement {
         TRACE("func_body_elem:ifelse_statement");
         ast_type_t type = AST_IFELSE_STATEMENT;
@@ -464,7 +497,14 @@ func_body_elem
     | trace_statement {
         TRACE("func_body_elem:trace_statement");
         ast_type_t type = AST_TRACE_STATEMENT;
-        $$ = create_ast_node(AST_TRACE_STATEMENT);
+        $$ = create_ast_node(AST_FUNC_BODY_ELEM);
+        add_ast_node_attrib($$, "node", $1);
+        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+    }
+    | func_body {
+        TRACE("func_body_elem:func_body");
+        ast_type_t type = AST_FUNC_BODY;
+        $$ = create_ast_node(AST_FUNC_BODY_ELEM);
         add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
     }
@@ -479,7 +519,7 @@ trace_statement
     | TRACE {
         TRACE("trace_statement: bare");
         $$ = create_ast_node(AST_TRACE_STATEMENT);
-        add_ast_node_attrib($$, "expression_list_param", NULL);
+        //add_ast_node_attrib($$, "expression_list_param", NULL);
     }
     ;
 
@@ -492,7 +532,7 @@ print_statement
     | PRINT {
         TRACE("print_statement: bare");
         $$ = create_ast_node(AST_PRINT_STATEMENT);
-        add_ast_node_attrib($$, "expression_list_param", NULL);
+        //add_ast_node_attrib($$, "expression_list_param", NULL);
     }
     ;
 
@@ -501,11 +541,6 @@ exit_statement
         TRACE("exit_statement: with params");
         $$ = create_ast_node(AST_EXIT_STATEMENT);
         add_ast_node_attrib($$, "expression_param", $2);
-    }
-    | EXIT {
-        TRACE("exit_statement: bare");
-        $$ = create_ast_node(AST_EXIT_STATEMENT);
-        add_ast_node_attrib($$, "expression_param", NULL);
     }
     ;
 
@@ -518,7 +553,25 @@ return_statement
     | RETURN {
         TRACE("return_statement: bare");
         $$ = create_ast_node(AST_RETURN_STATEMENT);
-        add_ast_node_attrib($$, "expression_param", NULL);
+        //add_ast_node_attrib($$, "expression_param", NULL);
+    }
+    ;
+
+for_statement
+    : FOR '(' IDENTIFIER IN expression ')' func_body {
+        TRACE("for_statement: no type spec");
+        $$ = create_ast_node(AST_FOR_STATEMENT);
+        add_ast_node_attrib($$, "token", $3);
+        add_ast_node_attrib($$, "expression", $5);
+        add_ast_node_attrib($$, "func_body", $7);
+    }
+    | FOR '(' type_name IDENTIFIER IN expression ')' func_body {
+        TRACE("for_statement: with type spec");
+        $$ = create_ast_node(AST_FOR_STATEMENT);
+        add_ast_node_attrib($$, "token", $4);
+        add_ast_node_attrib($$, "expression", $6);
+        add_ast_node_attrib($$, "func_body", $8);
+        add_ast_node_attrib($$, "type_name", $3);
     }
     ;
 
@@ -544,8 +597,8 @@ except_segment
         TRACE("except_segment(%s, %s)", $3, $5);
         $$ = create_ast_node(AST_EXCEPT_SEGMENT);
         add_ast_node_attrib($$, "func_body", $7);
-        add_ast_node_attrib($$, "ename", _COPY_STRING($3));
-        add_ast_node_attrib($$, "mname", _COPY_STRING($5));
+        add_ast_node_attrib($$, "ename", $3);
+        add_ast_node_attrib($$, "mname", $5);
     }
     ;
 
@@ -566,7 +619,7 @@ final_except_clause
         TRACE("final_except_clause %s", $3);
         $$ = create_ast_node(AST_FINAL_EXCEPT_CLAUSE);
         add_ast_node_attrib($$, "func_body", $5);
-        add_ast_node_attrib($$, "mname", _COPY_STRING($3));
+        add_ast_node_attrib($$, "mname", $3);
     }
     ;
 
@@ -594,7 +647,7 @@ raise_statement
         TRACE("raise_statement %s", $3);
         $$ = create_ast_node(AST_RAISE_STATEMENT);
         add_ast_node_attrib($$, "formatted_string", $5);
-        add_ast_node_attrib($$, "ename", _COPY_STRING($3));
+        add_ast_node_attrib($$, "ename", $3);
     }
     ;
 
@@ -684,7 +737,7 @@ while_clause
     | WHILE {
         TRACE("while_clause: bare");
         $$ = create_ast_node(AST_WHILE_CLAUSE);
-        add_ast_node_attrib($$, "expression_param", NULL);
+        //add_ast_node_attrib($$, "expression_param", NULL);
     }
     ;
 
@@ -750,7 +803,7 @@ dict_init_item
     : STRING_LIT ':' expression {
         TRACE("dict_init_item");
         $$ = create_ast_node(AST_DICT_INIT_ITEM);
-        add_ast_node_attrib($$, "STRING_LIT", _COPY_STRING($1));
+        add_ast_node_attrib($$, "STRING_LIT", $1);
         add_ast_node_attrib($$, "expression", $3);
     }
     ;
@@ -780,7 +833,7 @@ assignment_left
         TRACE("assignment_left: identifier %s", $1);
         int type = 0;
         $$ = create_ast_node(AST_ASSIGNMENT_LEFT);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
     }
     | list_reference {
@@ -804,24 +857,18 @@ assignment
 raw_value
     : IDENTIFIER {
         TRACE("raw_value:IDENTIFIER %s", $1);
-        int type = IDENTIFIER;
         $$ = create_ast_node(AST_RAW_VALUE);
-        add_ast_node_attrib($$, "value", _COPY_STRING($1));
-        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | INTEGER_LIT {
         TRACE("raw_value:INTEGER_LIT %ld", $1);
-        int type = INTEGER_LIT;
         $$ = create_ast_node(AST_RAW_VALUE);
-        add_ast_node_attrib($$, "value", _COPY_DS(&$1, int64_t));
-        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     | FLOAT_LIT {
         TRACE("raw_value:FLOAT_LIT %lf", $1);
-        int type = FLOAT_LIT;
         $$ = create_ast_node(AST_RAW_VALUE);
-        add_ast_node_attrib($$, "value", _COPY_DS(&$1, double));
-        add_ast_node_attrib($$, "type", _COPY_DS(&type, int));
+        add_ast_node_attrib($$, "token", $1);
     }
     ;
 
@@ -868,7 +915,7 @@ list_reference
         TRACE("list_reference: %s", $1);
         $$ = create_ast_node(AST_LIST_REFERENCE);
         add_ast_node_attrib($$, "list_ref_param_list", $2);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
     }
     ;
 
@@ -877,42 +924,42 @@ list_ref_value
         TRACE("list_ref_value:IDENTIFIER");
         int type = 0;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     | INTEGER_LIT {
         TRACE("list_ref_value:INTEGER_LIT");
-        int type = 1;
+        int type = 0;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "INTEGER_LIT", _COPY_DS((void*)&$1, int));
+        add_ast_node_attrib($$, "token", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     | STRING_LIT {
         TRACE("list_ref_value:STRING_LIT");
-        int type = 2;
+        int type = 0;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "STRING_LIT", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     | list_reference {
         TRACE("list_ref_value:list_reference");
-        int type = 3;
+        int type = 1;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "list_reference", $1);
+        add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     | func_reference {
         TRACE("list_ref_value:func_reference");
-        int type = 4;
+        int type = 2;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "func_reference", $1);
+        add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     | list_ref_param {
         TRACE("list_ref_value:list_ref_param");
-        int type = 5;
+        int type = 3;
         $$ = create_ast_node(AST_LIST_REF_VALUE);
-        add_ast_node_attrib($$, "list_ref_param", $1);
+        add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
     ;
@@ -942,7 +989,7 @@ func_reference
         TRACE("func_reference %s", $1);
         $$ = create_ast_node(AST_FUNC_REFERENCE);
         add_ast_node_attrib($$, "expression_list_param", $2);
-        add_ast_node_attrib($$, "IDENTIFIER", _COPY_STRING($1));
+        add_ast_node_attrib($$, "token", $1);
     }
     ;
 
@@ -952,131 +999,115 @@ expression
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "expr_primary", $1);
     }
-    | expression '+' expression {
+    | expression ADD_OPER expression {
         TRACE("expression:+");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '+';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
-    | expression '-' expression {
+    | expression SUB_OPER expression {
         TRACE("expression:-");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '-';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
-    | expression '*' expression {
+    | expression MUL_OPER expression {
         TRACE("expression:*");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '*';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
-    | expression '/' expression {
+    | expression DIV_OPER expression {
         TRACE("expression:/");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '/';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
-    | expression '%' expression {
+    | expression MOD_OPER expression {
         TRACE("expression:%%");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '%';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
-    | expression '^' expression {
+    | expression POW_OPER expression {
         TRACE("expression:^");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = '^';
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression GT_OPER expression {
         TRACE("expression:GT_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = GT_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression LT_OPER expression {
         TRACE("expression:LT_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = LT_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression EQU_OPER expression {
         TRACE("expression:EQU_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = EQU_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression NEQ_OPER expression {
         TRACE("expression:NEQ_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = NEQ_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression LTE_OPER expression {
         TRACE("expression:LTE_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = LTE_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression GTE_OPER expression {
         TRACE("expression:GTE_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = GTE_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression OR_OPER expression {
         TRACE("expression:OR_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = OR_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | expression AND_OPER expression {
         TRACE("expression:AND_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "left", $1);
         add_ast_node_attrib($$, "right", $3);
-        int oper = AND_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
-    }
-    | '-' expression %prec UNARY {
-        TRACE("expression:unary -");
-        $$ = create_ast_node(AST_EXPRESSION);
-        add_ast_node_attrib($$, "right", $2);
-        int oper = UNARY_MINUS_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $2);
     }
     | NOT_OPER expression %prec UNARY {
         TRACE("expression:unary NOT_OPER");
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "right", $2);
-        int oper = NOT_OPER;
-        add_ast_node_attrib($$, "oper", _COPY_DS(&oper, int));
+        add_ast_node_attrib($$, "oper", $1);
+    }
+    | SUB_OPER expression %prec UNARY {
+        TRACE("expression:unary SUB_OPER");
+        $$ = create_ast_node(AST_EXPRESSION);
+        add_ast_node_attrib($$, "right", $2);
+        add_ast_node_attrib($$, "oper", $1);
     }
     ;
 
@@ -1101,7 +1132,7 @@ expression_list_param
     | '(' ')' {
         TRACE("expression_list_param: bare");
         $$ = create_ast_node(AST_EXPRESSION_LIST_PARAM);
-        add_ast_node_attrib($$, "expression_list", NULL);
+        //add_ast_node_attrib($$, "expression_list", NULL);
     }
     ;
 
@@ -1114,7 +1145,7 @@ expression_param
     | '(' ')' {
         TRACE("expression_param: bare");
         $$ = create_ast_node(AST_EXPRESSION_PARAM);
-        add_ast_node_attrib($$, "expression", NULL);
+        //add_ast_node_attrib($$, "expression", NULL);
     }
     ;
 

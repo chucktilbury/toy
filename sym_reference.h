@@ -3,5 +3,6 @@
 
 #include "symtab.h"
 
+void check_sym_refs(void);
 
 #endif /* _SYM_REFERENCE_H_ */

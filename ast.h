@@ -34,6 +34,7 @@ typedef enum {
     AST_FINAL_EXCEPT_CLAUSE,
     AST_EXCEPT_CLAUSE,
     AST_RAISE_STATEMENT,
+    AST_FOR_STATEMENT,
     AST_IF_CLAUSE,
     AST_IFELSE_STATEMENT,
     AST_ELSE_SEGMENT,
@@ -61,6 +62,7 @@ typedef enum {
     AST_LIST_INIT,
     AST_DICT_INIT_ITEM,
     AST_DICT_INIT_ITEM_LIST,
+    AST_EXCEPT_ID,
 } ast_type_t;
 
 typedef struct {

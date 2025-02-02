@@ -5,14 +5,15 @@
 #include <stdbool.h>
 // #include <string.h>
 // #include <errno.h>
-#include "errors.h"
+//#include "errors.h"
 #include "fileio.h"
 
 // #include "errors.h"
 // #include "pointer_list.h"
-#include "ast.h"
+//#include "ast.h"
 #include "parser.h"
 #include "symtab.h"
+#include "sym_reference.h"
 
 int main(int argc, char** argv) {
 
@@ -23,12 +24,15 @@ int main(int argc, char** argv) {
 
     open_file(argv[1]);
 
+    // run the parser
     yyparse();
 
-    if(!get_errors()) {
-        create_symtab();
-        // traverse_ast(NULL, NULL);
-    }
+    traverse_ast(NULL, NULL);
+    // do the check passes
+    //create_symtab();
+    //check_sym_refs();
+
+
 
     return 0;
 }
