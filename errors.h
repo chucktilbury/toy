@@ -3,11 +3,11 @@
 #ifndef _ERRORS_H_
 #define _ERRORS_H_
 
-#include "ast.h"
+#include "tokens.h"
 
 void fatal_error(const char* fmt, ...);
 void parser_syntax_error(const char* fmt, ...);
-void node_syntax_error(ast_node_t* node, const char* fmt, ...);
+void token_syntax_error(token_t* tok, const char* fmt, ...);
 void misc_error(const char* fmt, ...);
 int get_errors(void);
 

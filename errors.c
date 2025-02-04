@@ -4,19 +4,9 @@
 
 #include "fileio.h"
 #include "errors.h"
-#include "hash.h"
+#include "tokens.h"
 
 static int errors = 0;
-
-#define FIND_ATTRIB(node, name, ptr) find_hashtable(node->table, #name, &ptr)
-
-#define GET_ATTRIB(node, name, ptr)                                  \
-    do {                                                             \
-        if(!FIND_ATTRIB(node, name, ptr))                            \
-            FATAL("improper node format: \"%s\" not found", #name);  \
-        else if(ptr == NULL)                                         \
-            FATAL("improper node format: \"%s\" is invalid", #name); \
-    } while(0)
 
 void fatal_error(const char* fmt, ...) {
 
@@ -32,19 +22,11 @@ void fatal_error(const char* fmt, ...) {
     exit(1);
 }
 
-void node_syntax_error(ast_node_t* node, const char* fmt, ...) {
+void token_syntax_error(token_t* tok, const char* fmt, ...) {
 
     va_list args;
-    void* ptr;
 
-    GET_ATTRIB(node, line_no, ptr);
-    int line = *(int*)ptr;
-    GET_ATTRIB(node, column_no, ptr);
-    int col = *(int*)ptr;
-    GET_ATTRIB(node, file_name, ptr);
-    const char* fname = (const char*)ptr;
-
-    fprintf(stderr, "%s:%d:%d syntax error, ", fname, line, col);
+    fprintf(stderr, "%s:%d:%d syntax error, ", tok->fname, tok->line_no, tok->col_no);
 
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);

@@ -70,3 +70,31 @@ void* iterate_pointer_list(pointer_list_t* lst, int* mark) {
 
     return ptr;
 }
+
+void push_pointer_list(pointer_list_t* lst, void* ptr) {
+
+    add_pointer_list(lst, ptr);
+}
+
+void* pop_pointer_list(pointer_list_t* lst) {
+
+    void* ptr = NULL;
+
+    if(lst->len > 0) {
+        ptr = lst->list[lst->len-1];
+        lst->len--;
+    }
+
+    return ptr;
+}
+
+void* peek_pointer_list(pointer_list_t* lst) {
+
+    void* ptr = NULL;
+
+    if(lst->len > 0)
+        ptr = lst->list[lst->len-1];
+
+    return ptr;
+}
+

@@ -4,12 +4,12 @@
 #include <stdint.h>
 
 typedef struct {
-    const char* raw;
-    int type;
+    const char* raw; // raw scanned text
+    int type;        // token that was scanned
     int line_no;
     int col_no;
     const char* fname;
-    union {
+    union {          // processed information, if any.
         int64_t integer_lit;
         double float_lit;
         const char* text;

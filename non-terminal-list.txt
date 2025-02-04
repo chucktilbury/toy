@@ -1,13 +1,14 @@
 program
 program_item_list
+import_statement
 program_item
+exception_identifier
 type_name
 formatted_string
-import_statement
-file_definition
 data_declaration
 data_declaration_list
 data_definition
+func_name
 func_definition
 func_params
 func_body
@@ -21,6 +22,7 @@ trace_statement
 print_statement
 exit_statement
 return_statement
+for_statement
 tryexcept_statement
 try_clause
 except_segment
@@ -38,6 +40,10 @@ while_clause
 while_statement
 do_statement
 assignment_right
+list_init
+dict_init_item
+dict_init_item_list
+dict_init
 assignment_left
 assignment
 raw_value
@@ -51,8 +57,3 @@ expression
 expression_list
 expression_list_param
 expression_param
-dict_init
-list_init
-dict_init_item
-dict_init_item_list
-

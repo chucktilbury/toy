@@ -1,4 +1,12 @@
 
+
+
+----------
+
+In symtab.c, make a func to display the decorated name as a prototype for 
+errors.
+
+---------
 The raise statement has 2 args. The first one is a definition of the actual 
 exception. Internally, it is an enum and is used to specify which exception is 
 to be caught. The second argument is a formatted string. The string is 
@@ -16,3 +24,11 @@ the second arg of a regular except.
 
 The enum value of a raise statement is always global and has it's own symbol 
 type.
+
+-------
+
+Symbol table is created in the parser and supported by the symtab.c module.
+The context is tracked as a stack. When a nre context is pushed, the symbols
+are create on that context. When the context is popped, then the symbols are
+created on the previous context. The context parent is used when finding the 
+definition for a symbol. 

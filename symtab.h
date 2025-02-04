@@ -1,42 +1,44 @@
 #ifndef _SYMTAB_H_
 #define _SYMTAB_H_
 
-#include <stdint.h>
-#include <stdbool.h>
-
-#include "ast.h"
-#include "hash.h"
-#include "tokens.h"
+#include "parser.h"
+#include "pointer_list.h"
 
 typedef enum {
     SYM_FUNC,
     SYM_DATA,
     SYM_EXCEPT,
-} symbol_type_t;
+} symbol_class_t;
 
 typedef struct {
-    symbol_type_t symbol_type;
-    int data_type;    // type that the symbol represents from the parser
-    const char* name; // the hash table key
-    bool is_init;     // true if the symbol is considered initialized
-    bool is_const;    // true if the symbol represents a constant value
-    token_t* tok;     // the token that holds the symbol from the source
-    int ref_count;    // reference count, used to detect errors
+    const char* name;         // decorated name for hash table
+    symbol_class_t sym_class; // general handling of the symbol
+    int sym_type;             // type user defined in source code
+    token_t* tok;             // token that defined the name
+    bool is_const;            // const keyword wous found
+    bool is_init;             // initializer was found in the syntax
+    bool is_iter;             // functions only
+    int ref_count;            // updated by the refernce checker
 } symbol_t;
 
-typedef struct _sym_context_t_ {
-    struct _sym_context_t_* child;  // result of a push
-    struct _sym_context_t_* parent; // result of a pop
-    hash_table_t* table;            // table of the symbols in this context
-} sym_context_t;
+typedef struct _symbol_table_t_ {
+    struct _symbol_table_t_* parent;
+    hash_table_t* table;
+} symbol_table_t;
 
-// Note that different passes implement their own push and pop functions in
-// order to remain reentrant, according to their needs.
+/*
+// global symbol table and context
+extern symbol_table_t* symbol_table;
+extern pointer_list_t* symbol_context;
 
-// call traverse_ast() to create the global symbol table.
-sym_context_t* create_symtab(void);
+symbol_t* create_symbol(void);
+void add_symbol(symbol_t* sym);
+void push_sym_context(void);
+void* pop_sym_context(void);
+symbol_table_t* peek_sym_context(void);
+symbol_table_t* create_symtab(void);
+*/
 
-// return a pointer to the global symbol table.
-sym_context_t* get_symtab(void);
+symbol_t* create_symbol(symbol_class_t, token_t*);
 
 #endif /* _SYMTAB_H_ */

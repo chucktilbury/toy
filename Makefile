@@ -9,9 +9,9 @@ OBJS	=	tokens.o \
 		memory.o \
 		hash.o \
 		ast.o \
-		pointer_list.o
-
-# 		symtab.o
+		pointer_list.o \
+		trace.o \
+ 		symtab.o
 #		sym_reference.o
 
 

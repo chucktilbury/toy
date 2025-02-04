@@ -209,6 +209,20 @@ void dump_hashtable(hash_table_t* tab) {
     }
 }
 
+int hash_name_exists(hash_table_t* tab, const char* key) {
+
+    int slot = find_slot(tab, key);
+
+    if(tab->table[slot] != NULL && tab->table[slot]->key != NULL) {
+        if(strcmp(tab->table[slot]->key, key) == 0) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+
 /*
  * Testing the hash table
  */
