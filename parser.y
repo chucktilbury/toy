@@ -87,14 +87,14 @@ const char* token_to_str(int);
 %header "parser.h"
 %output "parser.c"
 
-%left UNARY
 %left OR_OPER
 %left AND_OPER
 %left EQU_OPER NEQ_OPER
 %left LTE_OPER GTE_OPER LT_OPER GT_OPER
 %left ADD_OPER SUB_OPER
 %left MUL_OPER DIV_OPER MOD_OPER
-%right POW_OPER
+%right NOT_OPER POW_OPER
+%right UNARY
 
 %%
 
@@ -964,13 +964,6 @@ expr_primary
         add_ast_node_attrib($$, "node", $1);
         add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
     }
-    | '(' expression ')' {
-        TRACE("expr_primary:(expression)");
-        ast_type_t type = AST_EXPRESSION;
-        $$ = create_ast_node(AST_EXPR_PRIMARY);
-        add_ast_node_attrib($$, "node", $2);
-        add_ast_node_attrib($$, "type", _COPY_DS(&type, ast_type_t));
-    }
     ;
 
     /*
@@ -1177,6 +1170,9 @@ expression
         $$ = create_ast_node(AST_EXPRESSION);
         add_ast_node_attrib($$, "right", $2);
         add_ast_node_attrib($$, "oper", $1);
+    }
+    | '(' expression ')' {
+        TRACE("expr_primary:(expression)");
     }
     ;
 
