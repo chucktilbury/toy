@@ -239,8 +239,8 @@ int get_col_no(void) {
 }
 
 
-const char* slist[] = { "asdf",   "1234",     "weiuyer", "asdasd",    "oiuoiu", "098098",
-                        "(*&(*&", "}{P}{P}{", "KSDKJH",  "OIUO***&*", NULL };
+const char* slist[] = { "asdf", "1234", "weiuyer", "asdasd", "oiuoiu", "098098",
+                        "(*&(*&", "}{P}{P}{", "KSDKJH", "OIUO***&*", NULL };
 
 int main(void) {
 

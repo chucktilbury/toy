@@ -1,9 +1,19 @@
 
 #this is included
-
+# another line
 int fun_ction(int one, int two) {
 
     float something = 1.0101
 
     return(something)
 }
+
+{
+
+inline {
+// this is the inline text
+if x == p the { zop == doodle; }
+}
+
+}
+

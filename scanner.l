@@ -9,8 +9,11 @@
 #include "errors.h"
 #include "fileio.h"
 #include "tokens.h"
+#include "string_buffer.h"
 
 int yycolumn = 1;
+int inline_depth = 0;
+string_buffer_t* strbuf = NULL;
 
 #define MAX_INCL 16
 
@@ -44,6 +47,8 @@ const char* strip_quotes(const char* str) {
 
 %}
 
+%x INLINE_BLOCK
+%x FSTRING
 %option yylineno
 %option noinput
 %option noyywrap
@@ -54,6 +59,7 @@ const char* strip_quotes(const char* str) {
 
    // int start_line, start_column;
    int prev_yylineno = yylineno;
+
 
 "if"        { return IF; }
 "else"      { return ELSE; }
@@ -76,6 +82,7 @@ const char* strip_quotes(const char* str) {
 "iterator"  { return ITERATOR; }
 "for"       { return FOR; }
 "in"        { return IN; }
+"type"      { return TYPE; }
 
 "+" {
     yylval.token = create_token(yytext, ADD_OPER);
@@ -182,6 +189,82 @@ const char* strip_quotes(const char* str) {
     return NOTHING;
 }
 
+"inline"[ \n\r\t]*"{" {
+    inline_depth = 0;
+    if(strbuf == NULL)
+        strbuf = create_string_buffer(NULL);
+    BEGIN(INLINE_BLOCK);
+}
+
+<INLINE_BLOCK>"{" {
+    inline_depth++;
+    append_string_buffer_char(strbuf, '{');
+}
+
+<INLINE_BLOCK>[^{}\n] {
+    append_string_buffer_str(strbuf, yytext);
+}
+
+<INLINE_BLOCK>\n {
+    append_string_buffer_char(strbuf, '\n');
+    file_stack->line++;
+}
+
+<INLINE_BLOCK>"}" {
+    if(inline_depth > 0) {
+        inline_depth--;
+        append_string_buffer_char(strbuf, '}');
+    }
+    else {
+        yylval.token = create_token(raw_string_buffer(strbuf), INLINE);
+        //fprintf(stderr, "scanner returns INLINE: %s\n", raw_string_buffer(strbuf));
+        clear_string_buffer(strbuf);
+        BEGIN(INITIAL);
+        return INLINE;
+    }
+}
+
+    /* double quoted string supports escapes */
+\" {
+    if(strbuf == NULL)
+        strbuf = create_string_buffer(NULL);
+    BEGIN(FSTRING);
+}
+
+<FSTRING>\\n { append_string_buffer_char(strbuf, '\n'); }
+<FSTRING>\\r { append_string_buffer_char(strbuf, '\r'); }
+<FSTRING>\\e { append_string_buffer_char(strbuf, '\x1b'); }
+<FSTRING>\\t { append_string_buffer_char(strbuf, '\t'); }
+<FSTRING>\\b { append_string_buffer_char(strbuf, '\b'); }
+<FSTRING>\\f { append_string_buffer_char(strbuf, '\f'); }
+<FSTRING>\\v { append_string_buffer_char(strbuf, '\v'); }
+<FSTRING>\\\\ { append_string_buffer_char(strbuf, '\\'); }
+<FSTRING>\\\" { append_string_buffer_char(strbuf, '\"'); }
+<FSTRING>\\\' { append_string_buffer_char(strbuf, '\''); }
+<FSTRING>\\\? { append_string_buffer_char(strbuf, '\?'); }
+<FSTRING>\\.  { append_string_buffer_char(strbuf, yytext[1]); }
+<FSTRING>\\[0-7]{1,3} { append_string_buffer_char(strbuf, (char)strtol(yytext + 1, 0, 8)); }
+<FSTRING>\\[xX][0-9a-fA-F]{1,3} { append_string_buffer_char(strbuf, (char)strtol(yytext + 2, 0, 16)); }
+<FSTRING>[^\"\n\\]*  { append_string_buffer_str(strbuf, yytext); }
+
+<FSTRING>\" {
+    token_t* tok = create_token(raw_string_buffer(strbuf), STRING_LIT);
+    tok->val.text = _COPY_STRING(raw_string_buffer(strbuf));
+    fprintf(stderr, "FSTRING returns: \"%s\"\n", tok->val.text);
+    clear_string_buffer(strbuf);
+    yylval.token = tok;
+    BEGIN(INITIAL);
+    return STRING_LIT;
+}
+
+    /* single quoted string is an absolute literal */
+\'[^\'\n]*\' {
+    token_t* tok = create_token(yytext, STRING_LIT);
+    tok->val.text = _COPY_STRING(strip_quotes(yytext));
+    yylval.token = tok;
+    return STRING_LIT;
+}
+
 [a-zA-Z_][0-9a-zA-Z_]*  {
     token_t* tok = create_token(yytext, IDENTIFIER);
     tok->val.text = _COPY_STRING(yytext);
@@ -201,20 +284,6 @@ const char* strip_quotes(const char* str) {
     tok->val.integer_lit = strtol(yytext, NULL, 10);
     yylval.token = tok;
     return INTEGER_LIT;
-}
-
-\"[^\"\n]*\" {
-    token_t* tok = create_token(yytext, STRING_LIT);
-    tok->val.text = _COPY_STRING(strip_quotes(yytext));
-    yylval.token = tok;
-    return STRING_LIT;
-}
-
-\'[^\'\n]*\' {
-    token_t* tok = create_token(yytext, STRING_LIT);
-    tok->val.text = _COPY_STRING(strip_quotes(yytext));
-    yylval.token = tok;
-    return STRING_LIT;
 }
 
 #[^\n]*\n  {

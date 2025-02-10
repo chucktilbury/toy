@@ -24,18 +24,30 @@ nothing doodah(int plart, float zoop) {
 
     int plart = asdf(qwer, oier(1, 2, 3))
     IF(not 1 == 2) {
-        printf("foo bar"(1, 2, 3))
+        printf("[foo bar"(1, 2, 3))
     }
     else (123) { printf() }
     else {
         print("bar foo"(3, 4, 5), 123) ; this is a comment
     }
 
-    { as = ewr }
+    inline {
+        // This is another inline block
+        for(int a = 0; a < 100; a++) {
+            if(a == 123) {
+                printf("foo the heck the bar\n");
+            }
+        }
+        // and a comment
+    }
+
+   { as = ewr }
     asd[1] = 123 + 234;
 
     if(plart) {
         printf("spoof")
         while {        yield(1)}
     }
+
+    print("asdf\e[1;31m234234\e[0m"(123, 34))
 }

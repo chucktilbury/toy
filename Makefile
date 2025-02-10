@@ -9,9 +9,11 @@ OBJS	=	tokens.o \
 		memory.o \
 		hash.o \
 		ast.o \
+		ast_tables.o \
 		pointer_list.o \
-		trace.o \
- 		symtab.o
+		string_buffer.o \
+		trace.o
+#  		symtab.o
 #		sym_reference.o
 
 
@@ -64,3 +66,5 @@ clean:
 format:
 	@echo "format code"
 	@clang-format -i $(FORMAT)
+
+remake: clean all

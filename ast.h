@@ -27,6 +27,7 @@ typedef enum {
     AST_LOOP_BODY_ELEM,
     AST_FUNC_BODY_ELEM,
     AST_TRACE_STATEMENT,
+    AST_INLINE_STATEMENT,
     AST_PRINT_STATEMENT,
     AST_EXIT_STATEMENT,
     AST_RETURN_STATEMENT,
@@ -70,6 +71,9 @@ typedef enum {
 
 typedef struct {
     ast_type_t type;
+    int line;
+    int col;
+    const char* fname;
 } ast_node_t;
 
 /*
@@ -311,6 +315,7 @@ typedef struct _ast_loop_body_elem_t {
  *    | exit_statement
  *    | print_statement
  *    | trace_statement
+ *    | inline_statement
  *    | func_body
  *    ;
  */
@@ -327,8 +332,18 @@ typedef struct _ast_func_body_elem_t {
  */
 typedef struct _ast_trace_statement_t {
     ast_node_t node;
-    struct _ast_expression_list_parm_t* expression_list_param;
+    struct _ast_expression_list_param_t* expression_list_param;
 } ast_trace_statement_t;
+
+/*
+ * inline_statement
+ *    : INLINE
+ *    ;
+ */
+typedef struct _ast_inline_statement_t {
+    ast_node_t node;
+    token_t* token;
+} ast_inline_statement_t;
 
 /*
  * print_statement
@@ -338,7 +353,7 @@ typedef struct _ast_trace_statement_t {
  */
 typedef struct _ast_print_statement_t {
     ast_node_t node;
-    struct _ast_expression_list_parm_t* expression_list_param;
+    struct _ast_expression_list_param_t* expression_list_param;
 } ast_print_statement_t;
 
 /*
@@ -348,7 +363,7 @@ typedef struct _ast_print_statement_t {
  */
 typedef struct _ast_exit_statement_t {
     ast_node_t node;
-    struct _ast_expression_parm_t* expression_param;
+    struct _ast_expression_param_t* expression_param;
 } ast_exit_statement_t;
 
 /*
@@ -359,7 +374,7 @@ typedef struct _ast_exit_statement_t {
  */
 typedef struct _ast_return_statement_t {
     ast_node_t node;
-    struct _ast_expression_parm_t* expression_param;
+    struct _ast_expression_param_t* expression_param;
 } ast_return_statement_t;
 
 /*
@@ -747,8 +762,8 @@ typedef struct _ast_expression_t {
     struct _ast_expression_t* left;
     struct _ast_expression_t* right;
     token_t* oper;
-    struct _ast_expr_primary_t* primary;
-    struct _ast_expression_t* expr;
+    struct _ast_expr_primary_t* expr_primary;
+    struct _ast_expression_t* expression;
 } ast_expression_t;
 
 /*
@@ -785,15 +800,9 @@ typedef struct _ast_expression_param_t {
 } ast_expression_param_t;
 
 
-
 ast_node_t* create_ast_node(ast_type_t type);
-void add_ast_node_attrib(ast_node_t* node, const char* key, void* attrib);
-int get_ast_node_attrib(ast_node_t* node, const char* key, ast_node_t** val);
-void add_ast_node_list_item(ast_node_t* node, const char* key, void* attrib);
 void traverse_ast(void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-const char* node_type_to_str(ast_node_t* node);
-const char* node_type_to_name(ast_node_t* node);
 
-ast_node_t* alloc_ast_node(ast_type_t type);
+#include "ast_tables.h"
 
 #endif /* _AST_H_ */

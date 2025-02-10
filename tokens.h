@@ -9,7 +9,7 @@ typedef struct {
     int line_no;
     int col_no;
     const char* fname;
-    union {          // processed information, if any.
+    union { // processed information, if any.
         int64_t integer_lit;
         double float_lit;
         const char* text;

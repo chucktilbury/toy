@@ -200,7 +200,7 @@ symbol_t* create_symbol(symbol_class_t type, token_t* tok) {
     symbol_t* ptr = _ALLOC_DS(symbol_t);
 
     ptr->sym_class = type;
-    ptr->tok = tok;
+    ptr->tok       = tok;
 
     return ptr;
 }

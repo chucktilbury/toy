@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     // run the parser
     yyparse();
 
-    //traverse_ast(NULL, NULL);
+    traverse_ast(NULL, NULL);
     // do the check passes
     // create_symtab();
     //check_sym_refs();
