@@ -44,7 +44,6 @@ const char* token_to_str(int);
     ast_program_item_list_t* program_item_list;
     ast_import_statement_t* import_statement;
     ast_program_item_t* program_item;
-    ast_exception_identifier_t* exception_identifier;
     ast_type_name_t* type_name;
     ast_formatted_string_t* formatted_string;
     ast_data_declaration_t* data_declaration;
@@ -66,13 +65,6 @@ const char* token_to_str(int);
     ast_exit_statement_t* exit_statement;
     ast_return_statement_t* return_statement;
     ast_for_statement_t* for_statement;
-    ast_tryexcept_statement_t* tryexcept_statement;
-    ast_try_clause_t* try_clause;
-    ast_except_segment_t* except_segment;
-    ast_except_clause_list_t* except_clause_list;
-    ast_final_except_clause_t* final_except_clause;
-    ast_except_clause_t* except_clause;
-    ast_raise_statement_t* raise_statement;
     ast_if_clause_t* if_clause;
     ast_ifelse_statement_t* ifelse_statement;
     ast_else_segment_t* else_segment;
@@ -108,14 +100,13 @@ const char* token_to_str(int);
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
 
-%token IF ELSE WHILE DO TRY EXCEPT RAISE IMPORT YIELD FOR IN TYPE
+%token IF ELSE WHILE DO IMPORT YIELD FOR IN TYPE
 %token BREAK CONTINUE RETURN PRINT TRACE EXIT CONST ITERATOR
 
 %nterm <program> program
 %nterm <program_item_list> program_item_list
 %nterm <import_statement> import_statement
 %nterm <program_item> program_item
-%nterm <exception_identifier> exception_identifier
 %nterm <type_name> type_name
 %nterm <formatted_string> formatted_string
 %nterm <data_declaration> data_declaration
@@ -137,13 +128,6 @@ const char* token_to_str(int);
 %nterm <exit_statement> exit_statement
 %nterm <return_statement> return_statement
 %nterm <for_statement> for_statement
-%nterm <tryexcept_statement> tryexcept_statement
-%nterm <try_clause> try_clause
-%nterm <except_segment> except_segment
-%nterm <except_clause_list> except_clause_list
-%nterm <final_except_clause> final_except_clause
-%nterm <except_clause> except_clause
-%nterm <raise_statement> raise_statement
 %nterm <if_clause> if_clause
 %nterm <ifelse_statement> ifelse_statement
 %nterm <else_segment> else_segment
@@ -196,6 +180,7 @@ program
         TRACE("program");
         root_node = $$ = (ast_program_t*)create_ast_node(AST_PROGRAM);
         $$->program_item_list = $1;
+        pop_context();
     }
     ;
 
@@ -203,6 +188,8 @@ program_item_list
     : program_item {
         TRACE("program_item_list:CREATE");
         $$ = (ast_program_item_list_t*)create_ast_node(AST_PROGRAM_ITEM_LIST);
+        init_context();
+        $$->context = create_context();
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
@@ -242,22 +229,6 @@ program_item
         TRACE("program_item:import_statement");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
-    }
-    | exception_identifier {
-        TRACE("program_item:exception identifier");
-        $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    ;
-
-    /*
-     * Create a exception handler ID symbol.
-     */
-exception_identifier
-    : EXCEPT IDENTIFIER {
-        TRACE("exception_identifier: %s", $2->raw);
-        $$ = (ast_exception_identifier_t*)create_ast_node(AST_EXCEPTION_IDENTIFIER);
-        $$->IDENTIFIER = $2;
     }
     ;
 
@@ -328,6 +299,7 @@ data_declaration_list
         TRACE("data_declaration_list:CREATE");
         $$ = (ast_data_declaration_list_t*)create_ast_node(AST_DATA_DECLARATION_LIST);
         $$->list = create_pointer_list();
+        $$->context = create_context();
         add_pointer_list($$->list, $1);
     }
     | data_declaration_list ',' data_declaration {
@@ -377,7 +349,6 @@ func_name
         $$->IDENTIFIER = $2;
         $$->type_name = $1;
         $$->is_iterator = false;
-
     }
     | ITERATOR type_name IDENTIFIER {
         TRACE("func_name: type_name %s", $3->raw);
@@ -408,6 +379,7 @@ func_definition
         $$->func_name = $1;
         $$->func_params = $2;
         $$->func_body = $3;
+        pop_context(); // func_params
     }
     ;
 
@@ -428,6 +400,7 @@ func_body
         TRACE("func_body: with body");
         $$ = (ast_func_body_t*)create_ast_node(AST_FUNC_BODY);
         $$->func_body_list = $2;
+        pop_context(); // func_body
     }
     ;
 
@@ -437,6 +410,7 @@ func_body_list
         $$ = (ast_func_body_list_t*)create_ast_node(AST_FUNC_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
+        $$->context = create_context();
     }
     | func_body_list func_body_elem {
         TRACE("func_body_list:ADD");
@@ -453,6 +427,7 @@ loop_body
         TRACE("loop_body: with body");
         $$ = (ast_loop_body_t*)create_ast_node(AST_LOOP_BODY);
         $$->loop_body_list = $2;
+        pop_context();
     }
     ;
 
@@ -462,6 +437,7 @@ loop_body_list
         $$ = (ast_loop_body_list_t*)create_ast_node(AST_LOOP_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
+        $$->context = create_context();
     }
     | loop_body_list loop_body_elem {
         TRACE("loop_body_list:ADD");
@@ -534,16 +510,6 @@ func_body_elem
     }
     | ifelse_statement {
         TRACE("func_body_elem:ifelse_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | tryexcept_statement {
-        TRACE("func_body_elem:tryexcept_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | raise_statement {
-        TRACE("func_body_elem:raise_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -643,6 +609,7 @@ for_statement
         $$->IDENTIFIER = $3;
         $$->expression = $5;
         $$->func_body = $7;
+        $$->context = create_context();
     }
     | FOR '(' type_name IDENTIFIER IN expression ')' func_body {
         TRACE("for_statement: with type spec");
@@ -651,96 +618,7 @@ for_statement
         $$->expression = $6;
         $$->func_body = $8;
         $$->type_name = $3;
-    }
-    ;
-
-tryexcept_statement
-    : try_clause except_clause {
-        TRACE("tryexcept_statement");
-        $$ = (ast_tryexcept_statement_t*)create_ast_node(AST_TRYEXCEPT_STATEMENT);
-        $$->try_clause = $1;
-        $$->except_clause = $2;
-    }
-    ;
-
-try_clause
-    : TRY func_body {
-        TRACE("try_clause");
-        $$ = (ast_try_clause_t*)create_ast_node(AST_TRY_CLAUSE);
-        $$->func_body = $2;
-    }
-    ;
-
-    /*
-     * The first identifier is a reference to an expression handler ID and the
-     * second identifier is a symbol definition of a string that requires its
-     * own symbol context, similar to a function definition.
-     */
-except_segment
-    : EXCEPT '(' IDENTIFIER ',' IDENTIFIER ')' func_body {
-        TRACE("except_segment(%s, %s)", $3->raw, $5->raw);
-        $$ = (ast_except_segment_t*)create_ast_node(AST_EXCEPT_SEGMENT);
-        $$->eident = $3;
-        $$->mident = $5;
-        $$->func_body = $7;
-    }
-    ;
-
-except_clause_list
-    : except_segment {
-        TRACE("except_clause_list: CREATE");
-        $$ = (ast_except_clause_list_t*)create_ast_node(AST_EXCEPT_CLAUSE_LIST);
-        $$->list = create_pointer_list();
-        add_pointer_list($$->list, $1);
-    }
-    | except_clause_list except_segment {
-        TRACE("except_clause_list: ADD");
-        add_pointer_list($1->list, $2);
-    }
-    ;
-
-    /*
-     * The identifier is a definition of a string symbol, same as the second
-     * identifier in a except_segment.
-     */
-final_except_clause
-    : EXCEPT '(' IDENTIFIER ')' func_body {
-        TRACE("final_except_clause %s", $3->raw);
-        $$ = (ast_final_except_clause_t*)create_ast_node(AST_FINAL_EXCEPT_CLAUSE);
-        $$->IDENTIFIER = $3;
-        $$->func_body = $5;
-    }
-    ;
-
-except_clause
-    : except_clause_list {
-        TRACE("except_clause: alone");
-        $$ = (ast_except_clause_t*)create_ast_node(AST_EXCEPT_CLAUSE);
-        ($$)->except_clause_list = $1;
-    }
-    | except_clause_list final_except_clause {
-        TRACE("except_clause: with final");
-        $$ = (ast_except_clause_t*)create_ast_node(AST_EXCEPT_CLAUSE);
-        $$->except_clause_list = $1;
-        $$->final_except_clause = $2;
-    }
-    | final_except_clause {
-        TRACE("except_clause:final_except_clause");
-        $$ = (ast_except_clause_t*)create_ast_node(AST_EXCEPT_CLAUSE);
-        $$->final_except_clause = $1;
-    }
-    ;
-
-    /*
-     * The identifier is a reference to an exception ID and the string is
-     * assigned to the second identifier in an except clause.
-     */
-raise_statement
-    : RAISE '(' IDENTIFIER ',' formatted_string ')' {
-        TRACE("raise_statement %s", $3->raw);
-        $$ = (ast_raise_statement_t*)create_ast_node(AST_RAISE_STATEMENT);
-        $$->IDENTIFIER = $3;
-        $$->formatted_string = $5;
+        $$->context = create_context();
     }
     ;
 
@@ -1229,7 +1107,6 @@ expression_param
 
 void yyerror(const char* s) {
 
-    //parser_syntax_error("%s", s);
     fprintf(stderr, "%s:%d:%d: %s\n", get_file_name(), get_line_no(), get_col_no(), s);
 
 }

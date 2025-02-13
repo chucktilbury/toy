@@ -31,13 +31,6 @@ const char* node_type_to_str(ast_node_t* node) {
     (type == AST_FOR_STATEMENT)         ? "AST_FOR_STATEMENT" :
     (type == AST_EXIT_STATEMENT)        ? "AST_EXIT_STATEMENT" :
     (type == AST_RETURN_STATEMENT)      ? "AST_RETURN_STATEMENT" :
-    (type == AST_TRYEXCEPT_STATEMENT)   ? "AST_TRYEXCEPT_STATEMENT" :
-    (type == AST_TRY_CLAUSE)            ? "AST_TRY_CLAUSE" :
-    (type == AST_EXCEPT_SEGMENT)        ? "AST_EXCEPT_SEGMENT" :
-    (type == AST_EXCEPT_CLAUSE_LIST)    ? "AST_EXCEPT_CLAUSE_LIST" :
-    (type == AST_FINAL_EXCEPT_CLAUSE)   ? "AST_FINAL_EXCEPT_CLAUSE" :
-    (type == AST_EXCEPT_CLAUSE)         ? "AST_EXCEPT_CLAUSE" :
-    (type == AST_RAISE_STATEMENT)       ? "AST_RAISE_STATEMENT" :
     (type == AST_IF_CLAUSE)             ? "AST_IF_CLAUSE" :
     (type == AST_IFELSE_STATEMENT)      ? "AST_IFELSE_STATEMENT" :
     (type == AST_ELSE_SEGMENT)          ? "AST_ELSE_SEGMENT" :
@@ -92,13 +85,6 @@ const char* node_type_to_name(ast_node_t* node) {
     (type == AST_FOR_STATEMENT)         ? "for_statement" :
     (type == AST_EXIT_STATEMENT)        ? "exit_statement" :
     (type == AST_RETURN_STATEMENT)      ? "return_statement" :
-    (type == AST_TRYEXCEPT_STATEMENT)   ? "tryexcept_statement" :
-    (type == AST_TRY_CLAUSE)            ? "try_clause" :
-    (type == AST_EXCEPT_SEGMENT)        ? "except_segment" :
-    (type == AST_EXCEPT_CLAUSE_LIST)    ? "except_clause_list" :
-    (type == AST_FINAL_EXCEPT_CLAUSE)   ? "final_except_clause" :
-    (type == AST_EXCEPT_CLAUSE)         ? "except_clause" :
-    (type == AST_RAISE_STATEMENT)       ? "raise_statement" :
     (type == AST_IF_CLAUSE)             ? "if_clause" :
     (type == AST_IFELSE_STATEMENT)      ? "ifelse_statement" :
     (type == AST_ELSE_SEGMENT)          ? "else_segment" :
@@ -150,13 +136,6 @@ size_t alloc_ast_node_size(ast_type_t type) {
     (type == AST_PRINT_STATEMENT)       ? sizeof(ast_print_statement_t) :
     (type == AST_EXIT_STATEMENT)        ? sizeof(ast_exit_statement_t) :
     (type == AST_RETURN_STATEMENT)      ? sizeof(ast_return_statement_t) :
-    (type == AST_TRYEXCEPT_STATEMENT)   ? sizeof(ast_tryexcept_statement_t) :
-    (type == AST_TRY_CLAUSE)            ? sizeof(ast_try_clause_t) :
-    (type == AST_EXCEPT_SEGMENT)        ? sizeof(ast_except_segment_t) :
-    (type == AST_EXCEPT_CLAUSE_LIST)    ? sizeof(ast_except_clause_list_t) :
-    (type == AST_FINAL_EXCEPT_CLAUSE)   ? sizeof(ast_final_except_clause_t) :
-    (type == AST_EXCEPT_CLAUSE)         ? sizeof(ast_except_clause_t) :
-    (type == AST_RAISE_STATEMENT)       ? sizeof(ast_raise_statement_t) :
     (type == AST_FOR_STATEMENT)         ? sizeof(ast_for_statement_t) :
     (type == AST_IF_CLAUSE)             ? sizeof(ast_if_clause_t) :
     (type == AST_IFELSE_STATEMENT)      ? sizeof(ast_ifelse_statement_t) :
@@ -185,7 +164,6 @@ size_t alloc_ast_node_size(ast_type_t type) {
     (type == AST_LIST_INIT)             ? sizeof(ast_list_init_t) :
     (type == AST_DICT_INIT_ITEM)        ? sizeof(ast_dict_init_item_t) :
     (type == AST_DICT_INIT_ITEM_LIST)   ? sizeof(ast_dict_init_item_list_t) :
-    (type == AST_EXCEPTION_IDENTIFIER)  ? sizeof(ast_exception_identifier_t) :
     (size_t)-1;
 }
 

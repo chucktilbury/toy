@@ -5,6 +5,7 @@
 
 #include "pointer_list.h"
 #include "tokens.h"
+#include "context.h"
 
 typedef enum {
     AST_PROGRAM,
@@ -31,13 +32,6 @@ typedef enum {
     AST_PRINT_STATEMENT,
     AST_EXIT_STATEMENT,
     AST_RETURN_STATEMENT,
-    AST_TRYEXCEPT_STATEMENT,
-    AST_TRY_CLAUSE,
-    AST_EXCEPT_SEGMENT,
-    AST_EXCEPT_CLAUSE_LIST,
-    AST_FINAL_EXCEPT_CLAUSE,
-    AST_EXCEPT_CLAUSE,
-    AST_RAISE_STATEMENT,
     AST_FOR_STATEMENT,
     AST_IF_CLAUSE,
     AST_IFELSE_STATEMENT,
@@ -95,6 +89,7 @@ typedef struct _ast_program_t {
 typedef struct _ast_program_item_list_t {
     ast_node_t node;
     pointer_list_t* list;
+    context_t* context;
 } ast_program_item_list_t;
 
 /*
@@ -120,16 +115,6 @@ typedef struct _ast_program_item_t {
     ast_node_t node;
     ast_node_t* nterm;
 } ast_program_item_t;
-
-/*
- * exception_identifier
- *    : EXCEPT IDENTIFIER
- *    ;
- */
-typedef struct _ast_exception_identifier_t {
-    ast_node_t node;
-    token_t* IDENTIFIER;
-} ast_exception_identifier_t;
 
 /*
  * type_name
@@ -179,6 +164,7 @@ typedef struct _ast_data_declaration_t {
 typedef struct _ast_data_declaration_list_t {
     ast_node_t node;
     pointer_list_t* list;
+    context_t* context;
 } ast_data_declaration_list_t;
 
 /*
@@ -252,6 +238,7 @@ typedef struct _ast_func_body_t {
 typedef struct _ast_func_body_list_t {
     ast_node_t node;
     pointer_list_t* list;
+    context_t* context;
 } ast_func_body_list_t;
 
 /*
@@ -274,6 +261,7 @@ typedef struct _ast_loop_body_t {
 typedef struct _ast_loop_body_list_t {
     ast_node_t node;
     pointer_list_t* list;
+    context_t* context;
 } ast_loop_body_list_t;
 
 /*
@@ -309,8 +297,6 @@ typedef struct _ast_loop_body_elem_t {
  *    | do_statement
  *    | for_statement
  *    | ifelse_statement
- *    | tryexcept_statement
- *    | raise_statement
  *    | return_statement
  *    | exit_statement
  *    | print_statement
@@ -389,86 +375,8 @@ typedef struct _ast_for_statement_t {
     token_t* IDENTIFIER;
     struct _ast_expression_t* expression;
     struct _ast_func_body_t* func_body;
+    context_t* context;
 } ast_for_statement_t;
-
-/*
- * tryexcept_statement
- *    : try_clause except_clause
- *    ;
- */
-typedef struct _ast_tryexcept_statement_t {
-    ast_node_t node;
-    struct _ast_try_clause_t* try_clause;
-    struct _ast_except_clause_t* except_clause;
-} ast_tryexcept_statement_t;
-
-/*
- * try_clause
- *    : TRY func_body
- *    ;
- */
-typedef struct _ast_try_clause_t {
-    ast_node_t node;
-    struct _ast_func_body_t* func_body;
-} ast_try_clause_t;
-
-/*
- * except_segment
- *    : EXCEPT '(' IDENTIFIER ',' IDENTIFIER ')' func_body
- *    ;
- */
-typedef struct _ast_except_segment_t {
-    ast_node_t node;
-    token_t* eident;
-    token_t* mident;
-    struct _ast_func_body_t* func_body;
-} ast_except_segment_t;
-
-/*
- * except_clause_list
- *    : except_segment
- *    | except_clause_list except_segment
- *    ;
- */
-typedef struct _ast_except_clause_list_t {
-    ast_node_t node;
-    pointer_list_t* list;
-} ast_except_clause_list_t;
-
-/*
- * final_except_clause
- *    : EXCEPT '(' IDENTIFIER ')' func_body
- *    ;
- */
-typedef struct _ast_final_except_clause_t {
-    ast_node_t node;
-    token_t* IDENTIFIER;
-    struct _ast_func_body_t* func_body;
-} ast_final_except_clause_t;
-
-/*
- * except_clause
- *    : except_clause_list
- *    | except_clause_list final_except_clause
- *    | final_except_clause
- *    ;
- */
-typedef struct _ast_except_clause_t {
-    ast_node_t node;
-    struct _ast_except_clause_list_t* except_clause_list;
-    struct _ast_final_except_clause_t* final_except_clause;
-} ast_except_clause_t;
-
-/*
- * raise_statement
- *    : RAISE '(' IDENTIFIER ',' formatted_string ')'
- *    ;
- */
-typedef struct _ast_raise_statement_t {
-    ast_node_t node;
-    token_t* IDENTIFIER;
-    struct _ast_formatted_string_t* formatted_string;
-} ast_raise_statement_t;
 
 /*
  * if_clause
@@ -775,6 +683,7 @@ typedef struct _ast_expression_t {
 typedef struct _ast_expression_list_t {
     ast_node_t node;
     pointer_list_t* list;
+    context_t* context;
 } ast_expression_list_t;
 
 /*

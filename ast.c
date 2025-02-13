@@ -79,7 +79,6 @@ static inline void traverse_program(ast_program_t* node, void (*pre)(ast_node_t*
 static inline void traverse_program_item_list(ast_program_item_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_import_statement(ast_import_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_program_item(ast_program_item_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_exception_identifier(ast_exception_identifier_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_type_name(ast_type_name_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_formatted_string(ast_formatted_string_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_data_declaration(ast_data_declaration_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -101,13 +100,6 @@ static inline void traverse_print_statement(ast_print_statement_t* node, void (*
 static inline void traverse_exit_statement(ast_exit_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_return_statement(ast_return_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_for_statement(ast_for_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_tryexcept_statement(ast_tryexcept_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_try_clause(ast_try_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_except_segment(ast_except_segment_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_except_clause_list(ast_except_clause_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_final_except_clause(ast_final_except_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_except_clause(ast_except_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_raise_statement(ast_raise_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_if_clause(ast_if_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_ifelse_statement(ast_ifelse_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_else_segment(ast_else_segment_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -197,25 +189,8 @@ static inline void traverse_program_item(ast_program_item_t* node, void (*pre)(a
         CASE(AST_FUNC_DEFINITION, func_definition);
         CASE(AST_FUNC_BODY, func_body);
         CASE(AST_IMPORT_STATEMENT, import_statement);
-        CASE(AST_EXCEPTION_IDENTIFIER, exception_identifier);
         DEFAULT;
     }
-
-    AST_RETURN;
-}
-
-/*
- * Create a exception handler ID symbol.
- *
- * exception_identifier
- *    : EXCEPT IDENTIFIER
- *    ;
- */
-static inline void traverse_exception_identifier(ast_exception_identifier_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_EXCEPTION_IDENTIFIER);
-
-    TRACE_TOKEN(IDENTIFIER);
 
     AST_RETURN;
 }
@@ -471,8 +446,6 @@ static inline void traverse_loop_body_elem(ast_loop_body_elem_t* node, void (*pr
  *    | do_statement
  *    | for_statement
  *    | ifelse_statement
- *    | tryexcept_statement
- *    | raise_statement
  *    | return_statement
  *    | exit_statement
  *    | print_statement
@@ -492,8 +465,6 @@ static inline void traverse_func_body_elem(ast_func_body_elem_t* node, void (*pr
         CASE(AST_DO_STATEMENT, do_statement);
         CASE(AST_FOR_STATEMENT, for_statement);
         CASE(AST_IFELSE_STATEMENT, ifelse_statement);
-        CASE(AST_TRYEXCEPT_STATEMENT, tryexcept_statement);
-        CASE(AST_RAISE_STATEMENT, raise_statement);
         CASE(AST_RETURN_STATEMENT, return_statement);
         CASE(AST_EXIT_STATEMENT, exit_statement);
         CASE(AST_PRINT_STATEMENT, print_statement);
@@ -597,123 +568,6 @@ static inline void traverse_for_statement(ast_for_statement_t* node, void (*pre)
     TRAVERSE(type_name);
     TRAVERSE(expression);
     TRAVERSE(func_body);
-
-    AST_RETURN;
-}
-
-/*
- * tryexcept_statement
- *    : try_clause except_clause
- *    ;
- */
-static inline void traverse_tryexcept_statement(ast_tryexcept_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_TRYEXCEPT_STATEMENT);
-
-    TRAVERSE(try_clause);
-    TRAVERSE(except_clause);
-
-    AST_RETURN;
-}
-
-/*
- * try_clause
- *    : TRY func_body
- *    ;
- */
-static inline void traverse_try_clause(ast_try_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_TRY_CLAUSE);
-
-    TRAVERSE(func_body);
-
-    AST_RETURN;
-}
-
-/*
- * The first identifier is a reference to an expression handler ID and the
- * second identifier is a symbol definition of a string that requires its
- * own symbol context, similar to a function definition.
- *
- * except_segment
- *    : EXCEPT '(' IDENTIFIER ',' IDENTIFIER ')' func_body
- *    ;
- */
-static inline void traverse_except_segment(ast_except_segment_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_EXCEPT_SEGMENT);
-
-    TRACE_TOKEN(eident);
-    TRACE_TOKEN(mident);
-    TRAVERSE(func_body);
-
-    AST_RETURN;
-}
-
-/*
- * except_clause_list
- *    : except_segment
- *    | except_clause_list except_segment
- *    ;
- */
-static inline void traverse_except_clause_list(ast_except_clause_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_EXCEPT_CLAUSE_LIST);
-
-    TRAVERSE_LIST(except_segment);
-
-    AST_RETURN;
-}
-
-/*
- * The identifier is a definition of a string symbol, same as the second
- * identifier in a except_segment.
- *
- * final_except_clause
- *    : EXCEPT '(' IDENTIFIER ')' func_body
- *    ;
- */
-static inline void traverse_final_except_clause(ast_final_except_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_FINAL_EXCEPT_CLAUSE);
-
-    TRACE_TOKEN(IDENTIFIER);
-    TRAVERSE(func_body);
-
-    AST_RETURN;
-}
-
-/*
- * except_clause
- *    : except_clause_list
- *    | except_clause_list final_except_clause
- *    | final_except_clause
- *    ;
- */
-static inline void traverse_except_clause(ast_except_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_EXCEPT_CLAUSE);
-
-    TRAVERSE(except_clause_list);
-    TRAVERSE(final_except_clause);
-
-    AST_RETURN;
-}
-
-/*
- * The identifier is a reference to an exception ID and the string is
- * assigned to the second identifier in an except clause.
- *
- * raise_statement
- *    : RAISE '(' IDENTIFIER ',' formatted_string ')'
- *    ;
- */
-static inline void traverse_raise_statement(ast_raise_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_RAISE_STATEMENT);
-
-    TRACE_TOKEN(IDENTIFIER);
-    TRAVERSE(formatted_string);
 
     AST_RETURN;
 }

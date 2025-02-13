@@ -12,6 +12,7 @@ OBJS	=	tokens.o \
 		ast_tables.o \
 		pointer_list.o \
 		string_buffer.o \
+		context.o \
 		trace.o
 #  		symtab.o
 #		sym_reference.o

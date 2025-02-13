@@ -1,7 +1,7 @@
 
 /*
- * Support routines for the parser symbol table creation.
- *
+ *  This AST pass creates the symbol table. The symbol context has already been
+ *  created byt the parser.
  */
 #include <stdio.h>
 #include <string.h>

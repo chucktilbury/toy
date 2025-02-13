@@ -65,9 +65,6 @@ const char* strip_quotes(const char* str) {
 "else"      { return ELSE; }
 "while"     { return WHILE; }
 "do"        { return DO; }
-"try"       { return TRY; }
-"except"    { return EXCEPT; }
-"raise"     { return RAISE; }
 "yield"     { return YIELD; }
 "break"     { return BREAK; }
 "continue"  { return CONTINUE; }
