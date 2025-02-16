@@ -48,7 +48,6 @@ typedef enum {
     AST_EXPRESSION_LIST,
     AST_EXPRESSION_LIST_PARAM,
     AST_EXPRESSION_PARAM,
-    AST_EXCEPTION_IDENTIFIER,
 } ast_type_t;
 
 typedef struct {
