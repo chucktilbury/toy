@@ -94,12 +94,9 @@ static inline void traverse_loop_body_list(ast_loop_body_list_t* node, void (*pr
 static inline void traverse_loop_body_diffs(ast_loop_body_diffs_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_loop_body_elem(ast_loop_body_elem_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_func_body_elem(ast_func_body_elem_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_trace_statement(ast_trace_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_inline_statement(ast_inline_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_print_statement(ast_print_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_exit_statement(ast_exit_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_return_statement(ast_return_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_for_statement(ast_for_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_if_clause(ast_if_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_ifelse_statement(ast_ifelse_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_else_segment(ast_else_segment_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -110,18 +107,9 @@ static inline void traverse_while_clause(ast_while_clause_t* node, void (*pre)(a
 static inline void traverse_while_statement(ast_while_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_do_statement(ast_do_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_assignment_right(ast_assignment_right_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_list_init(ast_list_init_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_dict_init_item(ast_dict_init_item_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_dict_init_item_list(ast_dict_init_item_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_dict_init(ast_dict_init_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_assignment_left(ast_assignment_left_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_assignment(ast_assignment_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_raw_value(ast_raw_value_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_expr_primary(ast_expr_primary_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_list_reference(ast_list_reference_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_list_ref_value(ast_list_ref_value_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_list_ref_param(ast_list_ref_param_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_list_ref_param_list(ast_list_ref_param_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_func_reference(ast_func_reference_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_expression(ast_expression_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_expression_list(ast_expression_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -276,14 +264,8 @@ static inline void traverse_data_definition(ast_data_definition_t* node, void (*
     AST_ENTER(AST_DATA_DEFINITION);
 
     TRAVERSE(data_declaration);
+    TRAVERSE(expression);
     TRACE_BOOL(is_init);
-
-    SWITCH {
-        CASE(AST_EXPRESSION, expression);
-        CASE(AST_LIST_INIT, list_init);
-        CASE(AST_DICT_INIT, dict_init);
-        DEFAULT;
-    }
 
     AST_RETURN;
 }
@@ -463,31 +445,13 @@ static inline void traverse_func_body_elem(ast_func_body_elem_t* node, void (*pr
         CASE(AST_ASSIGNMENT, assignment);
         CASE(AST_WHILE_STATEMENT, while_statement);
         CASE(AST_DO_STATEMENT, do_statement);
-        CASE(AST_FOR_STATEMENT, for_statement);
         CASE(AST_IFELSE_STATEMENT, ifelse_statement);
         CASE(AST_RETURN_STATEMENT, return_statement);
         CASE(AST_EXIT_STATEMENT, exit_statement);
-        CASE(AST_PRINT_STATEMENT, print_statement);
-        CASE(AST_TRACE_STATEMENT, trace_statement);
         CASE(AST_INLINE_STATEMENT, inline_statement);
         CASE(AST_FUNC_BODY, func_body);
         DEFAULT;
     }
-
-    AST_RETURN;
-}
-
-/*
- * trace_statement
- *    : TRACE expression_list_param
- *    | TRACE
- *    ;
- */
-static inline void traverse_trace_statement(ast_trace_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_TRACE_STATEMENT);
-
-    TRAVERSE(expression_list_param);
 
     AST_RETURN;
 }
@@ -502,21 +466,6 @@ static inline void traverse_inline_statement(ast_inline_statement_t* node, void 
     AST_ENTER(AST_INLINE_STATEMENT);
 
     TRACE_TOKEN(token);
-
-    AST_RETURN;
-}
-
-/*
- * print_statement
- *    : PRINT expression_list_param
- *    | PRINT
- *    ;
- */
-static inline void traverse_print_statement(ast_print_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_PRINT_STATEMENT);
-
-    TRAVERSE(expression_list_param);
 
     AST_RETURN;
 }
@@ -550,27 +499,6 @@ static inline void traverse_return_statement(ast_return_statement_t* node, void 
     AST_RETURN;
 }
 
-/*
- * If the type name is specified then this is a symbol definition, but
- * if not, then it is a symbol reference. Either way it gets it's own
- * symbol context similar to a function definition.
- *
- * for_statement
- *    : FOR '(' IDENTIFIER IN expression ')' func_body
- *    | FOR '(' type_name IDENTIFIER IN expression ')' func_body
- *    ;
- */
-static inline void traverse_for_statement(ast_for_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_FOR_STATEMENT);
-
-    TRACE_TOKEN(IDENTIFIER);
-    TRAVERSE(type_name);
-    TRAVERSE(expression);
-    TRAVERSE(func_body);
-
-    AST_RETURN;
-}
 
 /*
  * if_clause
@@ -723,93 +651,11 @@ static inline void traverse_assignment_right(ast_assignment_right_t* node, void 
     AST_ENTER(AST_ASSIGNMENT_RIGHT);
 
     TRAVERSE(type_name);
-
-    SWITCH {
-        CASE(AST_EXPRESSION, expression);
-        CASE(AST_LIST_INIT, list_init);
-        CASE(AST_DICT_INIT, dict_init);
-        DEFAULT;
-    }
-
-    AST_RETURN;
-}
-
-/*
- * list_init
- *    : '[' expression_list ']'
- *    ;
- */
-static inline void traverse_list_init(ast_list_init_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_LIST_INIT);
-
-    TRAVERSE(expression_list);
-
-    AST_RETURN;
-}
-
-/*
- * dict_init_item
- *    : STRING_LIT ':' expression
- *    ;
- */
-static inline void traverse_dict_init_item(ast_dict_init_item_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_DICT_INIT_ITEM);
-
-    TRACE_TOKEN(STRING_LIT);
     TRAVERSE(expression);
 
     AST_RETURN;
 }
 
-/*
- * dict_init_item_list
- *    : dict_init_item
- *    | dict_init_item_list ',' dict_init_item
- *    ;
- */
-static inline void traverse_dict_init_item_list(ast_dict_init_item_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_DICT_INIT_ITEM_LIST);
-
-    TRAVERSE_LIST(dict_init_item);
-
-    AST_RETURN;
-}
-
-/*
- * dict_init
- *    : '[' dict_init_item_list ']'
- *    ;
- */
-static inline void traverse_dict_init(ast_dict_init_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_DICT_INIT);
-
-    TRAVERSE(dict_init_item_list);
-
-    AST_RETURN;
-}
-
-/*
- * Identifier is a reference that has to be examined when the variable
- * references are verified.
- *
- * assignment_left
- *    : IDENTIFIER
- *    | list_reference
- *    ;
- */
-static inline void traverse_assignment_left(ast_assignment_left_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_ASSIGNMENT_LEFT);
-
-    TRACE_TOKEN(IDENTIFIER);
-    TRAVERSE(list_reference);
-
-    AST_RETURN;
-}
 
 /*
  * assignment
@@ -820,7 +666,7 @@ static inline void traverse_assignment(ast_assignment_t* node, void (*pre)(ast_n
 
     AST_ENTER(AST_ASSIGNMENT);
 
-    TRAVERSE(assignment_left);
+    TRACE_TOKEN(IDENTIFIER);
     TRAVERSE(assignment_right);
 
     AST_RETURN;
@@ -848,8 +694,6 @@ static inline void traverse_raw_value(ast_raw_value_t* node, void (*pre)(ast_nod
  * expr_primary
  *    : raw_value
  *    | formatted_string
- *    | list_reference
- *    | func_reference
  *    ;
  */
 static inline void traverse_expr_primary(ast_expr_primary_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
@@ -859,91 +703,12 @@ static inline void traverse_expr_primary(ast_expr_primary_t* node, void (*pre)(a
     SWITCH {
         CASE(AST_RAW_VALUE, raw_value);
         CASE(AST_FORMATTED_STRING, formatted_string);
-        CASE(AST_LIST_REFERENCE, list_reference);
         CASE(AST_FUNC_REFERENCE, func_reference);
         DEFAULT;
     }
 
     AST_RETURN;
 }
-
-/*
- * This includes hashes as well as lists, since they are the same syntax.
- *
- * list_reference
- *    : IDENTIFIER list_ref_param_list
- *    ;
- */
-static inline void traverse_list_reference(ast_list_reference_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_LIST_REFERENCE);
-
-    TRACE_TOKEN(IDENTIFIER);
-    TRAVERSE(list_ref_param_list);
-
-    AST_RETURN;
-}
-
-/*
- * These have to be throurally check for symantic correctness.
- *
- * list_ref_value
- *    : IDENTIFIER
- *    | INTEGER_LIT
- *    | STRING_LIT
- *    | list_reference
- *    | func_reference
- *    | list_ref_param
- *    ;
- */
-static inline void traverse_list_ref_value(ast_list_ref_value_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_LIST_REF_VALUE);
-
-    if(node->token != NULL) {
-        TRACE_TOKEN(token);
-    }
-    else {
-        SWITCH {
-            CASE(AST_LIST_REFERENCE, list_reference);
-            CASE(AST_FUNC_REFERENCE, func_reference);
-            CASE(AST_LIST_REF_PARAM, list_ref_param);
-            DEFAULT;
-        }
-    }
-
-    AST_RETURN;
-}
-
-/*
- * list_ref_param
- *    : '[' list_ref_value ']'
- *    ;
- */
-static inline void traverse_list_ref_param(ast_list_ref_param_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_LIST_REF_PARAM);
-
-    TRAVERSE(list_ref_value);
-
-    AST_RETURN;
-}
-
-/*
- * list_ref_param_list
- *    : list_ref_param
- *    | list_ref_param_list list_ref_param
- *    ;
- */
-static inline void traverse_list_ref_param_list(ast_list_ref_param_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_LIST_REF_PARAM_LIST);
-
-    TRAVERSE_LIST(list_ref_param);
-
-    AST_RETURN;
-}
-
 
 /*
  * func_reference

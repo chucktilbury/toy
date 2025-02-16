@@ -59,12 +59,9 @@ const char* token_to_str(int);
     ast_loop_body_diffs_t* loop_body_diffs;
     ast_loop_body_elem_t* loop_body_elem;
     ast_func_body_elem_t* func_body_elem;
-    ast_trace_statement_t* trace_statement;
     ast_inline_statement_t* inline_statement;
-    ast_print_statement_t* print_statement;
     ast_exit_statement_t* exit_statement;
     ast_return_statement_t* return_statement;
-    ast_for_statement_t* for_statement;
     ast_if_clause_t* if_clause;
     ast_ifelse_statement_t* ifelse_statement;
     ast_else_segment_t* else_segment;
@@ -75,18 +72,9 @@ const char* token_to_str(int);
     ast_while_statement_t* while_statement;
     ast_do_statement_t* do_statement;
     ast_assignment_right_t* assignment_right;
-    ast_list_init_t* list_init;
-    ast_dict_init_item_t* dict_init_item;
-    ast_dict_init_item_list_t* dict_init_item_list;
-    ast_dict_init_t* dict_init;
-    ast_assignment_left_t* assignment_left;
     ast_assignment_t* assignment;
     ast_raw_value_t* raw_value;
     ast_expr_primary_t* expr_primary;
-    ast_list_reference_t* list_reference;
-    ast_list_ref_value_t* list_ref_value;
-    ast_list_ref_param_t* list_ref_param;
-    ast_list_ref_param_list_t* list_ref_param_list;
     ast_func_reference_t* func_reference;
     ast_expression_t* expression;
     ast_expression_list_t* expression_list;
@@ -95,13 +83,13 @@ const char* token_to_str(int);
 };
 
 %token <token> IDENTIFIER STRING_LIT INTEGER_LIT FLOAT_LIT
-%token <token> INTEGER FLOAT STRING LIST HASH NOTHING INLINE
+%token <token> INTEGER FLOAT STRING NOTHING INLINE
 %token <token> EQU_OPER NEQ_OPER LTE_OPER GTE_OPER LT_OPER
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
 
-%token IF ELSE WHILE DO IMPORT YIELD FOR IN TYPE
-%token BREAK CONTINUE RETURN PRINT TRACE EXIT CONST ITERATOR
+%token IF ELSE WHILE DO IMPORT YIELD
+%token BREAK CONTINUE RETURN EXIT CONST ITERATOR
 
 %nterm <program> program
 %nterm <program_item_list> program_item_list
@@ -122,12 +110,9 @@ const char* token_to_str(int);
 %nterm <loop_body_diffs> loop_body_diffs
 %nterm <loop_body_elem> loop_body_elem
 %nterm <func_body_elem> func_body_elem
-%nterm <trace_statement> trace_statement
 %nterm <inline_statement> inline_statement
-%nterm <print_statement> print_statement
 %nterm <exit_statement> exit_statement
 %nterm <return_statement> return_statement
-%nterm <for_statement> for_statement
 %nterm <if_clause> if_clause
 %nterm <ifelse_statement> ifelse_statement
 %nterm <else_segment> else_segment
@@ -138,18 +123,9 @@ const char* token_to_str(int);
 %nterm <while_statement> while_statement
 %nterm <do_statement> do_statement
 %nterm <assignment_right> assignment_right
-%nterm <list_init> list_init
-%nterm <dict_init_item> dict_init_item
-%nterm <dict_init_item_list> dict_init_item_list
-%nterm <dict_init> dict_init
-%nterm <assignment_left> assignment_left
 %nterm <assignment> assignment
 %nterm <raw_value> raw_value
 %nterm <expr_primary> expr_primary
-%nterm <list_reference> list_reference
-%nterm <list_ref_value> list_ref_value
-%nterm <list_ref_param> list_ref_param
-%nterm <list_ref_param_list> list_ref_param_list
 %nterm <func_reference> func_reference
 %nterm <expression> expression
 %nterm <expression_list> expression_list
@@ -248,16 +224,6 @@ type_name
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
-    | LIST {
-        TRACE("type_name:LIST");
-        $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
-        $$->token = $1;
-    }
-    | HASH {
-        TRACE("type_name:HASH");
-        $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
-        $$->token = $1;
-    }
     ;
 
 formatted_string
@@ -319,21 +285,7 @@ data_definition
         TRACE("data_definition: with expression");
         $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
         $$->data_declaration = $1;
-        $$->nterm = (ast_node_t*)$3;
-        $$->is_init = true;
-    }
-    | data_declaration '=' list_init {
-        TRACE("data_definition: with list_init");
-        $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
-        $$->data_declaration = $1;
-        $$->nterm = (ast_node_t*)$3;
-        $$->is_init = true;
-    }
-    | data_declaration '=' dict_init {
-        TRACE("data_definition: with dict_init");
-        $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
-        $$->data_declaration = $1;
-        $$->nterm = (ast_node_t*)$3;
+        $$->expression = $3;
         $$->is_init = true;
     }
     ;
@@ -503,11 +455,6 @@ func_body_elem
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
-    | for_statement {
-        TRACE("func_body_elem:for_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
     | ifelse_statement {
         TRACE("func_body_elem:ifelse_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
@@ -520,16 +467,6 @@ func_body_elem
     }
     | exit_statement {
         TRACE("func_body_elem:exit_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | print_statement {
-        TRACE("func_body_elem:print_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | trace_statement {
-        TRACE("func_body_elem:trace_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -553,30 +490,6 @@ inline_statement
     }
     ;
 
-trace_statement
-    : TRACE expression_list_param {
-        TRACE("trace_statement: with params");
-        $$ = (ast_trace_statement_t*)create_ast_node(AST_TRACE_STATEMENT);
-        $$->expression_list_param = $2;
-    }
-    | TRACE {
-        TRACE("trace_statement: bare");
-        $$ = (ast_trace_statement_t*)create_ast_node(AST_TRACE_STATEMENT);
-    }
-    ;
-
-print_statement
-    : PRINT expression_list_param {
-        TRACE("print_statement: with params");
-        $$ = (ast_print_statement_t*)create_ast_node(AST_PRINT_STATEMENT);
-        $$->expression_list_param = $2;
-    }
-    | PRINT {
-        TRACE("print_statement: bare");
-        $$ = (ast_print_statement_t*)create_ast_node(AST_PRINT_STATEMENT);
-    }
-    ;
-
 exit_statement
     : EXIT expression_param {
         TRACE("exit_statement: with params");
@@ -594,31 +507,6 @@ return_statement
     | RETURN {
         TRACE("return_statement: bare");
         $$ = (ast_return_statement_t*)create_ast_node(AST_RETURN_STATEMENT);
-    }
-    ;
-
-    /*
-     * If the type name is specified then this is a symbol definition, but
-     * if not, then it is a symbol reference. Either way it gets it's own
-     * symbol context similar to a function definition.
-     */
-for_statement
-    : FOR '(' IDENTIFIER IN expression ')' func_body {
-        TRACE("for_statement: no type spec");
-        $$ = (ast_for_statement_t*)create_ast_node(AST_FOR_STATEMENT);
-        $$->IDENTIFIER = $3;
-        $$->expression = $5;
-        $$->func_body = $7;
-        $$->context = create_context();
-    }
-    | FOR '(' type_name IDENTIFIER IN expression ')' func_body {
-        TRACE("for_statement: with type spec");
-        $$ = (ast_for_statement_t*)create_ast_node(AST_FOR_STATEMENT);
-        $$->IDENTIFIER = $4;
-        $$->expression = $6;
-        $$->func_body = $8;
-        $$->type_name = $3;
-        $$->context = create_context();
     }
     ;
 
@@ -733,90 +621,21 @@ assignment_right
     : expression {
         TRACE("assignment_right");
         $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | list_init {
-        TRACE("assignment_right:list_init");
-        $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | dict_init {
-        TRACE("assignment_right:dict_init");
-        $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | TYPE ':' expression {
-        $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
-        $$->nterm = (ast_node_t*)$3;
+        $$->expression = $1;
     }
     | type_name ':' expression {
         TRACE("assignment_right: as a cast");
         $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
-        $$->nterm = (ast_node_t*)$3;
+        $$->expression = $3;
         $$->type_name = $1;
     }
     ;
 
-list_init
-    : '[' expression_list ']' {
-        TRACE("list_init");
-        $$ = (ast_list_init_t*)create_ast_node(AST_LIST_INIT);
-        $$->expression_list = $2;
-    }
-    ;
-
-dict_init_item
-    : STRING_LIT ':' expression {
-        TRACE("dict_init_item");
-        $$ = (ast_dict_init_item_t*)create_ast_node(AST_DICT_INIT_ITEM);
-        $$->STRING_LIT = $1;
-        $$->expression = $3;
-    }
-    ;
-
-dict_init_item_list
-    : dict_init_item {
-        TRACE("dict_init_item_list: CREATE");
-        $$ = (ast_dict_init_item_list_t*)create_ast_node(AST_DICT_INIT_ITEM_LIST);
-        $$->list = create_pointer_list();
-        add_pointer_list($$->list, $1);
-    }
-    | dict_init_item_list ',' dict_init_item {
-        TRACE("dict_init_item_list: ADD");
-        add_pointer_list($1->list, $3);
-    }
-    ;
-
-dict_init
-    : '[' dict_init_item_list ']' {
-        TRACE("dict_init");
-        $$ = (ast_dict_init_t*)create_ast_node(AST_DICT_INIT);
-        $$->dict_init_item_list = $2;
-    }
-    ;
-
-    /*
-     * Identifier is a reference that has to be examined when the variable
-     * references are verified.
-     */
-assignment_left
-    : IDENTIFIER {
-        TRACE("assignment_left: identifier %s", $1->raw);
-        $$ = (ast_assignment_left_t*)create_ast_node(AST_ASSIGNMENT_LEFT);
-        $$->IDENTIFIER = $1;
-    }
-    | list_reference {
-        TRACE("assignment_left: list");
-        $$ = (ast_assignment_left_t*)create_ast_node(AST_ASSIGNMENT_LEFT);
-        $$->list_reference = $1;
-    }
-    ;
-
 assignment
-    : assignment_left '=' assignment_right {
+    : IDENTIFIER '=' assignment_right {
         TRACE("assignment");
         $$ = (ast_assignment_t*)create_ast_node(AST_ASSIGNMENT);
-        $$->assignment_left = $1;
+        $$->IDENTIFIER = $1;
         $$->assignment_right = $3;
     }
     ;
@@ -853,84 +672,10 @@ expr_primary
         $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
         $$->nterm = (ast_node_t*)$1;
     }
-    | list_reference {
-        TRACE("expr_primary:list_reference");
-        $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
-        $$->nterm = (ast_node_t*)$1;
-    }
     | func_reference {
         TRACE("expr_primary:func_reference");
         $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
         $$->nterm = (ast_node_t*)$1;
-    }
-    ;
-
-    /*
-     * This includes hashes as well as lists, since they are the same syntax.
-     */
-list_reference
-    : IDENTIFIER list_ref_param_list {
-        TRACE("list_reference: %s", $1->raw);
-        $$ = (ast_list_reference_t*)create_ast_node(AST_LIST_REFERENCE);
-        $$->IDENTIFIER = $1;
-        $$->list_ref_param_list = $2;
-    }
-    ;
-
-    /*
-     * These have to be throurally check for symantic correctness.
-     */
-list_ref_value
-    : IDENTIFIER {
-        TRACE("list_ref_value:IDENTIFIER");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->token = $1;
-    }
-    | INTEGER_LIT {
-        TRACE("list_ref_value:INTEGER_LIT");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->token = $1;
-    }
-    | STRING_LIT {
-        TRACE("list_ref_value:STRING_LIT");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->token = $1;
-    }
-    | list_reference {
-        TRACE("list_ref_value:list_reference");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | func_reference {
-        TRACE("list_ref_value:func_reference");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | list_ref_param {
-        TRACE("list_ref_value:list_ref_param");
-        $$ = (ast_list_ref_value_t*)create_ast_node(AST_LIST_REF_VALUE);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    ;
-
-list_ref_param
-    : '[' list_ref_value ']' {
-        TRACE("list_ref_param");
-        $$ = (ast_list_ref_param_t*)create_ast_node(AST_LIST_REF_PARAM);
-        $$->list_ref_value = $2;
-    }
-    ;
-
-list_ref_param_list
-    : list_ref_param {
-        TRACE("list_ref_param_list: CREATE");
-        $$ = (ast_list_ref_param_list_t*)create_ast_node(AST_LIST_REF_PARAM_LIST);
-        $$->list = create_pointer_list();
-        add_pointer_list($$->list, $1);
-    }
-    | list_ref_param_list list_ref_param {
-        TRACE("list_ref_param_list: ADD");
-        add_pointer_list($1->list, $2);
     }
     ;
 

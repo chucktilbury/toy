@@ -14,8 +14,8 @@ import "tests/something.toy"
 
 nothing doodah(int plart, float zoop) {
 
-    int plart = sdf[asd[1]]
-    int flarp = qwer[1][finky(asd[asdf])]
+    int plart = sdf + 123 / x
+    int flarp = qwer
     int fart
 }
 
@@ -42,7 +42,7 @@ nothing doodah(int plart, float zoop) {
     }
 
    { as = ewr }
-    asd[1] = 123 + 234;
+    asd = 123 + 234;
 
     if(plart) {
         printf("spoof")

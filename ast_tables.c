@@ -25,10 +25,7 @@ const char* node_type_to_str(ast_node_t* node) {
     (type == AST_LOOP_BODY_DIFFS)       ? "AST_LOOP_BODY_DIFFS" :
     (type == AST_LOOP_BODY_ELEM)        ? "AST_LOOP_BODY_ELEM" :
     (type == AST_FUNC_BODY_ELEM)        ? "AST_FUNC_BODY_ELEM" :
-    (type == AST_TRACE_STATEMENT)       ? "AST_TRACE_STATEMENT" :
     (type == AST_INLINE_STATEMENT)       ? "AST_INLINE_STATEMENT" :
-    (type == AST_PRINT_STATEMENT)       ? "AST_PRINT_STATEMENT" :
-    (type == AST_FOR_STATEMENT)         ? "AST_FOR_STATEMENT" :
     (type == AST_EXIT_STATEMENT)        ? "AST_EXIT_STATEMENT" :
     (type == AST_RETURN_STATEMENT)      ? "AST_RETURN_STATEMENT" :
     (type == AST_IF_CLAUSE)             ? "AST_IF_CLAUSE" :
@@ -44,10 +41,6 @@ const char* node_type_to_str(ast_node_t* node) {
     (type == AST_ASSIGNMENT)            ? "AST_ASSIGNMENT" :
     (type == AST_RAW_VALUE)             ? "AST_RAW_VALUE" :
     (type == AST_EXPR_PRIMARY)          ? "AST_EXPR_PRIMARY" :
-    (type == AST_LIST_REFERENCE)        ? "AST_LIST_REFERENCE" :
-    (type == AST_LIST_REF_VALUE)        ? "AST_LIST_REF_VALUE" :
-    (type == AST_LIST_REF_PARAM)        ? "AST_LIST_REF_PARAM" :
-    (type == AST_LIST_REF_PARAM_LIST)   ? "AST_LIST_REF_PARAM_LIST" :
     (type == AST_FUNC_REFERENCE)        ? "AST_FUNC_REFERENCE" :
     (type == AST_EXPRESSION)            ? "AST_EXPRESSION" :
     (type == AST_EXPRESSION_LIST)       ? "AST_EXPRESSION_LIST" :
@@ -79,10 +72,7 @@ const char* node_type_to_name(ast_node_t* node) {
     (type == AST_LOOP_BODY_DIFFS)       ? "loop_body_diffs" :
     (type == AST_LOOP_BODY_ELEM)        ? "loop_body_elem" :
     (type == AST_FUNC_BODY_ELEM)        ? "func_body_elem" :
-    (type == AST_TRACE_STATEMENT)       ? "trace_statement" :
     (type == AST_INLINE_STATEMENT)       ? "inline_statement" :
-    (type == AST_PRINT_STATEMENT)       ? "print_statement" :
-    (type == AST_FOR_STATEMENT)         ? "for_statement" :
     (type == AST_EXIT_STATEMENT)        ? "exit_statement" :
     (type == AST_RETURN_STATEMENT)      ? "return_statement" :
     (type == AST_IF_CLAUSE)             ? "if_clause" :
@@ -98,10 +88,6 @@ const char* node_type_to_name(ast_node_t* node) {
     (type == AST_ASSIGNMENT)            ? "assignment" :
     (type == AST_RAW_VALUE)             ? "raw_value" :
     (type == AST_EXPR_PRIMARY)          ? "expr_primary" :
-    (type == AST_LIST_REFERENCE)        ? "list_reference" :
-    (type == AST_LIST_REF_VALUE)        ? "list_ref_value" :
-    (type == AST_LIST_REF_PARAM)        ? "list_ref_param" :
-    (type == AST_LIST_REF_PARAM_LIST)   ? "list_ref_param_list" :
     (type == AST_FUNC_REFERENCE)        ? "func_reference" :
     (type == AST_EXPRESSION)            ? "expression" :
     (type == AST_EXPRESSION_LIST)       ? "expression_list" :
@@ -131,12 +117,9 @@ size_t alloc_ast_node_size(ast_type_t type) {
     (type == AST_LOOP_BODY_DIFFS)       ? sizeof(ast_loop_body_diffs_t) :
     (type == AST_LOOP_BODY_ELEM)        ? sizeof(ast_loop_body_elem_t) :
     (type == AST_FUNC_BODY_ELEM)        ? sizeof(ast_func_body_elem_t) :
-    (type == AST_TRACE_STATEMENT)       ? sizeof(ast_trace_statement_t) :
     (type == AST_INLINE_STATEMENT)       ? sizeof(ast_inline_statement_t) :
-    (type == AST_PRINT_STATEMENT)       ? sizeof(ast_print_statement_t) :
     (type == AST_EXIT_STATEMENT)        ? sizeof(ast_exit_statement_t) :
     (type == AST_RETURN_STATEMENT)      ? sizeof(ast_return_statement_t) :
-    (type == AST_FOR_STATEMENT)         ? sizeof(ast_for_statement_t) :
     (type == AST_IF_CLAUSE)             ? sizeof(ast_if_clause_t) :
     (type == AST_IFELSE_STATEMENT)      ? sizeof(ast_ifelse_statement_t) :
     (type == AST_ELSE_SEGMENT)          ? sizeof(ast_else_segment_t) :
@@ -147,23 +130,14 @@ size_t alloc_ast_node_size(ast_type_t type) {
     (type == AST_WHILE_STATEMENT)       ? sizeof(ast_while_statement_t) :
     (type == AST_DO_STATEMENT)          ? sizeof(ast_do_statement_t) :
     (type == AST_ASSIGNMENT_RIGHT)      ? sizeof(ast_assignment_right_t) :
-    (type == AST_ASSIGNMENT_LEFT)       ? sizeof(ast_assignment_left_t) :
     (type == AST_ASSIGNMENT)            ? sizeof(ast_assignment_t) :
     (type == AST_RAW_VALUE)             ? sizeof(ast_raw_value_t) :
     (type == AST_EXPR_PRIMARY)          ? sizeof(ast_expr_primary_t) :
-    (type == AST_LIST_REFERENCE)        ? sizeof(ast_list_reference_t) :
-    (type == AST_LIST_REF_VALUE)        ? sizeof(ast_list_ref_value_t) :
-    (type == AST_LIST_REF_PARAM)        ? sizeof(ast_list_ref_param_t) :
-    (type == AST_LIST_REF_PARAM_LIST)   ? sizeof(ast_list_ref_param_list_t) :
     (type == AST_FUNC_REFERENCE)        ? sizeof(ast_func_reference_t) :
     (type == AST_EXPRESSION)            ? sizeof(ast_expression_t) :
     (type == AST_EXPRESSION_LIST)       ? sizeof(ast_expression_list_t) :
     (type == AST_EXPRESSION_LIST_PARAM) ? sizeof(ast_expression_list_param_t) :
     (type == AST_EXPRESSION_PARAM)      ? sizeof(ast_expression_param_t) :
-    (type == AST_DICT_INIT)             ? sizeof(ast_dict_init_t) :
-    (type == AST_LIST_INIT)             ? sizeof(ast_list_init_t) :
-    (type == AST_DICT_INIT_ITEM)        ? sizeof(ast_dict_init_item_t) :
-    (type == AST_DICT_INIT_ITEM_LIST)   ? sizeof(ast_dict_init_item_list_t) :
     (size_t)-1;
 }
 

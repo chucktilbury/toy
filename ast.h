@@ -27,12 +27,9 @@ typedef enum {
     AST_LOOP_BODY_DIFFS,
     AST_LOOP_BODY_ELEM,
     AST_FUNC_BODY_ELEM,
-    AST_TRACE_STATEMENT,
     AST_INLINE_STATEMENT,
-    AST_PRINT_STATEMENT,
     AST_EXIT_STATEMENT,
     AST_RETURN_STATEMENT,
-    AST_FOR_STATEMENT,
     AST_IF_CLAUSE,
     AST_IFELSE_STATEMENT,
     AST_ELSE_SEGMENT,
@@ -43,14 +40,9 @@ typedef enum {
     AST_WHILE_STATEMENT,
     AST_DO_STATEMENT,
     AST_ASSIGNMENT_RIGHT,
-    AST_ASSIGNMENT_LEFT,
     AST_ASSIGNMENT,
     AST_RAW_VALUE,
     AST_EXPR_PRIMARY,
-    AST_LIST_REFERENCE,
-    AST_LIST_REF_VALUE,
-    AST_LIST_REF_PARAM,
-    AST_LIST_REF_PARAM_LIST,
     AST_FUNC_REFERENCE,
     AST_EXPRESSION,
     AST_EXPRESSION_LIST,
@@ -171,14 +163,12 @@ typedef struct _ast_data_declaration_list_t {
  * data_definition
  *    : data_declaration
  *    | data_declaration '=' expression
- *    | data_declaration '=' list_init
- *    | data_declaration '=' dict_init
  *    ;
  */
 typedef struct _ast_data_definition_t {
     ast_node_t node;
     struct _ast_data_declaration_t* data_declaration;
-    ast_node_t* nterm;
+    struct _ast_expression_t* expression;
     bool is_init;
 } ast_data_definition_t;
 
@@ -295,12 +285,9 @@ typedef struct _ast_loop_body_elem_t {
  *    | assignment
  *    | while_statement
  *    | do_statement
- *    | for_statement
  *    | ifelse_statement
  *    | return_statement
  *    | exit_statement
- *    | print_statement
- *    | trace_statement
  *    | inline_statement
  *    | func_body
  *    ;
@@ -311,17 +298,6 @@ typedef struct _ast_func_body_elem_t {
 } ast_func_body_elem_t;
 
 /*
- * trace_statement
- *    : TRACE expression_list_param
- *    | TRACE
- *    ;
- */
-typedef struct _ast_trace_statement_t {
-    ast_node_t node;
-    struct _ast_expression_list_param_t* expression_list_param;
-} ast_trace_statement_t;
-
-/*
  * inline_statement
  *    : INLINE
  *    ;
@@ -330,17 +306,6 @@ typedef struct _ast_inline_statement_t {
     ast_node_t node;
     token_t* token;
 } ast_inline_statement_t;
-
-/*
- * print_statement
- *    : PRINT expression_list_param
- *    | PRINT
- *    ;
- */
-typedef struct _ast_print_statement_t {
-    ast_node_t node;
-    struct _ast_expression_list_param_t* expression_list_param;
-} ast_print_statement_t;
 
 /*
  * exit_statement
@@ -362,21 +327,6 @@ typedef struct _ast_return_statement_t {
     ast_node_t node;
     struct _ast_expression_param_t* expression_param;
 } ast_return_statement_t;
-
-/*
- * for_statement
- *    : FOR '(' IDENTIFIER IN expression ')' func_body
- *    | FOR '(' type_name IDENTIFIER IN expression ')' func_body
- *    ;
- */
-typedef struct _ast_for_statement_t {
-    ast_node_t node;
-    struct _ast_type_name_t* type_name;
-    token_t* IDENTIFIER;
-    struct _ast_expression_t* expression;
-    struct _ast_func_body_t* func_body;
-    context_t* context;
-} ast_for_statement_t;
 
 /*
  * if_clause
@@ -484,78 +434,22 @@ typedef struct _ast_do_statement_t {
  * assignment_right
  *    : expression
  *    | '(' type_name ')' expression
- *    | list_init
- *    | dict_init
  *    ;
  */
 typedef struct _ast_assignment_right_t {
     ast_node_t node;
-    ast_node_t* nterm;
+    struct _ast_expression_t* expression;
     struct _ast_type_name_t* type_name;
 } ast_assignment_right_t;
 
 /*
- * list_init
- *    : '[' expression_list ']'
- *    ;
- */
-typedef struct _ast_list_init_t {
-    ast_node_t node;
-    struct _ast_expression_list_t* expression_list;
-} ast_list_init_t;
-
-/*
- * dict_init_item
- *    : STRING_LIT ':' expression
- *    ;
- */
-typedef struct _ast_dict_init_item_t {
-    ast_node_t node;
-    token_t* STRING_LIT;
-    struct _ast_expression_t* expression;
-} ast_dict_init_item_t;
-
-/*
- * dict_init_item_list
- *    : dict_init_item
- *    | dict_init_item_list ',' dict_init_item
- *    ;
- */
-typedef struct _ast_dict_init_item_list_t {
-    ast_node_t node;
-    pointer_list_t* list;
-} ast_dict_init_item_list_t;
-
-/*
- * dict_init
- *    : '[' dict_init_item_list ']'
- *    ;
- */
-typedef struct _ast_dict_init_t {
-    ast_node_t node;
-    struct _ast_dict_init_item_list_t* dict_init_item_list;
-} ast_dict_init_t;
-
-/*
- * assignment_left
- *    : IDENTIFIER
- *    | list_reference
- *    ;
- */
-typedef struct _ast_assignment_left_t {
-    ast_node_t node;
-    token_t* IDENTIFIER;
-    struct _ast_list_reference_t* list_reference;
-} ast_assignment_left_t;
-
-/*
  * assignment
- *    : assignment_left '=' assignment_right
+ *    : IDENTIFIER '=' assignment_right
  *    ;
  */
 typedef struct _ast_assignment_t {
     ast_node_t node;
-    struct _ast_assignment_left_t* assignment_left;
+    token_t* IDENTIFIER;
     struct _ast_assignment_right_t* assignment_right;
 } ast_assignment_t;
 
@@ -575,62 +469,12 @@ typedef struct _ast_raw_value_t {
  * expr_primary
  *    : raw_value
  *    | formatted_string
- *    | list_reference
- *    | func_reference
  *    ;
  */
 typedef struct _ast_expr_primary_t {
     ast_node_t node;
     ast_node_t* nterm;
 } ast_expr_primary_t;
-
-/*
- * list_reference
- *    : IDENTIFIER list_ref_param_list
- *    ;
- */
-typedef struct _ast_list_reference_t {
-    ast_node_t node;
-    token_t* IDENTIFIER;
-    struct _ast_list_ref_param_list_t* list_ref_param_list;
-} ast_list_reference_t;
-
-/*
- * list_ref_value
- *    : IDENTIFIER
- *    | INTEGER_LIT
- *    | STRING_LIT
- *    | list_reference
- *    | func_reference
- *    | list_ref_param
- *    ;
- */
-typedef struct _ast_list_ref_value_t {
-    ast_node_t node;
-    token_t* token;
-    ast_node_t* nterm;
-} ast_list_ref_value_t;
-
-/*
- * list_ref_param
- *    : '[' list_ref_value ']'
- *    ;
- */
-typedef struct _ast_list_ref_param_t {
-    ast_node_t node;
-    struct _ast_list_ref_value_t* list_ref_value;
-} ast_list_ref_param_t;
-
-/*
- * list_ref_param_list
- *    : list_ref_param
- *    | list_ref_param_list list_ref_param
- *    ;
- */
-typedef struct _ast_list_ref_param_list_t {
-    ast_node_t node;
-    pointer_list_t* list;
-} ast_list_ref_param_list_t;
 
 /*
  * func_reference

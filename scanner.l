@@ -69,17 +69,12 @@ const char* strip_quotes(const char* str) {
 "break"     { return BREAK; }
 "continue"  { return CONTINUE; }
 "return"    { return RETURN; }
-"print"     { return PRINT; }
-"trace"     { return TRACE; }
 "exit"      { return EXIT; }
 "import"    { return IMPORT; }
 "const"     { return CONST; }
 "constant"  { return CONST; }
 "iter"      { return ITERATOR; }
 "iterator"  { return ITERATOR; }
-"for"       { return FOR; }
-"in"        { return IN; }
-"type"      { return TYPE; }
 
 "+" {
     yylval.token = create_token(yytext, ADD_OPER);
@@ -169,16 +164,6 @@ const char* strip_quotes(const char* str) {
 "string" {
     yylval.token = create_token(yytext, STRING);
     return STRING;
-}
-
-"list" {
-    yylval.token = create_token(yytext, LIST);
-    return LIST;
-}
-
-"hash" {
-    yylval.token = create_token(yytext, HASH);
-    return HASH;
 }
 
 "nothing" {
