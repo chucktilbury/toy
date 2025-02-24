@@ -14,8 +14,8 @@ void push_context(context_t*);
 context_t* pop_context(void);
 context_t* peek_context(void);
 
-void add_context_item(const char*, void*);
-void* seek_context_item(const char*);
-
+//void add_context_item(const char*, void*);
+//void* seek_context_item(const char*);
+context_t* reset_context(void);
 
 #endif /* _CONTEXT_H_ */

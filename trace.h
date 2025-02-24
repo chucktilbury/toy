@@ -1,6 +1,8 @@
 #ifndef _TRACE_H_
 #define _TRACE_H_
 
+#include <stdio.h>
+
 //#define USE_TRACE
 
 extern int trace_depth;
@@ -29,10 +31,13 @@ extern int trace_depth;
         return __VA_ARGS__;                                   \
     } while(0)
 
+#define SEPARATOR printf("------------------------\n");
+
 #else
 #define TRACE(...)
 #define ENTER
 #define RETURN(...) return __VA_ARGS__
+#define SEPARATOR
 
 #endif
 

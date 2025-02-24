@@ -1,5 +1,5 @@
 #include <stddef.h>
-#include "ast_tables.h"
+#include "ast.h"
 #include "memory.h"
 
 const char* node_type_to_str(ast_node_t* node) {

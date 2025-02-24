@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "fileio.h"
 #include "errors.h"
 #include "tokens.h"
 
 static int errors = 0;
+static int warnings = 0;
 
 void fatal_error(const char* fmt, ...) {
 
@@ -22,7 +22,7 @@ void fatal_error(const char* fmt, ...) {
     exit(1);
 }
 
-void token_syntax_error(token_t* tok, const char* fmt, ...) {
+void syntax_error(token_t* tok, const char* fmt, ...) {
 
     va_list args;
 
@@ -35,17 +35,17 @@ void token_syntax_error(token_t* tok, const char* fmt, ...) {
     errors++;
 }
 
-void parser_syntax_error(const char* fmt, ...) {
+void syntax_warning(token_t* tok, const char* fmt, ...) {
 
     va_list args;
 
-    fprintf(stderr, "%s:%d:%d ", get_file_name(), get_line_no(), get_col_no());
+    fprintf(stderr, "%s:%d:%d warning, ", tok->fname, tok->line_no, tok->col_no);
 
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
     va_end(args);
     fputc('\n', stderr);
-    errors++;
+    warnings++;
 }
 
 void misc_error(const char* fmt, ...) {
@@ -64,4 +64,13 @@ void misc_error(const char* fmt, ...) {
 
 int get_errors(void) {
     return errors;
+}
+
+int get_warnings(void) {
+    return warnings;
+}
+
+void increment_errors(void) {
+
+    errors++;
 }

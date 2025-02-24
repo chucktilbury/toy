@@ -1,19 +1,29 @@
 
-string foo
-except asdf
+int foo
+float asdf
 int asphalt(int one, float two) {
 
     float plart = one
 }
 
-; int nuts
+int nuts
+int plzark = foo
 
 {
     int barn = foo
 
     {
         asdf = barn
+        int pongo = 0
     }
 
-    list nubs = barn
+    int nubs = barn
+    int power = glart(barn, asdf)
+}
+
+int plart = asdf
+
+float glart(int soop, float glop) {
+
+    asphalt(foo, asdf)
 }

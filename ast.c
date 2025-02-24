@@ -1,15 +1,18 @@
-#include <stdio.h>
-#include <assert.h>
-#include <stdint.h>
-#include <stdlib.h>
 
 #include "errors.h"
 #include "pointer_list.h"
 #include "ast.h"
-#include "ast_tables.h"
 #include "parser.h"
 
+//#define AST_TRACE
+
+#ifdef AST_TRACE
 #define USE_TRACE
+#include <stdio.h>
+#include <assert.h>
+#include <stdint.h>
+#include <stdlib.h>
+#endif
 #include "trace.h"
 
 // global used as the return value of the parser.
@@ -57,6 +60,8 @@ ast_program_t* root_node = NULL;
             traverse_##name(item, pre, post);                           \
     } while(0)
 
+#ifdef AST_TRACE
+
 #define TRACE_TOKEN(t)                                                                                  \
     do {                                                                                                \
         if(node->t != NULL)                                                                             \
@@ -74,6 +79,11 @@ ast_program_t* root_node = NULL;
         TRACE("terminal: %s", token_to_str(node->t)); \
     } while(0)
 
+#else
+#define TRACE_TOKEN(v)
+#define TRACE_BOOL(v)
+#define TRACE_TERM(v)
+#endif
 
 static inline void traverse_program(ast_program_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_program_item_list(ast_program_item_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -650,8 +660,8 @@ static inline void traverse_assignment_right(ast_assignment_right_t* node, void 
 
     AST_ENTER(AST_ASSIGNMENT_RIGHT);
 
-    TRAVERSE(type_name);
     TRAVERSE(expression);
+    TRAVERSE(type_name);
 
     AST_RETURN;
 }
@@ -666,8 +676,8 @@ static inline void traverse_assignment(ast_assignment_t* node, void (*pre)(ast_n
 
     AST_ENTER(AST_ASSIGNMENT);
 
-    TRACE_TOKEN(IDENTIFIER);
     TRAVERSE(assignment_right);
+    TRACE_TOKEN(IDENTIFIER);
 
     AST_RETURN;
 }
@@ -751,15 +761,17 @@ static inline void traverse_expression(ast_expression_t* node, void (*pre)(ast_n
 
     AST_ENTER(AST_EXPRESSION);
 
-    if(node->expr_primary != NULL)
+    if(node->expr_primary != NULL) {
         traverse_expr_primary(node->expr_primary, pre, post);
-    else if(node->expression != NULL)
+    }
+    else if(node->expression != NULL) {
         traverse_expression(node->expression, pre, post);
+    }
     else if(node->oper->type == NOT_OPER) {
         TRACE_TOKEN(oper);
         traverse_expression(node->right, pre, post);
     }
-    else if(node->oper->type == SUB_OPER && node->left == NULL) {
+    else if(node->oper->type == UNARY_MINUS_OPER) {
         TRACE_TOKEN(oper);
         traverse_expression(node->right, pre, post);
     }
@@ -828,6 +840,7 @@ const char* get_file_name(void);
 
 void traverse_ast(void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
 
+    SEPARATOR;
     ENTER;
 
     ASSERT(root_node != NULL, "root node is NULL!");

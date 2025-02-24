@@ -12,10 +12,10 @@ import "tests/something.toy"
 ; import "something.toy"()
 ; import "something.toy"(123, 123, 123)
 
-nothing doodah(int plart, float zoop) {
+nothing doodah(int snark, float zoop) {
 
-    int plart = sdf + 123 / x
-    int flarp = qwer
+    int asdf = sdf + 123 / x
+    int flarp = zoop
     int fart
 }
 

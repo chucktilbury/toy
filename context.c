@@ -1,23 +1,32 @@
-
+/*
+ * This manages the symbolic context as a double linked list. The actual
+ * forward or "next" pointer is located in the AST. The "prev" pointer is
+ * located in the context data structure. When a symbol is looked up, it is
+ * only searched from the current context toward the root, so the prev pointer
+ * if the one that matters for this data structure.
+ */
 #include <stdbool.h>
 
 #include "context.h"
 #include "memory.h"
-#include "pointer_list.h"
+#include "errors.h"
 
-pointer_list_t* context_stack = NULL;
+//#define TRACE_CONTEXT
 
-void init_context(void) {
+#ifdef TRACE_CONTEXT
+#define USE_TRACE
+#endif
+#include "trace.h"
 
-    if(context_stack == NULL)
-        context_stack = create_pointer_list();
-}
+static context_t* root_context = NULL;
+static context_t* crnt_context = NULL;
 
 context_t* create_context(void) {
 
     context_t* ptr = _ALLOC_DS(context_t);
-    ptr->table = create_hashtable();
-    ptr->prev = peek_context();
+    ptr->table     = create_hashtable();
+    ptr->prev      = peek_context();
+
     push_context(ptr);
 
     return ptr;
@@ -25,46 +34,38 @@ context_t* create_context(void) {
 
 void push_context(context_t* ptr) {
 
-    push_pointer_list(context_stack, ptr);
+    if(root_context == NULL)
+        root_context = ptr;
+
+    TRACE("push context: %p", (void*)ptr);
+    crnt_context = ptr;
 }
 
 context_t* pop_context(void) {
 
-    return pop_pointer_list(context_stack);
+    if(crnt_context == NULL)
+        FATAL("symbolic context stack underrun");
+
+    TRACE("pop context: %p", (void*)crnt_context);
+    crnt_context = crnt_context->prev;
+    return crnt_context;
 }
 
 context_t* peek_context(void) {
 
-    return peek_pointer_list(context_stack);
+    TRACE("peek context: %p", (void*)crnt_context);
+    return crnt_context;
 }
 
+context_t* reset_context(void) {
 
-// actually stores objects of type ast_node_t*
-void add_context_item(const char* name, void* node) {
+    if(root_context == NULL)
+        FATAL("symbol context error: root context is NULL");
 
-    // check if symbol has already been defined or not.
-    context_t* ptr = peek_context();
-    insert_hashtable(ptr->table, name, node);
+    TRACE("reset context: %p", (void*)root_context);
+    crnt_context = root_context;
+
+    return root_context;
 }
 
-void* seek_context_item(const char* name) {
-
-    context_t* ptr = peek_context();
-    void* data = NULL;
-
-    while(true) {
-        if(find_hashtable(ptr->table, name, &data)) {
-            break;
-        }
-        else if(ptr->prev != NULL) {
-            ptr = ptr->prev;
-        }
-        else {
-            data = NULL;
-            break;
-        }
-    }
-
-    return data;
-}
 

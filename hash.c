@@ -56,19 +56,16 @@ static int find_slot(hash_table_t* tab, const char* key) {
     inc           = (inc == 0) ? 1 : inc;
 
     if(tab->table[hash] == NULL) {
-        tab->count++;
         return hash;
     }
     else {
         do {
             for(int i = 0; i < tab->cap; i++) {
                 if(tab->table[hash] == NULL) {
-                    tab->count++;
                     return hash;
                 }
                 else if(tab->table[hash]->key == NULL) {
                     tab->tombstones--;
-                    tab->count++;
                     return hash;
                 }
                 else if(strcmp(tab->table[hash]->key, key) == 0) {
@@ -100,6 +97,7 @@ static void rehash_table(hash_table_t* tab) {
             if(oldtab[i] != NULL && oldtab[i]->key != NULL) {
                 slot             = find_slot(tab, oldtab[i]->key);
                 tab->table[slot] = oldtab[i];
+                tab->count++;
             }
         }
         _FREE(oldtab);
@@ -158,6 +156,7 @@ int insert_hashtable(hash_table_t* table, const char* key, void* data) {
 
     table->table[slot]->key  = _COPY_STRING(key);
     table->table[slot]->data = data;
+    table->count++;
 
     // printf("inserted key: %s:%p in %p\n", key, (void*)data, (void*)table);
     return 1;

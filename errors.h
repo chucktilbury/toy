@@ -3,13 +3,16 @@
 #ifndef _ERRORS_H_
 #define _ERRORS_H_
 
+#include <stdio.h>
 #include "tokens.h"
 
 void fatal_error(const char* fmt, ...);
-void parser_syntax_error(const char* fmt, ...);
-void token_syntax_error(token_t* tok, const char* fmt, ...);
+void syntax_error(token_t* tok, const char* fmt, ...);
+void syntax_warning(token_t* tok, const char* fmt, ...);
 void misc_error(const char* fmt, ...);
 int get_errors(void);
+int get_warnings(void);
+void increment_errors(void);
 
 #define ASSERT(expr, ...)                                                                                 \
     do {                                                                                                  \

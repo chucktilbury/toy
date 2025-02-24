@@ -232,7 +232,7 @@ const char* strip_quotes(const char* str) {
 <FSTRING>\" {
     token_t* tok = create_token(raw_string_buffer(strbuf), STRING_LIT);
     tok->val.text = _COPY_STRING(raw_string_buffer(strbuf));
-    fprintf(stderr, "FSTRING returns: \"%s\"\n", tok->val.text);
+    //fprintf(stderr, "FSTRING returns: \"%s\"\n", tok->val.text);
     clear_string_buffer(strbuf);
     yylval.token = tok;
     BEGIN(INITIAL);

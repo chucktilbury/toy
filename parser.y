@@ -83,7 +83,7 @@ const char* token_to_str(int);
 };
 
 %token <token> IDENTIFIER STRING_LIT INTEGER_LIT FLOAT_LIT
-%token <token> INTEGER FLOAT STRING NOTHING INLINE
+%token <token> INTEGER FLOAT STRING NOTHING BOOL INLINE
 %token <token> EQU_OPER NEQ_OPER LTE_OPER GTE_OPER LT_OPER
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
@@ -156,7 +156,6 @@ program
         TRACE("program");
         root_node = $$ = (ast_program_t*)create_ast_node(AST_PROGRAM);
         $$->program_item_list = $1;
-        pop_context();
     }
     ;
 
@@ -164,8 +163,6 @@ program_item_list
     : program_item {
         TRACE("program_item_list:CREATE");
         $$ = (ast_program_item_list_t*)create_ast_node(AST_PROGRAM_ITEM_LIST);
-        init_context();
-        $$->context = create_context();
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
@@ -265,7 +262,6 @@ data_declaration_list
         TRACE("data_declaration_list:CREATE");
         $$ = (ast_data_declaration_list_t*)create_ast_node(AST_DATA_DECLARATION_LIST);
         $$->list = create_pointer_list();
-        $$->context = create_context();
         add_pointer_list($$->list, $1);
     }
     | data_declaration_list ',' data_declaration {
@@ -331,7 +327,6 @@ func_definition
         $$->func_name = $1;
         $$->func_params = $2;
         $$->func_body = $3;
-        pop_context(); // func_params
     }
     ;
 
@@ -344,6 +339,9 @@ func_params
     | '(' ')' {
         TRACE("func_params: bare");
         $$ = (ast_func_params_t*)create_ast_node(AST_FUNC_PARAMS);
+        // this creates a symbol context, so we need a dummy DDL
+        $$->data_declaration_list = (ast_data_declaration_list_t*)create_ast_node(AST_DATA_DECLARATION_LIST);
+        $$->data_declaration_list->list = create_pointer_list();
     }
     ;
 
@@ -352,7 +350,6 @@ func_body
         TRACE("func_body: with body");
         $$ = (ast_func_body_t*)create_ast_node(AST_FUNC_BODY);
         $$->func_body_list = $2;
-        pop_context(); // func_body
     }
     ;
 
@@ -362,7 +359,6 @@ func_body_list
         $$ = (ast_func_body_list_t*)create_ast_node(AST_FUNC_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
-        $$->context = create_context();
     }
     | func_body_list func_body_elem {
         TRACE("func_body_list:ADD");
@@ -379,7 +375,6 @@ loop_body
         TRACE("loop_body: with body");
         $$ = (ast_loop_body_t*)create_ast_node(AST_LOOP_BODY);
         $$->loop_body_list = $2;
-        pop_context();
     }
     ;
 
@@ -389,7 +384,6 @@ loop_body_list
         $$ = (ast_loop_body_list_t*)create_ast_node(AST_LOOP_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
-        $$->context = create_context();
     }
     | loop_body_list loop_body_elem {
         TRACE("loop_body_list:ADD");
@@ -648,16 +642,19 @@ raw_value
         TRACE("raw_value:IDENTIFIER %s", $1->raw);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
+        $$->type = 0; // unknown, determined later
     }
     | INTEGER_LIT {
         TRACE("raw_value:INTEGER_LIT %ld", $1->val.integer_lit);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
+        $$->type = INTEGER;
     }
     | FLOAT_LIT {
         TRACE("raw_value:FLOAT_LIT %lf", $1->val.float_lit);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
+        $$->type = FLOAT;
     }
     ;
 
@@ -802,7 +799,13 @@ expression
         TRACE("expression:unary SUB_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->right = $2;
-        $$->oper = $1;
+        token_t* tok = _ALLOC_DS(token_t);
+        tok->raw = $1->raw;
+        tok->fname = $1->fname;
+        tok->line_no = $1->line_no;
+        tok->col_no = $1->col_no;
+        tok->type = UNARY_MINUS_OPER;
+        $$->oper = tok;
     }
     | '(' expression ')' {
         TRACE("expr_primary:(expression)");
@@ -833,6 +836,8 @@ expression_list_param
     | '(' ')' {
         TRACE("expression_list_param: bare");
         $$ = (ast_expression_list_param_t*)create_ast_node(AST_EXPRESSION_LIST_PARAM);
+        $$->expression_list = (ast_expression_list_t*)create_ast_node(AST_EXPRESSION_LIST);
+        $$->expression_list->list = create_pointer_list();
     }
     ;
 
@@ -853,6 +858,7 @@ expression_param
 void yyerror(const char* s) {
 
     fprintf(stderr, "%s:%d:%d: %s\n", get_file_name(), get_line_no(), get_col_no(), s);
+    increment_errors();
 
 }
 

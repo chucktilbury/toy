@@ -6,6 +6,7 @@
 #include "pointer_list.h"
 #include "tokens.h"
 #include "context.h"
+#include "string_buffer.h"
 
 typedef enum {
     AST_PROGRAM,
@@ -140,6 +141,7 @@ typedef struct _ast_data_declaration_t {
     struct _ast_type_name_t* type_name;
     token_t* IDENTIFIER;
     bool is_const;
+    int type;
 } ast_data_declaration_t;
 
 /*
@@ -165,6 +167,7 @@ typedef struct _ast_data_definition_t {
     struct _ast_data_declaration_t* data_declaration;
     struct _ast_expression_t* expression;
     bool is_init;
+    int type;
 } ast_data_definition_t;
 
 /*
@@ -191,6 +194,8 @@ typedef struct _ast_func_definition_t {
     struct _ast_func_name_t* func_name;
     struct _ast_func_params_t* func_params;
     struct _ast_func_body_t* func_body;
+    int arity;
+    string_buffer_t* proto; // for error reporting
 } ast_func_definition_t;
 
 /*
@@ -435,6 +440,7 @@ typedef struct _ast_assignment_right_t {
     ast_node_t node;
     struct _ast_expression_t* expression;
     struct _ast_type_name_t* type_name;
+    int type;
 } ast_assignment_right_t;
 
 /*
@@ -446,6 +452,7 @@ typedef struct _ast_assignment_t {
     ast_node_t node;
     token_t* IDENTIFIER;
     struct _ast_assignment_right_t* assignment_right;
+    int type;
 } ast_assignment_t;
 
 /*
@@ -458,6 +465,7 @@ typedef struct _ast_assignment_t {
 typedef struct _ast_raw_value_t {
     ast_node_t node;
     token_t* token;
+    int type;
 } ast_raw_value_t;
 
 /*
@@ -469,6 +477,7 @@ typedef struct _ast_raw_value_t {
 typedef struct _ast_expr_primary_t {
     ast_node_t node;
     ast_node_t* nterm;
+    int type;
 } ast_expr_primary_t;
 
 /*
@@ -480,6 +489,10 @@ typedef struct _ast_func_reference_t {
     ast_node_t node;
     token_t* IDENTIFIER;
     struct _ast_expression_list_param_t* expression_list_param;
+    int type;
+    int arity;
+    string_buffer_t* proto; // for error reporting
+    struct _ast_func_definition_t* definition;
 } ast_func_reference_t;
 
 /*
@@ -511,6 +524,7 @@ typedef struct _ast_expression_t {
     token_t* oper;
     struct _ast_expr_primary_t* expr_primary;
     struct _ast_expression_t* expression;
+    int type;
 } ast_expression_t;
 
 /*
@@ -522,7 +536,6 @@ typedef struct _ast_expression_t {
 typedef struct _ast_expression_list_t {
     ast_node_t node;
     pointer_list_t* list;
-    context_t* context;
 } ast_expression_list_t;
 
 /*
@@ -551,6 +564,10 @@ typedef struct _ast_expression_param_t {
 ast_node_t* create_ast_node(ast_type_t type);
 void traverse_ast(void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 
-#include "ast_tables.h"
+//#include "ast_tables.h"
+// Defined in ast_tables.c
+const char* node_type_to_str(ast_node_t* node);
+const char* node_type_to_name(ast_node_t* node);
+ast_node_t* alloc_ast_node(ast_type_t type);
 
 #endif /* _AST_H_ */

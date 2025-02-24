@@ -4,6 +4,7 @@
 
 #include "string_buffer.h"
 #include "memory.h"
+#include "errors.h"
 
 static inline void append_buffer(string_buffer_t* buf, const char* str, int len) {
 
@@ -62,6 +63,23 @@ void append_string_buffer_fmt(string_buffer_t* buf, const char* fmt, ...) {
 void cat_string_buffer(string_buffer_t* buf1, string_buffer_t* buf2) {
 
     append_buffer(buf1, buf2->buf, buf2->len);
+}
+
+void trunc_string_buffer(string_buffer_t* buf, int idx) {
+
+    int nidx;
+
+    if(idx == 0)
+        nidx = 0;
+    else if(idx < 0)
+        nidx = buf->len + idx;
+    else if(idx < buf->len)
+        nidx = idx;
+    else
+        nidx = buf->len;
+
+    buf->len = nidx;
+    buf->buf[buf->len] = 0;
 }
 
 int cmp_string_buffer(string_buffer_t* buf1, string_buffer_t* buf2) {

@@ -1,5 +1,6 @@
 
-HIDE	=	@
+CHIDE	=	@
+EHIDE	=	@
 TARGET	=	toy
 DEPS	=	$(TARGET).deps
 CC 	= 	clang
@@ -13,9 +14,13 @@ OBJS	=	tokens.o \
 		pointer_list.o \
 		string_buffer.o \
 		context.o \
-		trace.o
-#  		symtab.o
-#		sym_reference.o
+		trace.o \
+		symbol.o \
+		symbol_table.o \
+		sym_reference.o \
+		func_reference.o \
+		type_table.o \
+		dump_symbols.o
 
 
 GEN	=	parser.o \
@@ -33,39 +38,41 @@ FORMAT	=	$(OBJS:%.o=%.c) $(OBJS:%.o=%.h)
 all: $(TARGET) Makefile
 
 %.o: %.c
-	@echo "build $@"
-	$(HIDE)$(CC) -c $(OPT) $< -o $@
+	$(EHIDE)echo "$(CC) $@"
+	$(CHIDE)$(CC) -c $(OPT) $< -o $@
 
 $(DEPS): $(ALL_OBJ:%.o=%.c)
-	@echo "make depends"
-	$(HIDE)$(CC) -MM $^ > $(DEPS)
+	$(EHIDE)echo "$(CC) $(DEPS)"
+	$(CHIDE)$(CC) -MM $^ > $(DEPS)
 
 $(TARGET): $(ALL_OBJ) $(DEPS)
-	@echo "make $(TARGET)"
-	$(HIDE)$(CC) $(OPT) -o $@ $(ALL_OBJ)
+	$(EHIDE)echo "$(CC) $(TARGET)"
+	$(CHIDE)$(CC) $(OPT) -o $@ $(ALL_OBJ)
 
 scanner.h scanner.c: scanner.l
-	@echo "build scanner.l"
-	$(HIDE)flex -i scanner.l
+	$(EHIDE)echo "flex scanner.l"
+	$(CHIDE)flex -i scanner.l
 
 parser.h parser.c: parser.y
-	@echo "build parser.y"
-	$(HIDE)bison parser.y
+	$(EHIDE)echo "bison parser.y"
+	$(CHIDE)bison parser.y
 
 scanner.o: scanner.c scanner.h
-	@echo "build $@"
-	$(HIDE)$(CC) -c -g -std=c11 -Wno-parentheses-equality \
+	$(EHIDE)echo "$(CC) $@"
+	$(CHIDE)$(CC) -c -g -std=c11 -Wno-parentheses-equality \
 		-Wno-implicit-function-declaration $< -o $@
 
 include $(DEPS)
 
 clean:
-	@echo "clean"
-	@rm -f scanner.c scanner.h parser.c parser.h parser.output \
+	$(EHIDE)echo "clean"
+	$(CHIDE)rm -f scanner.c scanner.h parser.c parser.h parser.output \
 		$(TARGET) $(OBJS) $(DEPS)
 
 format:
-	@echo "format code"
-	@clang-format -i $(FORMAT)
+	$(EHIDE)echo "format code"
+	$(CHIDE)clang-format -i $(FORMAT)
 
-remake: clean all
+remake: clean
+	$(EHIDE)echo "remake all"
+	$(CHIDE)make -C . -j12 $(TARGET)

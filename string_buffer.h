@@ -13,6 +13,7 @@ void append_string_buffer_str(string_buffer_t*, const char*);
 void append_string_buffer_fmt(string_buffer_t*, const char*, ...);
 void cat_string_buffer(string_buffer_t*, string_buffer_t*);
 void clear_string_buffer(string_buffer_t*);
+void trunc_string_buffer(string_buffer_t*, int);
 
 int cmp_string_buffer(string_buffer_t*, string_buffer_t*);
 int cmp_string_buffer_str(string_buffer_t*, const char*);
