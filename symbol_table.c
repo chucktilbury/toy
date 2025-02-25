@@ -14,6 +14,8 @@
 #include "ast.h"
 #include "parser.h"
 
+static int start_block_count = 0;
+
 #define SYMTAB_TRACE
 
 #ifdef SYMTAB_TRACE
@@ -160,6 +162,10 @@ static void pre(ast_node_t* node) {
             create_func_symbol((ast_func_definition_t*)node);
             break;
 
+        case AST_START_BLOCK:
+            start_block_count++;
+            break;
+
         default:
             break;
     }
@@ -189,6 +195,13 @@ void create_symbol_table(void) {
 
     if(!get_errors()) {
         traverse_ast(pre, post);
+    }
+
+    if(start_block_count != 1) {
+        if(start_block_count == 0)
+            syntax_warning(NULL, "no start block found");
+        else if(start_block_count > 1)
+            syntax_error(NULL, "only one start block is allowed in the whole program space");
     }
 
     RETURN();

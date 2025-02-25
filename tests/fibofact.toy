@@ -1,0 +1,34 @@
+
+import "tests/stdio.toy"
+
+int factorial(int n) {
+   ; base case
+   if(n == 0) {
+      return(1)
+   } else {
+      return(n * factorial(n-1))
+   }
+}
+
+int fibbonacci(int n) {
+   if(n == 0){
+      return(0)
+   } else(n == 1) {
+      return(1)
+   } else {
+      return((fibbonacci(n-1) + fibbonacci(n-2)))
+   }
+}
+
+start {
+   int n = 5
+   int i = 0
+
+   print("Factorial of %d: %d\n"(n , factorial(n)))
+   print("Fibbonacci of %d: "(n))
+
+   while(i < n) {
+      print("%d "(fibbonacci(i)))
+      i = i + 1
+   }
+}

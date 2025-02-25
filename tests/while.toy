@@ -1,0 +1,69 @@
+
+import "tests/stdio.toy"
+
+int max(int num1, int num2) {
+    if (num1 > num2) {
+        return (num1)
+    }
+    else {
+        return (num2)
+    }
+}
+
+start {
+    print("\n#### TEST 4 (Loops) ####\n")
+
+    print("\nPattern printing using FOR loop:")
+    print("\n\n")
+
+    int n = 9
+    int i = 1
+    int j = 1
+
+    while(i <= 2 * n - 1) {
+        int x1 = n + 1 - i
+        int x2 = i - n + 1
+        j = 1
+        while(j <= 2 * n - 1) {
+            int y1 = n + 1 - j
+            int y2 = j - n + 1
+            print("%d"(max(max(x1, x2), max(y1, y2))))
+            print(" ")
+        }
+        i = i + 1
+        print("\n")
+    }
+    print("\n")
+
+    int pow2 = 1
+    print("\nPowers of 2 using WHILE loop: ")
+    while(pow2 <= 1024) {
+        print("%d"(pow2))
+        print(" ")
+        pow2 = int:pow2^2
+    }
+    print("\n\n")
+
+    i = 0
+    int iters
+    int ep
+    print("\nTesting DO-WHILE loop:")
+    do {
+        if(i == 0) {
+            print("\nEntered do-while loop. Enter number of times you wish to run the loop after this: ")
+            ep = read()
+            if(ep == 0) {
+                print("\nInvalid input. Exiting...\n\n")
+                return(0)
+            }
+        } else {
+            print("\nIteration ")
+            print("%d"(i))
+            print("\n")
+        }
+        i = i + 1
+    } while(i < iters)
+
+    print("\n\n")
+    return(0)
+}

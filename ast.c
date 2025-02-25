@@ -89,6 +89,7 @@ static inline void traverse_program(ast_program_t* node, void (*pre)(ast_node_t*
 static inline void traverse_program_item_list(ast_program_item_list_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_import_statement(ast_import_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_program_item(ast_program_item_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
+static inline void traverse_start_block(ast_start_block_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_type_name(ast_type_name_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_formatted_string(ast_formatted_string_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_data_declaration(ast_data_declaration_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -105,7 +106,6 @@ static inline void traverse_loop_body_diffs(ast_loop_body_diffs_t* node, void (*
 static inline void traverse_loop_body_elem(ast_loop_body_elem_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_func_body_elem(ast_func_body_elem_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_inline_statement(ast_inline_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
-static inline void traverse_exit_statement(ast_exit_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_return_statement(ast_return_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_if_clause(ast_if_clause_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 static inline void traverse_ifelse_statement(ast_ifelse_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
@@ -187,8 +187,23 @@ static inline void traverse_program_item(ast_program_item_t* node, void (*pre)(a
         CASE(AST_FUNC_DEFINITION, func_definition);
         CASE(AST_FUNC_BODY, func_body);
         CASE(AST_IMPORT_STATEMENT, import_statement);
+        CASE(AST_START_BLOCK, start_block);
         DEFAULT;
     }
+
+    AST_RETURN;
+}
+
+/*
+ * start_block
+ *    : START func_body
+ *    ;
+ */
+static inline void traverse_start_block(ast_start_block_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
+
+    AST_ENTER(AST_START_BLOCK);
+
+        TRAVERSE(func_body);
 
     AST_RETURN;
 }
@@ -457,7 +472,6 @@ static inline void traverse_func_body_elem(ast_func_body_elem_t* node, void (*pr
         CASE(AST_DO_STATEMENT, do_statement);
         CASE(AST_IFELSE_STATEMENT, ifelse_statement);
         CASE(AST_RETURN_STATEMENT, return_statement);
-        CASE(AST_EXIT_STATEMENT, exit_statement);
         CASE(AST_INLINE_STATEMENT, inline_statement);
         CASE(AST_FUNC_BODY, func_body);
         DEFAULT;
@@ -476,20 +490,6 @@ static inline void traverse_inline_statement(ast_inline_statement_t* node, void 
     AST_ENTER(AST_INLINE_STATEMENT);
 
     TRACE_TOKEN(token);
-
-    AST_RETURN;
-}
-
-/*
- * exit_statement
- *    : EXIT expression_param
- *    ;
- */
-static inline void traverse_exit_statement(ast_exit_statement_t* node, void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
-
-    AST_ENTER(AST_EXIT_STATEMENT);
-
-    TRAVERSE(expression_param);
 
     AST_RETURN;
 }

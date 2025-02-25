@@ -26,7 +26,9 @@ void syntax_error(token_t* tok, const char* fmt, ...) {
 
     va_list args;
 
-    fprintf(stderr, "%s:%d:%d syntax error, ", tok->fname, tok->line_no, tok->col_no);
+    if(tok != NULL)
+        fprintf(stderr, "%s:%d:%d ", tok->fname, tok->line_no, tok->col_no);
+    fprintf(stderr, "syntax error, ");
 
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);
@@ -39,7 +41,9 @@ void syntax_warning(token_t* tok, const char* fmt, ...) {
 
     va_list args;
 
-    fprintf(stderr, "%s:%d:%d warning, ", tok->fname, tok->line_no, tok->col_no);
+    if(tok != NULL)
+        fprintf(stderr, "%s:%d:%d ", tok->fname, tok->line_no, tok->col_no);
+    fprintf(stderr, "warning, ");
 
     va_start(args, fmt);
     vfprintf(stderr, fmt, args);

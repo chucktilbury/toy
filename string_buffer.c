@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <errno.h>
 
 #include "string_buffer.h"
 #include "memory.h"
@@ -14,7 +15,9 @@ static inline void append_buffer(string_buffer_t* buf, const char* str, int len)
         buf->buf = _REALLOC_ARRAY(buf->buf, char, buf->cap);
     }
 
-    memcpy(&buf->buf[buf->len], str, len);
+    if(str != NULL)
+        memcpy(&buf->buf[buf->len], str, len);
+
     buf->len += len;
     buf->buf[buf->len] = '\0';
 }
@@ -107,3 +110,33 @@ int len_string_buffer(string_buffer_t* buf) {
     return buf->len;
 }
 
+void write_string_buffer(string_buffer_t* buf, const char* fname) {
+
+    FILE* fp = fopen(fname, "w");
+    if(fp == NULL)
+        FATAL("connnot open output file: %s", strerror(errno));
+
+    fwrite(buf->buf, sizeof(char), buf->len, fp);
+    fclose(fp);
+}
+
+string_buffer_t* read_string_buffer(const char* fname) {
+
+    string_buffer_t* buf;
+
+    FILE* fp = fopen(fname, "w");
+    if(fp == NULL)
+        FATAL("connnot open input file: %s", strerror(errno));
+
+    fseek(fp, 0, SEEK_END);
+    int len = (int)ftell(fp);
+    rewind(fp);
+
+    buf = create_string_buffer(NULL);
+    append_buffer(buf, NULL, len);
+
+    fread(buf->buf, sizeof(char), len, fp);
+    fclose(fp);
+
+    return buf;
+}

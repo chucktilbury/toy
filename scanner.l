@@ -69,8 +69,8 @@ const char* strip_quotes(const char* str) {
 "break"     { return BREAK; }
 "continue"  { return CONTINUE; }
 "return"    { return RETURN; }
-"exit"      { return EXIT; }
 "import"    { return IMPORT; }
+"start"     { return START; }
 "const"|"constant"  { return CONST; }
 "iter"|"iterator"   { return ITERATOR; }
 "bool"|"boolean"    { return BOOL; }

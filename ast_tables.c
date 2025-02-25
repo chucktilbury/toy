@@ -9,6 +9,7 @@ const char* node_type_to_str(ast_node_t* node) {
     return (type == AST_PROGRAM)                ? "AST_PROGRAM" :
     (type == AST_PROGRAM_ITEM_LIST)     ? "AST_PROGRAM_ITEM_LIST" :
     (type == AST_PROGRAM_ITEM)          ? "AST_PROGRAM_ITEM" :
+    (type == AST_START_BLOCK)          ? "AST_START_BLOCK" :
     (type == AST_TYPE_NAME)             ? "AST_TYPE_NAME" :
     (type == AST_FORMATTED_STRING)      ? "AST_FORMATTED_STRING" :
     (type == AST_IMPORT_STATEMENT)      ? "AST_IMPORT_STATEMENT" :
@@ -26,7 +27,6 @@ const char* node_type_to_str(ast_node_t* node) {
     (type == AST_LOOP_BODY_ELEM)        ? "AST_LOOP_BODY_ELEM" :
     (type == AST_FUNC_BODY_ELEM)        ? "AST_FUNC_BODY_ELEM" :
     (type == AST_INLINE_STATEMENT)       ? "AST_INLINE_STATEMENT" :
-    (type == AST_EXIT_STATEMENT)        ? "AST_EXIT_STATEMENT" :
     (type == AST_RETURN_STATEMENT)      ? "AST_RETURN_STATEMENT" :
     (type == AST_IF_CLAUSE)             ? "AST_IF_CLAUSE" :
     (type == AST_IFELSE_STATEMENT)      ? "AST_IFELSE_STATEMENT" :
@@ -56,6 +56,7 @@ const char* node_type_to_name(ast_node_t* node) {
     return (type == AST_PROGRAM)                ? "program" :
     (type == AST_PROGRAM_ITEM_LIST)     ? "program_item_list" :
     (type == AST_PROGRAM_ITEM)          ? "program_item" :
+    (type == AST_START_BLOCK)          ? "start_block" :
     (type == AST_TYPE_NAME)             ? "type_name" :
     (type == AST_FORMATTED_STRING)      ? "formatted_string" :
     (type == AST_IMPORT_STATEMENT)      ? "import_statement" :
@@ -73,7 +74,6 @@ const char* node_type_to_name(ast_node_t* node) {
     (type == AST_LOOP_BODY_ELEM)        ? "loop_body_elem" :
     (type == AST_FUNC_BODY_ELEM)        ? "func_body_elem" :
     (type == AST_INLINE_STATEMENT)       ? "inline_statement" :
-    (type == AST_EXIT_STATEMENT)        ? "exit_statement" :
     (type == AST_RETURN_STATEMENT)      ? "return_statement" :
     (type == AST_IF_CLAUSE)             ? "if_clause" :
     (type == AST_IFELSE_STATEMENT)      ? "ifelse_statement" :
@@ -101,6 +101,7 @@ size_t alloc_ast_node_size(ast_type_t type) {
     return (type == AST_PROGRAM)                ? sizeof(ast_program_t) :
     (type == AST_PROGRAM_ITEM_LIST)     ? sizeof(ast_program_item_list_t) :
     (type == AST_PROGRAM_ITEM)          ? sizeof(ast_program_item_t) :
+    (type == AST_START_BLOCK)          ? sizeof(ast_start_block_t) :
     (type == AST_TYPE_NAME)             ? sizeof(ast_type_name_t) :
     (type == AST_FORMATTED_STRING)      ? sizeof(ast_formatted_string_t) :
     (type == AST_IMPORT_STATEMENT)      ? sizeof(ast_import_statement_t) :
@@ -118,7 +119,6 @@ size_t alloc_ast_node_size(ast_type_t type) {
     (type == AST_LOOP_BODY_ELEM)        ? sizeof(ast_loop_body_elem_t) :
     (type == AST_FUNC_BODY_ELEM)        ? sizeof(ast_func_body_elem_t) :
     (type == AST_INLINE_STATEMENT)       ? sizeof(ast_inline_statement_t) :
-    (type == AST_EXIT_STATEMENT)        ? sizeof(ast_exit_statement_t) :
     (type == AST_RETURN_STATEMENT)      ? sizeof(ast_return_statement_t) :
     (type == AST_IF_CLAUSE)             ? sizeof(ast_if_clause_t) :
     (type == AST_IFELSE_STATEMENT)      ? sizeof(ast_ifelse_statement_t) :

@@ -4,6 +4,7 @@
 #define _ERRORS_H_
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "tokens.h"
 
 void fatal_error(const char* fmt, ...);

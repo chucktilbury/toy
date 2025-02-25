@@ -29,7 +29,6 @@ typedef enum {
     AST_LOOP_BODY_ELEM,
     AST_FUNC_BODY_ELEM,
     AST_INLINE_STATEMENT,
-    AST_EXIT_STATEMENT,
     AST_RETURN_STATEMENT,
     AST_IF_CLAUSE,
     AST_IFELSE_STATEMENT,
@@ -49,6 +48,7 @@ typedef enum {
     AST_EXPRESSION_LIST,
     AST_EXPRESSION_LIST_PARAM,
     AST_EXPRESSION_PARAM,
+    AST_START_BLOCK,
 } ast_type_t;
 
 typedef struct {
@@ -103,6 +103,16 @@ typedef struct _ast_program_item_t {
     ast_node_t node;
     ast_node_t* nterm;
 } ast_program_item_t;
+
+/*
+ * start_block
+ *     : START func_body
+ *     ;
+ */
+typedef struct _ast_start_block_t {
+    ast_node_t node;
+    struct _ast_func_body_t* func_body;
+} ast_start_block_t;
 
 /*
  * type_name
@@ -306,16 +316,6 @@ typedef struct _ast_inline_statement_t {
     ast_node_t node;
     token_t* token;
 } ast_inline_statement_t;
-
-/*
- * exit_statement
- *    : EXIT expression_param
- *    ;
- */
-typedef struct _ast_exit_statement_t {
-    ast_node_t node;
-    struct _ast_expression_param_t* expression_param;
-} ast_exit_statement_t;
 
 /*
  * return_statement

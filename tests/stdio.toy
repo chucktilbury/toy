@@ -1,0 +1,25 @@
+; Implement the stdio library for toy
+
+nothing print(string str) {
+
+    inline {
+        // format the string and print it ot the console
+        // formatted string has the parameters in it
+        fputs(format_string(STRING_DATA__str), stdout);
+    }
+}
+
+integer read() {
+
+    inline {
+        // do something smart here
+    }
+}
+
+nothing exit(int result) {
+
+    inline {
+        // call the system exit
+        exit(INTEGER_DATA__result);
+    }
+}

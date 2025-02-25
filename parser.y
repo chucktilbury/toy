@@ -44,6 +44,7 @@ const char* token_to_str(int);
     ast_program_item_list_t* program_item_list;
     ast_import_statement_t* import_statement;
     ast_program_item_t* program_item;
+    ast_start_block_t* start_block;
     ast_type_name_t* type_name;
     ast_formatted_string_t* formatted_string;
     ast_data_declaration_t* data_declaration;
@@ -60,7 +61,6 @@ const char* token_to_str(int);
     ast_loop_body_elem_t* loop_body_elem;
     ast_func_body_elem_t* func_body_elem;
     ast_inline_statement_t* inline_statement;
-    ast_exit_statement_t* exit_statement;
     ast_return_statement_t* return_statement;
     ast_if_clause_t* if_clause;
     ast_ifelse_statement_t* ifelse_statement;
@@ -88,13 +88,14 @@ const char* token_to_str(int);
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
 
-%token IF ELSE WHILE DO IMPORT YIELD
-%token BREAK CONTINUE RETURN EXIT CONST ITERATOR
+%token IF ELSE WHILE DO IMPORT YIELD START
+%token BREAK CONTINUE RETURN CONST ITERATOR
 
 %nterm <program> program
 %nterm <program_item_list> program_item_list
 %nterm <import_statement> import_statement
 %nterm <program_item> program_item
+%nterm <start_block> start_block
 %nterm <type_name> type_name
 %nterm <formatted_string> formatted_string
 %nterm <data_declaration> data_declaration
@@ -111,7 +112,6 @@ const char* token_to_str(int);
 %nterm <loop_body_elem> loop_body_elem
 %nterm <func_body_elem> func_body_elem
 %nterm <inline_statement> inline_statement
-%nterm <exit_statement> exit_statement
 %nterm <return_statement> return_statement
 %nterm <if_clause> if_clause
 %nterm <ifelse_statement> ifelse_statement
@@ -203,7 +203,19 @@ program_item
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }
+    | start_block {
+        TRACE("program_item:start_block");
+        $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
+        $$->nterm = (ast_node_t*)$1;
+    }
     ;
+
+start_block
+    : START func_body {
+        TRACE("start_block");
+        $$ = (ast_start_block_t*)create_ast_node(AST_START_BLOCK);
+        $$->func_body = $2;
+    }
 
 type_name
     : INTEGER {
@@ -464,11 +476,6 @@ func_body_elem
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
-    | exit_statement {
-        TRACE("func_body_elem:exit_statement");
-        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
     | inline_statement {
         TRACE("func_body_elem:inline_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
@@ -486,14 +493,6 @@ inline_statement
         TRACE("trace_statement: with params");
         $$ = (ast_inline_statement_t*)create_ast_node(AST_INLINE_STATEMENT);
         $$->token = $1;
-    }
-    ;
-
-exit_statement
-    : EXIT expression_param {
-        TRACE("exit_statement: with params");
-        $$ = (ast_exit_statement_t*)create_ast_node(AST_EXIT_STATEMENT);
-        $$->expression_param = $2;
     }
     ;
 

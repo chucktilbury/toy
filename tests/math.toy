@@ -1,0 +1,14 @@
+
+; implement the C math library
+
+float sqrt(float num) {
+
+    float result;
+
+    inline {
+        // implement the sqrt function for toy
+        FLOAT_DATA__result = sqrt(FLOAT_DATA__num);
+    }
+
+    return (result);
+}
