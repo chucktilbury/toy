@@ -82,8 +82,8 @@ const char* token_to_str(int);
     ast_expression_param_t* expression_param;
 };
 
-%token <token> IDENTIFIER STRING_LIT INTEGER_LIT FLOAT_LIT
-%token <token> INTEGER FLOAT STRING NOTHING BOOL INLINE
+%token <token> IDENTIFIER STRING_LIT INTEGER_LIT FLOAT_LIT BOOL_LIT
+%token <token> INTEGER FLOAT STRING NOTHING BOOL INLINE TRUE FALSE
 %token <token> EQU_OPER NEQ_OPER LTE_OPER GTE_OPER LT_OPER
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
@@ -218,6 +218,11 @@ type_name
     }
     | STRING {
         TRACE("type_name:STRING");
+        $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
+        $$->token = $1;
+    }
+    | BOOL {
+        TRACE("type_name:BOOL");
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
@@ -655,6 +660,12 @@ raw_value
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
         $$->type = FLOAT;
+    }
+    | BOOL_LIT {
+        TRACE("raw_value:BOOL_LIT %lf", $1->val.float_lit);
+        $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
+        $$->token = $1;
+        $$->type = BOOL;
     }
     ;
 
