@@ -20,7 +20,8 @@ OBJS	=	tokens.o \
 		sym_reference.o \
 		func_reference.o \
 		type_table.o \
-		dump_symbols.o
+		dump_symbols.o \
+		emit_code.o
 
 
 GEN	=	parser.o \
