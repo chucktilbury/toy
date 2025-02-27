@@ -56,7 +56,7 @@ function dbg {
 export PATH=$_PROJECT_LOC:$_PROJECT_LOC/bin:$_PROJECT_LOC/scripts:$PATH
 export _RUNTIME=$_PROJECT_LOC/src/runtime
 
-PS1='\[\e[0;30;107m\]$_PROJECT_NAME($_BUILD_TYPE):\[\e[0m\]'$PS1
+PS1='\[\e[1;31m\]$_PROJECT_NAME($_BUILD_TYPE):\[\e[0m\]'$PS1
 cd $_PROJECT_LOC
 
 if [[ -d build ]]; then
