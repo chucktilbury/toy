@@ -28,7 +28,7 @@ static inline void emit_program_start(ast_program_t* node) {
     time_t t = time(NULL);
 
     EMIT("\n// generated code -- do not edit --\n");
-    EMIT("// source: %s\n", get_file_name());
+    EMIT("// source: %s\n", get_base_file_name());
     EMIT("// date:   %s", ctime(&t));
     EMIT("// user:   %s\n", getenv("USER"));
     EMIT("// dir:    %s\n\n", getcwd(NULL, 0));

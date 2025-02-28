@@ -1,3 +1,7 @@
+build/
+docs/out/
+bin/
+lib/
 toy
 parser.c
 parser.h

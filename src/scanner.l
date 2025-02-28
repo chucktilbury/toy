@@ -336,7 +336,7 @@ void open_file(const char *fname) {
     }
     else {
         file_stack = fs;
-        base_file_name = _COPY_STRING(fs->fname);
+        set_base_file_name(fs->fname);
     }
 
 }
@@ -362,6 +362,6 @@ const char* get_file_name(void) {
     if(file_stack != NULL)
         return file_stack->fname;
     else
-        return base_file_name;
+        return get_base_file_name();
 }
 

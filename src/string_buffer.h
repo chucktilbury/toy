@@ -21,7 +21,8 @@ int cmp_string_buffer_str(string_buffer_t*, const char*);
 const char* raw_string_buffer(string_buffer_t*);
 int len_string_buffer(string_buffer_t*);
 
-void write_string_buffer(string_buffer_t*, const char* fname);
-string_buffer_t* read_string_buffer(const char* fname);
+void write_string_buffer(string_buffer_t*, const char*);
+void print_string_buffer(string_buffer_t*);
+string_buffer_t* read_string_buffer(const char*);
 
 #endif /* _STRING_BUFFER_H_ */

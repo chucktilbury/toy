@@ -1,5 +1,7 @@
 
-Make sure that global initializes all have values.
+TODO:
+* Make sure that global initializes all have values.
+* Add code to use the env to search for an import file.
 
 -------------
 

@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
     ast_tables.c
     pointer_list.c
     string_buffer.c
+    string_list.c
     context.c
     trace.c
     symbol.c

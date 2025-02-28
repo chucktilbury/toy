@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    open_file(argv[1]);
+    open_file(find_file(argv[1]));
 
     // run the parser
     yyparse();

@@ -140,3 +140,8 @@ string_buffer_t* read_string_buffer(const char* fname) {
 
     return buf;
 }
+
+void print_string_buffer(string_buffer_t* s) {
+
+    puts(s->buf);
+}
