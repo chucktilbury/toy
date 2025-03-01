@@ -282,13 +282,7 @@ data_declaration_list
     ;
 
 data_definition
-    : data_declaration {
-        TRACE("data_definition: bare");
-        $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
-        $$->data_declaration = $1;
-        $$->is_init = false;
-    }
-    | data_declaration '=' expression {
+    : data_declaration '=' expression {
         TRACE("data_definition: with expression");
         $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
         $$->data_declaration = $1;
@@ -437,6 +431,11 @@ loop_body_elem
 func_body_elem
     : data_definition {
         TRACE("func_body_elem:data_definition");
+        $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
+        $$->nterm = (ast_node_t*)$1;
+    }
+    | data_declaration {
+        TRACE("func_body_elem:data_declaration");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -803,13 +802,16 @@ expression
         TRACE("expression:unary SUB_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->right = $2;
-        token_t* tok = _ALLOC_DS(token_t);
-        tok->raw = $1->raw;
-        tok->fname = $1->fname;
-        tok->line_no = $1->line_no;
-        tok->col_no = $1->col_no;
-        tok->type = UNARY_MINUS_OPER;
-        $$->oper = tok;
+        // token_t* tok = _ALLOC_DS(token_t);
+        // tok->raw = $1->raw;
+        // tok->fname = $1->fname;
+        // tok->line_no = $1->line_no;
+        // tok->col_no = $1->col_no;
+        // tok->type = UNARY_MINUS_OPER;
+        // $$->oper = tok;
+        $1->type = UNARY_MINUS_OPER;
+        $$->oper = $1;
+
     }
     | '(' expression ')' {
         TRACE("expr_primary:(expression)");

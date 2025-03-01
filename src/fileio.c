@@ -185,5 +185,5 @@ const char* get_base_file_name(void) {
  */
 void set_base_file_name(const char* fname) {
 
-    base_file_name = fname;
+    base_file_name = _COPY_STRING(fname);
 }

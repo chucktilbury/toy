@@ -56,6 +56,7 @@ typedef struct {
     int line;
     int col;
     const char* fname;
+    bool emit;
 } ast_node_t;
 
 /*

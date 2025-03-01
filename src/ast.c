@@ -867,6 +867,7 @@ ast_node_t* create_ast_node(ast_type_t type) {
     ptr->line  = get_line_no();
     ptr->col   = get_col_no();
     ptr->fname = get_file_name();
+    ptr->emit = true;
 
     return ptr;
 }
