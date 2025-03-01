@@ -4,16 +4,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
-#include <limits.h>
 #include <errno.h>
 #include <glob.h>
 #include <sys/stat.h>
+#include <linux/limits.h>
 
 #include "string_list.h"
 #include "memory.h"
 #include "errors.h"
 
-//#define USE_TRACE
+#define USE_TRACE
 #include "trace.h"
 
 static const char* base_file_name = NULL;
@@ -58,7 +58,7 @@ static void add_dirs(const char* dname) {
 
     char* tmp = NULL;
 
-    tmp = (char*)get_path("..");
+    tmp = (char*)get_path(dname);
     strcat(tmp, "/*");
     glob_t gstruct;
     glob(tmp, GLOB_ONLYDIR, NULL, &gstruct);
@@ -125,5 +125,5 @@ const char* get_base_file_name(void) {
 
 void set_base_file_name(const char* fname) {
 
-    base_file_name = _COPY_STRING(fname);
+    base_file_name = fname;
 }

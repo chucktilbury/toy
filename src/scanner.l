@@ -314,17 +314,18 @@ const char* strip_quotes(const char* str) {
 
 extern const char* base_file_name;
 
-void open_file(const char *fname) {
+void open_file(const char* fn) {
 
-    file_stack_t* fs = _ALLOC_DS(file_stack_t);
-    fs->fname = _COPY_STRING(fname);
-    fs->next = NULL;
-    fs->line = 1;
-    fs->col = 1;
-
+    const char *fname = find_file(fn);
     yyin = fopen(fname, "r");
     if(yyin == NULL)
         FATAL("cannot open input file: \"%s\": %s\n", fname, strerror(errno));
+
+    file_stack_t* fs = _ALLOC_DS(file_stack_t);
+    fs->fname = fname;
+    fs->next = NULL;
+    fs->line = 1;
+    fs->col = 1;
 
     fs->fp = yyin;
     fs->buffer = yy_create_buffer(yyin, YY_BUF_SIZE);
