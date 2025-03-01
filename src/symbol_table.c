@@ -47,20 +47,20 @@ static int start_block_count = 0;
 #define TRACE_CONTEXT(c)
 #endif
 
-static inline void create_data_symbol(ast_data_definition_t* node) {
+static inline void create_data_symbol(ast_data_declaration_t* node) {
 
     SYMTAB_ENTER(AST_DATA_DEFINITION);
 
     symbol_t* sym = create_symbol(SYM_DATA);
     sym->is_iter  = false;
-    sym->is_init  = node->is_init;
+    sym->is_init  = false; //node->is_init;
     sym->node     = (ast_node_t*)node;
 
-    ast_data_declaration_t* dd = node->data_declaration;
-    sym->is_const              = dd->is_const;
-    sym->sym_type              = dd->type_name->token->type;
-    sym->tok                   = dd->IDENTIFIER;
-    sym->name                  = dd->IDENTIFIER->raw;
+    //ast_data_declaration_t* dd = node->data_declaration;
+    sym->is_const              = node->is_const;
+    sym->sym_type              = node->type_name->token->type;
+    sym->tok                   = node->IDENTIFIER;
+    sym->name                  = node->IDENTIFIER->raw;
     sym->ref_count             = 0;
 
     add_symbol(peek_context(), sym->name, sym);
@@ -73,29 +73,13 @@ static inline void create_func_params(ast_func_definition_t* node) {
 
     SYMTAB_ENTER(AST_FUNC_DEFINITION);
 
-    ast_func_params_t* parms              = node->func_params;
-    pointer_list_t* list                  = parms->data_declaration_list->list;
-    parms->data_declaration_list->context = create_context();
+    pointer_list_t* list = node->func_params->data_declaration_list->list;
+    node->func_params->data_declaration_list->context = create_context();
 
     int mark = 0;
     ast_data_declaration_t* dd;
     while(NULL != (dd = iterate_pointer_list(list, &mark))) {
-        symbol_t* sym = create_symbol(SYM_DATA);
-        sym->is_iter  = false;
-        // assignment is not legal
-        sym->is_init  = true;
-        sym->is_const = true;
-        sym->node     = (ast_node_t*)dd;
-
-        sym->sym_type  = dd->type_name->token->type;
-        sym->tok       = dd->IDENTIFIER;
-        sym->name      = dd->IDENTIFIER->raw;
-        sym->ref_count = 0;
         node->arity++;
-
-        TRACE("adding func param symbol: %s %s", token_to_str(sym->sym_type), sym->name);
-        add_symbol(peek_context(), sym->name, sym);
-
         append_string_buffer_fmt(node->proto, "%s, ",
                                  token_to_str(dd->type_name->token->type));
     }
@@ -154,8 +138,8 @@ static void pre(ast_node_t* node) {
             ((ast_program_item_list_t*)node)->context = create_context();
             break;
 
-        case AST_DATA_DEFINITION:
-            create_data_symbol((ast_data_definition_t*)node);
+        case AST_DATA_DECLARATION:
+            create_data_symbol((ast_data_declaration_t*)node);
             break;
 
         case AST_FUNC_DEFINITION:

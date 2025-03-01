@@ -181,8 +181,8 @@ import_statement
     ;
 
 program_item
-    : data_definition {
-        TRACE("program_item:data_definition");
+    : data_declaration {
+        TRACE("program_item:data_declaration");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }

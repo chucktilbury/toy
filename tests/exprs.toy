@@ -1,8 +1,15 @@
 ; this tests expressions a little bit
 
+int not_const
+int value
+
 int somefunc(int a, int b, int c) {
 
-    int d = (1+2)/3
+    int d = (a+b)/c
 
     return(d)
+}
+
+start {
+    somefunc(1, 2, 3)
 }

@@ -193,7 +193,7 @@ static inline void traverse_program_item(ast_program_item_t* node, void (*pre)(a
     AST_ENTER(AST_PROGRAM_ITEM);
 
     SWITCH {
-        CASE(AST_DATA_DEFINITION, data_definition);
+        CASE(AST_DATA_DECLARATION, data_declaration);
         CASE(AST_FUNC_DEFINITION, func_definition);
         CASE(AST_FUNC_BODY, func_body);
         CASE(AST_IMPORT_STATEMENT, import_statement);
