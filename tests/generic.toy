@@ -14,13 +14,13 @@ import "tests/something.toy"
 
 nothing doodah(int snark, float zoop) {
 
-    int asdf = sdf + 123 / x
+    int asdf = snark + 123 / ploot
     int flarp = zoop
     int fart
 }
 
 ; this is equvent to the a "main" function
-{
+start{
 
     int plart = asdf(qwer, oier(1, 2, 3))
     IF(not 1 == 2) {

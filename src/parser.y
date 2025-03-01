@@ -176,7 +176,7 @@ import_statement
         // All processing happenes here, and not in an AST pass.
         $$ = (ast_import_statement_t*)create_ast_node(AST_IMPORT_STATEMENT);
         $$->STRING_LIT = $2;
-        open_file($2->val.text);
+        open_file($2->raw);
     }
     ;
 
@@ -188,11 +188,6 @@ program_item
     }
     | func_definition {
         TRACE("program_item:func_definition");
-        $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
-        $$->nterm = (ast_node_t*)$1;
-    }
-    | func_body {
-        TRACE("program_item:func_body");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }

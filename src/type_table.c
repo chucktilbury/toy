@@ -14,6 +14,9 @@ int check_assignment_type(token_t* tok, int lhs, int rhs) {
 
     int val = -1;
 
+    if(lhs == 0 || rhs == 0)
+        return val;
+
     TRACE("checking %s <- %s", token_to_str(lhs), token_to_str(rhs));
     switch(lhs) {
         case INTEGER:
@@ -140,6 +143,9 @@ int check_expression_type(token_t* tok, int left, int right) {
 
     int val  = -1;
     int oper = tok->type;
+
+    if(left == 0 || right == 0)
+        return val;
 
     switch(oper) {
         // boolean operation always produces a bool

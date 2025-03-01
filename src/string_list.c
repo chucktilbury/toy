@@ -1,4 +1,13 @@
-
+/**
+ * @file string_list.c
+ * 
+ * @brief Simple wrapper for pointer_list_t. Type checking.
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 #include "string_list.h"
 
 string_list_t* create_string_list(void) {

@@ -1,4 +1,13 @@
-
+/**
+ * @file ast.c
+ * 
+ * @brief Implement the Abstract Syntax Tree
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 #include "errors.h"
 #include "pointer_list.h"
 #include "ast.h"

@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}
     context.c
     trace.c
     symbol.c
+    value.c
     symbol_table.c
     sym_reference.c
     func_reference.c

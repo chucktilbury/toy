@@ -1,8 +1,15 @@
-/*
- * This module traverses the AST and verifies that all symbols referenced are
- * present and that they have acceptable type references. If there is a problem
- * then publish a syntax error. When the emit passes are called, then the
- * existance and use of variables has already been verified.
+/**
+ * @file dump_symbols.c
+ * 
+ * @brief This module traverses the AST and verifies that all symbols 
+ * referenced are present and that they have acceptable type references. If 
+ * there is a problem then publish a syntax error. When the emit passes are 
+ * called, then the existance and use of variables has already been verified.
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
  */
 #include <stdio.h>
 
@@ -24,9 +31,17 @@
 const char* token_to_str(int);
 
 #define DUMP dump_context(ctx)
+/**
+ * @brief Dump the context. Only if tracing in this module is enabled.
+ * 
+ * @param ctx 
+ */
 static void dump_context(context_t* ctx) {
 
     ASSERT(ctx != NULL, "invalid context");
+
+    if(ctx->table->count == 0)
+        return;
 
     TRACE("this ptr: %p", (void*)ctx);
     TRACE("prev ptr: %p", (void*)ctx->prev);
@@ -58,6 +73,11 @@ static void dump_context(context_t* ctx) {
 
 static context_t* ctx = NULL;
 
+/**
+ * @brief Set the context for a function body.
+ * 
+ * @param node 
+ */
 static inline void func_body(ast_func_body_list_t* node) {
 
     ENTER;
@@ -66,6 +86,11 @@ static inline void func_body(ast_func_body_list_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Set the context for a loop body.
+ * 
+ * @param node 
+ */
 static inline void loop_body(ast_loop_body_list_t* node) {
 
     ENTER;
@@ -74,6 +99,11 @@ static inline void loop_body(ast_loop_body_list_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Set the context for func parameters.
+ * 
+ * @param node 
+ */
 static inline void func_parms(ast_data_declaration_list_t* node) {
 
     ENTER;
@@ -82,6 +112,11 @@ static inline void func_parms(ast_data_declaration_list_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Set the root context.
+ * 
+ * @param node 
+ */
 static inline void program_list(ast_program_item_list_t* node) {
 
     ENTER;
@@ -90,6 +125,11 @@ static inline void program_list(ast_program_item_list_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Callback run before the node is traversed.
+ * 
+ * @param node 
+ */
 static void pre(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -116,6 +156,10 @@ static void pre(ast_node_t* node) {
     }
 }
 
+/**
+ * @brief External interface for the pass.
+ * 
+ */
 void dump_symbols(void) {
 
     SEPARATOR;

@@ -207,7 +207,8 @@ const char* strip_quotes(const char* str) {
     }
     else {
         yylval.token = create_token(raw_string_buffer(strbuf), INLINE);
-        //fprintf(stderr, "scanner returns INLINE: %s\n", raw_string_buffer(strbuf));
+        yylval.token->value = create_value(INLINE); 
+        yylval.token->value->val.str = yylval.token->raw;
         clear_string_buffer(strbuf);
         BEGIN(INITIAL);
         return INLINE;
@@ -239,8 +240,8 @@ const char* strip_quotes(const char* str) {
 
 <FSTRING>\" {
     token_t* tok = create_token(raw_string_buffer(strbuf), STRING_LIT);
-    tok->val.text = _COPY_STRING(raw_string_buffer(strbuf));
-    //fprintf(stderr, "FSTRING returns: \"%s\"\n", tok->val.text);
+    tok->value = create_value(STRING_LIT); 
+    tok->value->val.str = tok->raw;
     clear_string_buffer(strbuf);
     yylval.token = tok;
     BEGIN(INITIAL);
@@ -249,29 +250,33 @@ const char* strip_quotes(const char* str) {
 
     /* single quoted string is an absolute literal */
 \'[^\'\n]*\' {
-    token_t* tok = create_token(yytext, STRING_LIT);
-    tok->val.text = _COPY_STRING(strip_quotes(yytext));
+    token_t* tok = create_token(strip_quotes(yytext), STRING_LIT);
+    tok->value = create_value(STRING_LIT);
+    tok->value->val.str = tok->raw;
     yylval.token = tok;
     return STRING_LIT;
 }
 
 [a-zA-Z_][0-9a-zA-Z_]*  {
     token_t* tok = create_token(yytext, IDENTIFIER);
-    tok->val.text = _COPY_STRING(yytext);
+    tok->value = create_value(IDENTIFIER);
+    tok->value->val.str = tok->raw;
     yylval.token = tok;
     return IDENTIFIER;
 }
 
 (([1-9][0-9]*)|0)?\.[0-9]*([eE][-+]?[0-9]+)? {
     token_t* tok = create_token(yytext, FLOAT_LIT);
-    tok->val.float_lit = strtod(yytext, NULL);
+    tok->value = create_value(FLOAT_LIT);
+    tok->value->val.real = strtod(yytext, NULL);
     yylval.token = tok;
     return FLOAT_LIT;
 }
 
 ([1-9][0-9]*)|0 {
     token_t* tok = create_token(yytext, INTEGER_LIT);
-    tok->val.integer_lit = strtol(yytext, NULL, 10);
+    tok->value = create_value(INTEGER_LIT);
+    tok->value->val.integer = strtol(yytext, NULL, 10);
     yylval.token = tok;
     return INTEGER_LIT;
 }

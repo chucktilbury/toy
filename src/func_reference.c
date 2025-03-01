@@ -1,3 +1,15 @@
+/**
+ * @file func_reference.c
+ * 
+ * @brief This AST pass verifies that function references are defined that 
+ * and that the parameter types all match.
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
+
 #include <stdio.h>
 
 #include "ast.h"
@@ -18,7 +30,12 @@
 const char* token_to_str(int);
 static context_t* ctx = NULL;
 
-
+/**
+ * @brief Internal function verified that the function arity and the prototype
+ * match. Issue a syntax error if they don't.
+ * 
+ * @param node 
+ */
 static void check_func_ref(ast_func_reference_t* node) {
 
     // existance of symbol is done in sym_reference.c
@@ -33,7 +50,12 @@ static void check_func_ref(ast_func_reference_t* node) {
                      node->proto->buf, def->proto->buf);
 }
 
-
+/**
+ * @brief Internal function that creates a function prototype string for a 
+ * function reference. Looks up the parameters and verifies the type.
+ * 
+ * @param node 
+ */
 static void make_func_ref_proto(ast_func_reference_t* node) {
 
     node->proto = create_string_buffer(NULL);
@@ -70,6 +92,11 @@ static void make_func_ref_proto(ast_func_reference_t* node) {
     check_func_ref(node);
 }
 
+/**
+ * @brief Callback run before the node is traversed.
+ * 
+ * @param node 
+ */
 static void pre(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -84,6 +111,10 @@ static void pre(ast_node_t* node) {
     }
 }
 
+/**
+ * @brief Top level interface to run the AST pass.
+ * 
+ */
 void create_func_references(void) {
 
     SEPARATOR;

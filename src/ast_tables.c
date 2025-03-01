@@ -1,7 +1,23 @@
+/**
+ * @file ast_tables.c
+ * 
+ * @brief Handle converting the AST type labels to different forms.
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 #include <stddef.h>
 #include "ast.h"
 #include "memory.h"
 
+/**
+ * @brief Convert the AST type to a string.
+ * 
+ * @param node 
+ * @return const char* 
+ */
 const char* node_type_to_str(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -49,6 +65,12 @@ const char* node_type_to_str(ast_node_t* node) {
                                                   "UNKNOWN";
 }
 
+/**
+ * @brief Convert the AST node type to a friendly name.
+ * 
+ * @param node 
+ * @return const char* 
+ */
 const char* node_type_to_name(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -96,6 +118,12 @@ const char* node_type_to_name(ast_node_t* node) {
                                                   "UNKNOWN";
 }
 
+/**
+ * @brief Get the size of the AST data structure that is specified by the type.
+ * 
+ * @param type 
+ * @return size_t 
+ */
 size_t alloc_ast_node_size(ast_type_t type) {
 
     return (type == AST_PROGRAM)                ? sizeof(ast_program_t) :
@@ -141,6 +169,12 @@ size_t alloc_ast_node_size(ast_type_t type) {
                                                   (size_t)-1;
 }
 
+/**
+ * @brief Allocate an AST node based on the specified type.
+ * 
+ * @param type 
+ * @return ast_node_t* 
+ */
 ast_node_t* alloc_ast_node(ast_type_t type) {
 
     return (ast_node_t*)_ALLOC(alloc_ast_node_size(type));

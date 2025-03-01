@@ -1,4 +1,14 @@
-
+/**
+ * @file emit_code.c
+ * 
+ * @brief Top level code emitter. This AST pass dispatches all other 
+ * code emitters to the output file.
+ * 
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-02-28
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
@@ -20,6 +30,11 @@
 
 string_buffer_t* buffer;
 
+/**
+ * @brief Emit the code for the program start up.
+ * 
+ * @param node 
+ */
 static inline void emit_program_start(ast_program_t* node) {
 
     ENTER;
@@ -36,6 +51,11 @@ static inline void emit_program_start(ast_program_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Emit the code for the program end.
+ * 
+ * @param node 
+ */
 static inline void emit_program_end(ast_program_t* node) {
 
     ENTER;
@@ -46,6 +66,11 @@ static inline void emit_program_end(ast_program_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Emite the code for a data definition.
+ * 
+ * @param node 
+ */
 static inline void emit_data_definition(ast_data_definition_t* node) {
 
     ENTER;
@@ -54,6 +79,11 @@ static inline void emit_data_definition(ast_data_definition_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Emite the code for a function definition.
+ * 
+ * @param node 
+ */
 static inline void emit_func_definition(ast_func_definition_t* node) {
 
     ENTER;
@@ -62,6 +92,11 @@ static inline void emit_func_definition(ast_func_definition_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Emit the code for a function body.
+ * 
+ * @param node 
+ */
 static inline void emit_func_body(ast_func_body_t* node) {
 
     ENTER;
@@ -70,7 +105,24 @@ static inline void emit_func_body(ast_func_body_t* node) {
     RETURN();
 }
 
+/**
+ * @brief Emit the code for a loop body.
+ * 
+ * @param node 
+ */
+static inline void emit_loop_body(ast_loop_body_t* node) {
 
+    ENTER;
+
+
+    RETURN();
+}
+
+/**
+ * @brief Callback run before the node is traversed.
+ * 
+ * @param node 
+ */
 static void pre(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -92,6 +144,10 @@ static void pre(ast_node_t* node) {
             emit_func_body((ast_func_body_t*)node);
             break;
 
+        case AST_LOOP_BODY:
+            emit_loop_body((ast_loop_body_t*)node);
+            break;
+
         case AST_START_BLOCK:
             break;
 
@@ -100,6 +156,11 @@ static void pre(ast_node_t* node) {
     }
 }
 
+/**
+ * @brief Callback run after the node is traversed.
+ * 
+ * @param node 
+ */
 static void post(ast_node_t* node) {
 
     ast_type_t type = node->type;
@@ -114,6 +175,11 @@ static void post(ast_node_t* node) {
     }
 }
 
+/**
+ * @brief Top level entry point of the AST pass.
+ * 
+ * @param fname 
+ */
 void emit_code(const char* fname) {
 
     SEPARATOR;

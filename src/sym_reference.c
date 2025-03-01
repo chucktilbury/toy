@@ -15,7 +15,7 @@
 #include "parser.h"
 #include "type_table.h"
 
-// #define TRACE_SYM_REF
+//#define TRACE_SYM_REF
 
 #ifdef TRACE_SYM_REF
 #define USE_TRACE
