@@ -48,7 +48,6 @@ const char* strip_quotes(const char* str) {
 %}
 
 %x INLINE_BLOCK
-%x FSTRING
 %option yylineno
 %option noinput
 %option nounput
@@ -207,7 +206,7 @@ const char* strip_quotes(const char* str) {
     }
     else {
         yylval.token = create_token(raw_string_buffer(strbuf), INLINE);
-        yylval.token->value = create_value(INLINE); 
+        yylval.token->value = create_value(INLINE);
         yylval.token->value->val.str = yylval.token->raw;
         clear_string_buffer(strbuf);
         BEGIN(INITIAL);
@@ -215,40 +214,14 @@ const char* strip_quotes(const char* str) {
     }
 }
 
-    /* double quoted string supports escapes */
-\" {
-    if(strbuf == NULL)
-        strbuf = create_string_buffer(NULL);
-    BEGIN(FSTRING);
-}
-
-<FSTRING>\\n { append_string_buffer_char(strbuf, '\n'); }
-<FSTRING>\\r { append_string_buffer_char(strbuf, '\r'); }
-<FSTRING>\\e { append_string_buffer_char(strbuf, '\x1b'); }
-<FSTRING>\\t { append_string_buffer_char(strbuf, '\t'); }
-<FSTRING>\\b { append_string_buffer_char(strbuf, '\b'); }
-<FSTRING>\\f { append_string_buffer_char(strbuf, '\f'); }
-<FSTRING>\\v { append_string_buffer_char(strbuf, '\v'); }
-<FSTRING>\\\\ { append_string_buffer_char(strbuf, '\\'); }
-<FSTRING>\\\" { append_string_buffer_char(strbuf, '\"'); }
-<FSTRING>\\\' { append_string_buffer_char(strbuf, '\''); }
-<FSTRING>\\\? { append_string_buffer_char(strbuf, '\?'); }
-<FSTRING>\\.  { append_string_buffer_char(strbuf, yytext[1]); }
-<FSTRING>\\[0-7]{1,3} { append_string_buffer_char(strbuf, (char)strtol(yytext + 1, 0, 8)); }
-<FSTRING>\\[xX][0-9a-fA-F]{1,3} { append_string_buffer_char(strbuf, (char)strtol(yytext + 2, 0, 16)); }
-<FSTRING>[^\"\n\\]*  { append_string_buffer_str(strbuf, yytext); }
-
-<FSTRING>\" {
-    token_t* tok = create_token(raw_string_buffer(strbuf), STRING_LIT);
-    tok->value = create_value(STRING_LIT); 
+\"[^\"\n]*\" {
+    token_t* tok = create_token(strip_quotes(yytext), STRING_LIT);
+    tok->value = create_value(STRING_LIT);
     tok->value->val.str = tok->raw;
-    clear_string_buffer(strbuf);
     yylval.token = tok;
-    BEGIN(INITIAL);
     return STRING_LIT;
 }
 
-    /* single quoted string is an absolute literal */
 \'[^\'\n]*\' {
     token_t* tok = create_token(strip_quotes(yytext), STRING_LIT);
     tok->value = create_value(STRING_LIT);

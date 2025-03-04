@@ -198,7 +198,7 @@ static inline void emit_start_block(ast_start_block_t* node) {
     ENTER;
 
     if(false == main_seen) {
-        EMIT("\nint main(int argc, char** argv, char**env) { ");
+        EMIT("int main(int argc, char** argv, char**env) { ");
         EMIT("runtime_main_init(argc, argv, env); ");
         emit_func_body(node->func_body);
         EMIT("return 0;} ");
