@@ -41,15 +41,9 @@ function all {
 
 function dbg {
     if [ $# -eq 0 ]; then
-        echo "error: executable name is required"
-    elif [ $# -eq 1 ]; then
-        echo "$1"
-        kdbg $1
-    elif [ $# -gt 1 ]; then
-        args=("$@")
-        name=${args[0]}
-        unset args[0]
-        kdbg -a "${args[*]}" $name 2> /dev/null &
+        echo "error: input file name is required"
+    else
+        kdbg $_PROJECT_LOC/bin/$_PROJECT_ -a "$1" 2> /dev/null &
     fi
 }
 

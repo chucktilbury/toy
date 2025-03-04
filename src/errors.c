@@ -83,6 +83,21 @@ void syntax_warning(token_t* tok, const char* fmt, ...) {
     warnings++;
 }
 
+void node_syntax(ast_node_t* node, const char* fmt, ...) {
+
+    va_list args;
+
+    if(node != NULL)
+        fprintf(stderr, "%s:%d:%d ", node->fname, node->line, node->col);
+    fprintf(stderr, "syntax error, ");
+
+    va_start(args, fmt);
+    vfprintf(stderr, fmt, args);
+    va_end(args);
+    fputc('\n', stderr);
+    errors++;
+}
+
 /**
  * @brief Misc errors.
  * 

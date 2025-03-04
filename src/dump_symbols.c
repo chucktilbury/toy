@@ -19,7 +19,7 @@
 #include "symbol.h"
 
 
-#define TRACE_DUMP_SYM
+//#define TRACE_DUMP_SYM
 
 #ifdef TRACE_DUMP_SYM
 #define USE_TRACE

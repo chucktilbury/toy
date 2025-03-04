@@ -570,5 +570,6 @@ void traverse_ast(void (*pre)(ast_node_t*), void (*post)(ast_node_t*));
 const char* node_type_to_str(ast_node_t* node);
 const char* node_type_to_name(ast_node_t* node);
 ast_node_t* alloc_ast_node(ast_type_t type);
+ast_program_t* get_program(void);
 
 #endif /* _AST_H_ */

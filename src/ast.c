@@ -871,3 +871,8 @@ ast_node_t* create_ast_node(ast_type_t type) {
 
     return ptr;
 }
+
+ast_program_t* get_program(void) {
+
+    return root_node;
+}
