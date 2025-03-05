@@ -38,8 +38,8 @@ add_executable(${PROJECT_NAME}
     symbol.c
     value.c
     symbol_table.c
-    sym_reference.c
-    func_reference.c
+    #sym_reference.c
+    #func_reference.c
     type_table.c
     dump_symbols.c
     emit_code.c

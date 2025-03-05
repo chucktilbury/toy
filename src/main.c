@@ -12,10 +12,10 @@
 #include "errors.h"
 // #include "pointer_list.h"
 // #include "ast.h"
-#include "func_reference.h"
+//#include "func_reference.h"
 #include "parser.h"
 #include "symbol_table.h"
-#include "sym_reference.h"
+//#include "sym_reference.h"
 #include "dump_symbols.h"
 
 int main(int argc, char** argv) {
@@ -33,8 +33,8 @@ int main(int argc, char** argv) {
     // traverse_ast(NULL, NULL);
     //  do the check passes
     create_symbol_table();
-    check_sym_refs();
-    create_func_references();
+    //check_sym_refs();
+    //create_func_references();
     emit_code("outfile.c");
     dump_symbols();
 

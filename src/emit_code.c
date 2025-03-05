@@ -18,7 +18,7 @@
 #include "parser.h"
 #include "fileio.h"
 
-#define EMIT_TRACE
+// #define EMIT_TRACE
 
 #ifdef EMIT_TRACE
 #define USE_TRACE
@@ -38,16 +38,19 @@ typedef enum {
     IN_EXPR,
 } emit_state_t;
 
-static bool is_last            = false;
-static bool is_data_def        = false;
-static bool in_loop = false;
-static bool in_expr = false;
-static bool main_seen = false;
+static bool is_last     = false;
+static bool is_data_def = false;
+static bool in_loop     = false;
+static bool in_expr     = false;
+static bool main_seen   = false;
 
-#define EMIT(...)                                                \
-    do {                                                         \
-        append_string_buffer_fmt(buffer, __VA_ARGS__);           \
-    } while(false)
+#define EMIT(...) append_string_buffer_fmt(buffer, __VA_ARGS__);
+
+#if 0
+#define LINE EMIT("\n#line %d \"%s\"\n\n", node->node.line, node->node.fname);
+#else
+#define LINE
+#endif
 
 static string_buffer_t* buffer;
 
@@ -115,6 +118,7 @@ static inline void emit_program(ast_program_t* node) {
     EMIT("#include <stdint.h>\n");
     EMIT("#include <stdbool.h>\n");
     EMIT("#include <string.h>\n\n");
+
     EMIT("#include \"runtime.h\"\n\n");
 
     EMIT("// intrinsic types for TOY code\n");
@@ -122,13 +126,15 @@ static inline void emit_program(ast_program_t* node) {
     EMIT("typedef int64_t TOY_INTEGER;\n");
     EMIT("typedef void TOY_NOTHING;\n");
     EMIT("typedef bool TOY_BOOL;\n");
-    EMIT("typedef string_buffer_t* TOY_STRING;\n\n");
+    EMIT("typedef char* TOY_STRING;\n\n");
 
-    EMIT("//--- begin user code ---\n\n");
+    EMIT("//---------------------------\n");
+    EMIT("//----- begin user code -----\n");
+    EMIT("//---------------------------\n\n");
 
     emit_program_item_list(node->program_item_list);
 
-    EMIT("\n//---------------------------\n");
+    EMIT("\n\n//---------------------------\n");
     EMIT("//-- end of generated code --\n");
     EMIT("//---------------------------\n\n");
 
@@ -148,8 +154,10 @@ static inline void emit_program_item_list(ast_program_item_list_t* node) {
     int mark = 0;
     ast_program_item_t* pi;
 
-    while(NULL != (pi = iterate_pointer_list(node->list, &mark)))
+    while(NULL != (pi = iterate_pointer_list(node->list, &mark))) {
+        LINE;
         emit_program_item(pi);
+    }
 
     RETURN();
 }
@@ -182,7 +190,6 @@ static inline void emit_program_item(ast_program_item_t* node) {
             break;
         default:
             FATAL("unknown node type: %s (%d)", node_type_to_name(node->nterm), node->nterm->type);
-
     }
 
     RETURN();
@@ -198,10 +205,10 @@ static inline void emit_start_block(ast_start_block_t* node) {
     ENTER;
 
     if(false == main_seen) {
-        EMIT("int main(int argc, char** argv, char**env) { ");
-        EMIT("runtime_main_init(argc, argv, env); ");
+        EMIT("\n\nint main(int argc, char** argv, char**env){");
+        EMIT("runtime_main_init(argc, argv, env);");
         emit_func_body(node->func_body);
-        EMIT("return 0;} ");
+        EMIT("runtime_main_uninit();return runtime_error_number;}");
         main_seen = true;
     }
     else
@@ -342,12 +349,14 @@ static inline void emit_func_name(ast_func_name_t* node) {
 
     ENTER;
 
-    if(node->type_name != NULL)
+    if(node->type_name != NULL) {
+        EMIT("\n\n")
         emit_type_name(node->type_name);
+    }
     else
         EMIT("void");
 
-    EMIT(" FUNC_%s", node->IDENTIFIER->raw);
+    EMIT("FUNC_%s", node->IDENTIFIER->raw);
 
     RETURN();
 }
@@ -366,12 +375,21 @@ static inline void emit_func_definition(ast_func_definition_t* node) {
 
     emit_func_name(node->func_name);
     emit_func_params(node->func_params);
-    if(node->func_name->is_iterator) {
-        EMIT("{ runtime_iterator_preamble();");
+
+    EMIT("{runtime_gc_node_t* runtime_gc_node = runtime_gc_begin();");
+    if(node->func_name->type_name->token->type != NOTHING)
+        EMIT("TOY_%s runtime_return_value;", token_to_str(node->func_name->type_name->token->type));
+
+        emit_func_body(node->func_body);
+
+    EMIT("runtime_function_return_label:");
+    if(node->func_name->type_name->token->type != NOTHING) {
+        EMIT("runtime_gc_end(runtime_gc_node, runtime_return_value);");
+        EMIT("return runtime_return_value;}");
     }
-    emit_func_body(node->func_body);
-    if(node->func_name->is_iterator) {
-        EMIT("runtime_iterator_postamble(); }");
+    else {
+        EMIT("runtime_gc_end(runtime_gc_node, NULL);");
+        EMIT("return;}");
     }
 
     RETURN();
@@ -391,7 +409,7 @@ static inline void emit_func_params(ast_func_params_t* node) {
     in_loop = true;
     emit_data_declaration_list(node->data_declaration_list);
     in_loop = false;
-    EMIT(") ");
+    EMIT(")");
 
     RETURN();
 }
@@ -405,9 +423,9 @@ static inline void emit_func_body(ast_func_body_t* node) {
 
     ENTER;
 
-    EMIT("{ ");
+    EMIT("{");
     emit_func_body_list(node->func_body_list);
-    EMIT("} ");
+    EMIT("}");
 
     RETURN();
 }
@@ -425,8 +443,10 @@ static inline void emit_func_body_list(ast_func_body_list_t* node) {
     int mark = 0;
     ast_func_body_elem_t* be;
 
-    while(NULL != (be = iterate_pointer_list(node->list, &mark)))
+    while(NULL != (be = iterate_pointer_list(node->list, &mark))) {
+        LINE;
         emit_func_body_elem(be);
+    }
 
     RETURN();
 }
@@ -461,8 +481,10 @@ static inline void emit_loop_body_list(ast_loop_body_list_t* node) {
     int mark = 0;
     ast_loop_body_elem_t* lbe;
 
-    while(NULL != (lbe = iterate_pointer_list(node->list, &mark)))
+    while(NULL != (lbe = iterate_pointer_list(node->list, &mark))) {
+        LINE;
         emit_loop_body_elem(lbe);
+    }
 
     RETURN();
 }
@@ -471,7 +493,6 @@ static inline void emit_loop_body_list(ast_loop_body_list_t* node) {
  * loop_body_diffs
  *    : BREAK
  *    | CONTINUE
- *    | YIELD '(' expression ')'
  *    ;
  */
 static inline void emit_loop_body_diffs(ast_loop_body_diffs_t* node) {
@@ -480,17 +501,10 @@ static inline void emit_loop_body_diffs(ast_loop_body_diffs_t* node) {
 
     switch(node->type) {
         case BREAK:
-            EMIT("break; ");
+            EMIT("break;");
             break;
         case CONTINUE:
-            EMIT("continue; ");
-            break;
-        case YIELD:
-            EMIT("runtime_do_yield(");
-            in_expr = true;
-            emit_expression(node->expression);
-            in_expr = false;
-            EMIT("); ");
+            EMIT("continue;");
             break;
         default:
             FATAL("unknown node type: %s (%d)", token_to_str(node->type), node->type);
@@ -566,7 +580,6 @@ static inline void emit_func_body_elem(ast_func_body_elem_t* node) {
             break;
         default:
             FATAL("unknown node type: %s (%d)", node_type_to_name(node->nterm), node->nterm->type);
-
     }
 
     RETURN();
@@ -596,10 +609,15 @@ static inline void emit_return_statement(ast_return_statement_t* node) {
 
     ENTER;
 
-    EMIT("return ");
-    if(node->expression_param != NULL)
+
+//    EMIT("return ");
+    EMIT("{");
+    if(node->expression_param != NULL) {
+        EMIT("runtime_return_value=");
         emit_expression_param(node->expression_param);
-    EMIT(";\n");
+        EMIT(";");
+    }
+    EMIT("goto runtime_function_return_label;}");
 
     RETURN();
 }
@@ -706,7 +724,7 @@ static inline void emit_else_clause(ast_else_clause_t* node) {
         emit_else_clause_list(node->else_clause_list);
 
     if(node->final_else_segment != NULL)
-    emit_final_else_segment(node->final_else_segment);
+        emit_final_else_segment(node->final_else_segment);
 
     RETURN();
 }
@@ -778,6 +796,7 @@ static inline void emit_assignment_right(ast_assignment_right_t* node) {
     }
 
     emit_expression(node->expression);
+    EMIT(";");
 
     RETURN();
 }

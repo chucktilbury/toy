@@ -15,6 +15,9 @@ int yycolumn = 1;
 int inline_depth = 0;
 string_buffer_t* strbuf = NULL;
 
+extern int parser_line;
+extern char* parser_file;
+
 #define MAX_INCL 16
 
 typedef struct _file_stack_t_ {
@@ -63,15 +66,18 @@ const char* strip_quotes(const char* str) {
 "else"      { return ELSE; }
 "while"     { return WHILE; }
 "do"        { return DO; }
-"yield"     { return YIELD; }
 "break"     { return BREAK; }
 "continue"  { return CONTINUE; }
 "return"    { return RETURN; }
-"import"    { return IMPORT; }
 "start"     { return START; }
 "const"|"constant"  { return CONST; }
-"iter"|"iterator"   { return ITERATOR; }
 "bool"|"boolean"    { return BOOL; }
+
+"import" {
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
+    return IMPORT;
+}
 
 "+" {
     yylval.token = create_token(yytext, ADD_OPER);
@@ -150,21 +156,29 @@ const char* strip_quotes(const char* str) {
 
 "integer"|"int" {
     yylval.token = create_token(yytext, INTEGER);
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     return INTEGER;
 }
 
 "float" {
     yylval.token = create_token(yytext, FLOAT);
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     return FLOAT;
 }
 
 "string" {
     yylval.token = create_token(yytext, STRING);
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     return STRING;
 }
 
 "nothing" {
     yylval.token = create_token(yytext, NOTHING);
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     return NOTHING;
 }
 
@@ -209,6 +223,8 @@ const char* strip_quotes(const char* str) {
         yylval.token->value = create_value(INLINE);
         yylval.token->value->val.str = yylval.token->raw;
         clear_string_buffer(strbuf);
+        parser_line = get_line_no();
+        parser_file = (char*)get_file_name();
         BEGIN(INITIAL);
         return INLINE;
     }
@@ -235,6 +251,8 @@ const char* strip_quotes(const char* str) {
     tok->value = create_value(IDENTIFIER);
     tok->value->val.str = tok->raw;
     yylval.token = tok;
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     return IDENTIFIER;
 }
 
@@ -256,11 +274,15 @@ const char* strip_quotes(const char* str) {
 
 #[^\n]*\n  {
     /* comment */
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     file_stack->line++;
 }
 
 ;[^\n]*\n  {
     /* comment */
+    parser_line = get_line_no();
+    parser_file = (char*)get_file_name();
     file_stack->line++;
 }
 

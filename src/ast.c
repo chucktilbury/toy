@@ -1,8 +1,8 @@
 /**
  * @file ast.c
- * 
+ *
  * @brief Implement the Abstract Syntax Tree
- * 
+ *
  * @author Chuck Tilbury (chucktilbury@gmail.com)
  * @date 2025-02-28
  * @version 0.0.1
@@ -12,6 +12,7 @@
 #include "pointer_list.h"
 #include "ast.h"
 #include "parser.h"
+#include "memory.h"
 
 // #define AST_TRACE
 
@@ -848,6 +849,9 @@ int get_line_no(void);
 int get_col_no(void);
 const char* get_file_name(void);
 
+extern int parser_line;
+extern char* parser_file;
+
 void traverse_ast(void (*pre)(ast_node_t*), void (*post)(ast_node_t*)) {
 
     SEPARATOR;
@@ -864,10 +868,11 @@ ast_node_t* create_ast_node(ast_type_t type) {
     ast_node_t* ptr = alloc_ast_node(type);
 
     ptr->type  = type;
-    ptr->line  = get_line_no();
-    ptr->col   = get_col_no();
-    ptr->fname = get_file_name();
-    ptr->emit = true;
+    //ptr->line  = get_line_no();
+    ptr->line  = parser_line;
+    //ptr->col   = get_col_no();
+    //ptr->fname = get_file_name();
+    ptr->fname = _COPY_STRING(parser_file);
 
     return ptr;
 }

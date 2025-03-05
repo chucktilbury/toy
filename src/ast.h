@@ -56,7 +56,6 @@ typedef struct {
     int line;
     int col;
     const char* fname;
-    bool emit;
 } ast_node_t;
 
 /*
@@ -192,7 +191,6 @@ typedef struct _ast_func_name_t {
     ast_node_t node;
     struct _ast_type_name_t* type_name;
     token_t* IDENTIFIER;
-    bool is_iterator;
 } ast_func_name_t;
 
 /*
@@ -207,6 +205,7 @@ typedef struct _ast_func_definition_t {
     struct _ast_func_body_t* func_body;
     int arity;
     string_buffer_t* proto; // for error reporting
+    context_t* context;
 } ast_func_definition_t;
 
 /*

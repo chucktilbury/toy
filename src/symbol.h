@@ -15,9 +15,8 @@ typedef struct {
     const char* name;         // decorated name for hash table
     symbol_class_t sym_class; // general handling of the symbol
     int sym_type;             // type user defined in source code
-    token_t* tok;             // token that defined the name
-    bool is_const;            // const keyword wous found
-    bool is_init;             // initializer was found in the syntax
+    token_t* tok;             // identifier that defined the name
+    bool is_const;            // const keyword was found
     bool is_iter;             // functions only
     int ref_count;            // updated by the refernce checker
     ast_node_t* node;         // node that defines the symbol

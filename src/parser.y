@@ -12,9 +12,9 @@
 //#define USE_TRACE
 #include "trace.h"
 
-// #define USE_PARSE_TRACE
-
 void yyerror(const char*);
+int parser_line;
+char* parser_file;
 
 /*
  * Global root node is the return value of the parser.
@@ -88,8 +88,8 @@ const char* token_to_str(int);
 %token <token> NOT_OPER OR_OPER AND_OPER GT_OPER UNARY_MINUS_OPER
 %token <token> ADD_OPER SUB_OPER MUL_OPER DIV_OPER MOD_OPER POW_OPER
 
-%token IF ELSE WHILE DO IMPORT YIELD START
-%token BREAK CONTINUE RETURN CONST ITERATOR
+%token IF ELSE WHILE DO IMPORT START
+%token BREAK CONTINUE RETURN CONST
 
 %type <program> program
 %type <program_item_list> program_item_list
@@ -177,6 +177,8 @@ import_statement
         $$ = (ast_import_statement_t*)create_ast_node(AST_IMPORT_STATEMENT);
         $$->STRING_LIT = $2;
         open_file($2->raw);
+        parser_line = get_line_no();
+        parser_file = (char*)get_file_name();
     }
     ;
 
@@ -301,20 +303,11 @@ func_name
         $$ = (ast_func_name_t*)create_ast_node(AST_FUNC_NAME);
         $$->IDENTIFIER = $2;
         $$->type_name = $1;
-        $$->is_iterator = false;
-    }
-    | ITERATOR type_name IDENTIFIER {
-        TRACE("func_name: type_name %s", $3->raw);
-        $$ = (ast_func_name_t*)create_ast_node(AST_FUNC_NAME);
-        $$->IDENTIFIER = $3;
-        $$->type_name = $2;
-        $$->is_iterator = true;
     }
     | NOTHING IDENTIFIER {
         TRACE("func_name: NOTHING %s", $2->raw);
         $$ = (ast_func_name_t*)create_ast_node(AST_FUNC_NAME);
         $$->IDENTIFIER = $2;
-        $$->is_iterator = false;
         ast_type_name_t* ptr = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         ptr->token = $1;
         $$->type_name = ptr;
@@ -406,12 +399,6 @@ loop_body_diffs
         TRACE("loop_body_diffs:CONTINUE");
         $$ = (ast_loop_body_diffs_t*)create_ast_node(AST_LOOP_BODY_DIFFS);
         $$->type = CONTINUE;
-    }
-    | YIELD '(' expression ')' {
-        TRACE("loop_body_diffs:YIELD");
-        $$ = (ast_loop_body_diffs_t*)create_ast_node(AST_LOOP_BODY_DIFFS);
-        $$->type = YIELD;
-        $$->expression = $3;
     }
     ;
 
@@ -802,13 +789,6 @@ expression
         TRACE("expression:unary SUB_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->right = $2;
-        // token_t* tok = _ALLOC_DS(token_t);
-        // tok->raw = $1->raw;
-        // tok->fname = $1->fname;
-        // tok->line_no = $1->line_no;
-        // tok->col_no = $1->col_no;
-        // tok->type = UNARY_MINUS_OPER;
-        // $$->oper = tok;
         $1->type = UNARY_MINUS_OPER;
         $$->oper = $1;
 

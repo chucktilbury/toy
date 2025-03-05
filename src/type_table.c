@@ -139,13 +139,15 @@ int check_assignment_type(token_t* tok, int lhs, int rhs) {
     return val;
 }
 
-int check_expression_type(token_t* tok, int left, int right) {
+int check_binary_expression_type(token_t* tok, int left, int right) {
 
     int val  = -1;
     int oper = tok->type;
 
-    if(left == 0 || right == 0)
+    if(left == 0 || right == 0) {
+        syntax_error(tok, "binary expression type is unknown");
         return val;
+    }
 
     switch(oper) {
         // boolean operation always produces a bool
@@ -413,6 +415,37 @@ int check_expression_type(token_t* tok, int left, int right) {
 
         default:
             FATAL("unknown operator type: %s (%d)", token_to_str(oper), oper);
+    }
+
+    return val;
+}
+
+int check_unary_expression_type(token_t* tok, int expr) {
+
+    int val = -1;
+
+    if(expr == 0) {
+        syntax_error(tok, "unary expression type is unknown");
+        return val;
+    }
+
+    switch(tok->type) {
+        case UNARY_MINUS_OPER:
+            switch(expr) {
+                case INTEGER:
+                    break;
+                case FLOAT:
+                    break;
+                default:
+                    syntax_error(tok, "unary minus does not make sense with %s", token_to_str(expr));
+            }
+            break;
+        case NOT_OPER:
+            if(expr != BOOL)
+                syntax_error(tok, "unary not does not make sense with %s", token_to_str(expr));
+            break;
+        default:
+            FATAL("unknown unary operator type: %s (%d)", token_to_str(tok->type), tok->type);
     }
 
     return val;
