@@ -7,9 +7,15 @@ int asphalt(int one, float two) {
 }
 
 int nuts
-int plzark = foo
+int plzark
+int plart
 
-{
+int glart(int soop, float glop) {
+
+    asphalt(foo, asdf)
+}
+
+start {
     int barn = foo
 
     {
@@ -17,13 +23,6 @@ int plzark = foo
         int pongo = 0
     }
 
-    int nubs = barn
+    const int nubs = barn
     int power = glart(barn, asdf)
-}
-
-int plart = asdf
-
-float glart(int soop, float glop) {
-
-    asphalt(foo, asdf)
 }

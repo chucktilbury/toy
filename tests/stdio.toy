@@ -2,10 +2,9 @@
 
 nothing print(string str) {
 
+    ; string was formatted before this call.
     inline {
-        // format the string and print it ot the console
-        // formatted string has the parameters in it
-        fputs(format_string(STRING_DATA__str), stdout);
+        fputs(TOY_str, stdout);
     }
 }
 
@@ -20,6 +19,6 @@ nothing exit(int result) {
 
     inline {
         // call the system exit
-        exit(INTEGER_DATA__result);
+        exit((int)TOY_result);
     }
 }
