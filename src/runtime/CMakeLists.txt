@@ -4,7 +4,7 @@ add_library(${PROJECT_NAME} STATIC
     runtime.c
     memory.c
     strings.c
-    values.c
+    object.c
 )
 
 target_include_directories(${PROJECT_NAME}

@@ -10,6 +10,38 @@
  */
 #include "runtime.h"
 
+/*
+ * Garbage collection
+ *
+ * Note that it's okay to place requirements on the code that allocates memory
+ * because this is generated code. Any mechanism that makes GC easier or more
+ * efficient is permissable.
+ *
+ * The garbage collector works with the notion of "context". The context of
+ * the memory allocation is tracked and the sweep function uses it to mark
+ * accessible memory. In the example of a simple function, all memory
+ * allocated by it is marked as inaccesible when the function returns, unless
+ * the pointer was returned by the funciton.
+ *
+ * When a pointer is allocate in the context of another data structure, then
+ * the context of that data structure is the context of the pointer. The sweep
+ * function searches the data block that was allocated for pointers and they
+ * receive the same status as the root pointer.
+ *
+ * All memory allocations are kept in a double-link list. When a function is
+ * entered a marker is dropped on the list that indicates where the context
+ * starts. Root allocations are allocated by one funciton and child allocations
+ * are allocated by another, where the root is given as a parameter. When the
+ * function returns the memory allocated by it is freed, unless it is returned
+ * by the funciton. In that case, the allocation becomes part of the caller's
+ * context. When a root allocation is freed, so are the children.
+ *
+ * When the function modifies a pointer, such as doing pointer arithmatic, the
+ * compiler needs to set up a local so that the original pointer is no
+ * modified.
+ *
+ */
+
 //-----------------------------------------------------------------------------
 // garbage collection API
 
