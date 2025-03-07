@@ -11,8 +11,19 @@ void runtime_main_uninit(void);
 
 //-----------------------------------------------------------------------------
 // strings API
+// String data strucutre.
+typedef struct _string_t_ {
+    char* text;
+    int len;
+    int cap;
+} runtime_string_t;
+
 // returns an allocated string in garbage collected code.
-char* runtime_string_format(const char* fmt, ...);
+runtime_string_t* runtime_string_format(const char*, ...);
+
+// send the string to stdout.
+void runtime_string_print(runtime_string_t*);
+
 
 //-----------------------------------------------------------------------------
 // garbage collection API

@@ -1,42 +1,14 @@
-
-
+/**
+ * @file memory.c
+ *
+ * @brief Implement memory allocation.
+ *
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-03-07
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 #include "runtime.h"
-
-int runtime_error_number = 0;
-
-/**
- * @brief Initialize all of the runtime data structures, including the
- * command line interface.
- *
- * @param argc
- * @param argv
- * @param arge
- */
-void runtime_main_init(int argc, char** argv, char** arge) {
-
-}
-
-/**
- * @brief Destroy all of the runtime data ahead of the operating system.
- *
- */
-void runtime_main_uninit(void) {
-
-}
-
-//-----------------------------------------------------------------------------
-// strings API
-
-/**
- * @brief Return the formated string with garbage collections in place.
- *
- * @param fmt
- * @param ...
- * @return const char*
- */
-char* runtime_string_format(const char* fmt, ...) {
-
-}
 
 //-----------------------------------------------------------------------------
 // garbage collection API
