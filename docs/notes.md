@@ -12,7 +12,45 @@ TODO:
 
 The basic unit of data in Toy is the object. All data and functions are bound to an object. When a function is defined as a global, it is bound to the root object, which is nameless.
 
-A function is another kind of object that has a parameter list as attributes and an entry point for execution. Objects are created and deleted inside a function. The return keyword allows the function to return an object that was created in the function.
+### When an object is constructed
+
+* The parent objects are added to the object, according to the scope operators.
+
+    * Public means that the method or attribute and be seen externally. Note that an inherited class can be deemed public or private and this overrides the scope given in the inherited class to make a class item more private, but not more public.
+
+    * Private means that a class item cannot be seen outside of the class, even if it was inherited as public. If a child class overrides a private method in the parent class, then functions in the inherited class can still use the private function and the child function will not know about the private function in the inherited class.
+
+    * Protected means that the child class can see and use the attribute or method as if it was defined locally, but it is private to deny outside access.
+
+* The default handlers for the operators and the default methods are added to the object by the default constructor. For example, the to-string cast operator is added and for integer literals, the to-float cast operator is added.
+
+* After that the operator overrides are added to the class, and then the user-defined methods are added.
+
+### Accessing objects.
+
+###### (not sure about the numbering thing. maybe I just need to use the names)
+When a class is constructed into an object, the attributes and methods are given a number which corresponds to an index into an array of objects. The compiler remembers these numbers and uses them to build the code that accesses them. Once an object or method has been created, it cannot be deleted or moved. That means that operations such as monkey patching cannot be used. I believe that patching the code at runtime is inappropriate.
+
+#### Data structure
+```
+// generic data object struct
+typedef struct _data_object_t_ {
+    object_type_t type;
+    // literal values
+    union {
+        int64_t count;
+        double real;
+        bool boolean;
+    } val;
+    // array of data objects.
+    struct _data_object_t_* attributes;
+    // array of method objects.
+    struct _method_object_t_* methods;
+} data_object_t;
+
+```
+
+#### Example
 
 All user-defined classes and native types are handled exactly the same. Some methods or operators can be overridden at compile time. No "monkey patching" or overriding an existing method is allowed. Overriding virtual methods follows strict rules and is done completely at compile time.
 
@@ -32,7 +70,7 @@ objects[obj3]->assign(objects[obj1]->add_int(objects[obj2]));
 
 ### This approach allows several things to happen.
 
-* Operators are handled in the same manner, no matter what kind of object is being operated upon. If a particular operator is not implemented for a particular object, then that can be reasonably handled as a runtime error. If the user wants to define an operator for his object then that can be correctly handled at the syntax level.
+* All operators are handled in the same manner, no matter what kind of object is being operated upon. If a particular operator is not implemented for a particular object, then that can be reasonably handled as a runtime error. If the user wants to define an operator for his object then that can be correctly handled at the syntax level.
 
 * All objects that are not returned by a method or retained by the object are destroyed when the method returns, creating perfect GC for the user's application.
 
@@ -63,6 +101,12 @@ An operator is a type of method defined on a class. All operators can be overrid
 * exec: provides an operator that allows the class to be executed as a method.
 
 Of course, for user defined types the comparison and arithmetic operators are undefined.
+
+### Methods
+
+A method is simply a function that operates on an object. The symbols that are defined for the class that implements the object are accessible as if they are local variables in Simple, but the compiler inserts a ``this`` pointer as the first parameter, which points to the object. The compiler dereferences this pointer when a class attribute is accessed.
+
+Methods can be overridden, similar to C++, by providing different parameter types. The actual name is then decorated using the type names to differentiate the functions as individuals.
 
 -------------
 
