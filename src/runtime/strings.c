@@ -8,6 +8,7 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
+#include <stddef.h>
 #include "runtime.h"
 
 //-----------------------------------------------------------------------------
@@ -22,6 +23,9 @@
  */
 runtime_string_t* runtime_string_format(const char* fmt, ...) {
 
+    runtime_string_t* ptr = NULL;
+
+    return ptr;
 }
 
 /**

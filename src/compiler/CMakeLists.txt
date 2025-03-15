@@ -38,14 +38,14 @@ add_executable(${PROJECT_NAME}
     symbol.c
     value.c
     symbol_table.c
-    #sym_reference.c
-    #func_reference.c
     type_table.c
     dump_symbols.c
     emit_code.c
 )
 
 target_link_libraries(${PROJECT_NAME}
+    gc
+    cord
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -61,6 +61,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     -Wno-sign-compare
     -Wno-unused-variable
     -Wno-parentheses-equality
+    -DUSE_GC
     $<$<CONFIG:DEBUG>:-DENABLE_AST_DUMP>
     #$<$<CONFIG:DEBUG>:-DENABLE_PARSER_TRACE>
     $<$<CONFIG:DEBUG>:-g>

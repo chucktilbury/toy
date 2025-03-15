@@ -4,7 +4,7 @@
 ; this file is just generic syntax tests to check the raw parser.
 
 int ploot
-string foobart = "something.toy"
+string foobart
 
 import "tests/something.toy"
 ; Making this a formatted string will be implemented after the symbol table
