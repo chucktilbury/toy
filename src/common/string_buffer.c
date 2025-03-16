@@ -114,7 +114,7 @@ void write_string_buffer(string_buffer_t* buf, const char* fname) {
 
     FILE* fp = fopen(fname, "w");
     if(fp == NULL)
-        FATAL("connnot open output file: %s", strerror(errno));
+        FATAL("cannot open output file: %s", strerror(errno));
 
     fwrite(buf->buf, sizeof(char), buf->len, fp);
     fclose(fp);
@@ -126,7 +126,7 @@ string_buffer_t* read_string_buffer(const char* fname) {
 
     FILE* fp = fopen(fname, "w");
     if(fp == NULL)
-        FATAL("connnot open input file: %s", strerror(errno));
+        FATAL("cannot open input file: %s", strerror(errno));
 
     fseek(fp, 0, SEEK_END);
     int len = (int)ftell(fp);

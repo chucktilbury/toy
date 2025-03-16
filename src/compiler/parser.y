@@ -173,7 +173,7 @@ program_item_list
 import_statement
     : IMPORT STRING_LIT {
         TRACE("import_statement: %s", $2->raw);
-        // All processing happenes here, and not in an AST pass.
+        // All processing happens here, and not in an AST pass.
         $$ = (ast_import_statement_t*)create_ast_node(AST_IMPORT_STATEMENT);
         $$->STRING_LIT = $2;
         open_file($2->raw);

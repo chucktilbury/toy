@@ -4,7 +4,7 @@
  * @brief This module traverses the AST and verifies that all symbols
  * referenced are present and that they have acceptable type references. If
  * there is a problem then publish a syntax error. When the emit passes are
- * called, then the existance and use of variables has already been verified.
+ * called, then the existence and use of variables has already been verified.
  *
  * @author Chuck Tilbury (chucktilbury@gmail.com)
  * @date 2025-02-28

@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
     dump_symbols();
 
     printf("\ncompile %s: errors = %d warnings = %d\n\n",
-           get_errors() ? "FAILED" : "SUCCEDED", get_errors(), get_warnings());
+           get_errors() ? "FAILED" : "SUCCEEDED", get_errors(), get_warnings());
 
     return 0;
 }

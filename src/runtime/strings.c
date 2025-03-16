@@ -15,7 +15,7 @@
 // strings API
 
 /**
- * @brief Return the formated string with garbage collections in place.
+ * @brief Return the formatted string with garbage collections in place.
  *
  * @param fmt
  * @param ...

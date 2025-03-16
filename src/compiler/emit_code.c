@@ -812,7 +812,7 @@ static inline void emit_assignment(ast_assignment_t* node) {
 
     ENTER;
 
-    // emit the indetifier
+    // emit the identifier
     EMIT("TOY_%s = ", node->IDENTIFIER->raw);
     emit_assignment_right(node->assignment_right);
 

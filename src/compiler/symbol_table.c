@@ -794,7 +794,7 @@ static inline void _func_reference(ast_func_reference_t* node) {
         if(sym->sym_class != SYM_FUNC)
             syntax_error(node->IDENTIFIER, "symbol \"%s\" is not a function", node->IDENTIFIER->raw);
         else {
-            // check the parameters for existance and set the types for exprs
+            // check the parameters for existence and set the types for exprs
             _expression_list_param(node->expression_list_param);
 
             // generate the proto to check against the definition.
