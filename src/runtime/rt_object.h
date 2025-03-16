@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RUNTIME_OBJECT_H_
-#define _RUNTIME_OBJECT_H_
+#ifndef _RT_OBJECT_H_
+#define _RT_OBJECT_H_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -37,12 +37,12 @@ typedef struct _object_t_ {
     union {
         uint64_t integer;
         double real;
-        runtime_string_t* string;
+        rt_string_t* string;
         bool boolean;
         void* other;
     } v;
     struct _object_t_* attributes;
-} runtime_object_t;
+} rt_object_t;
 
 
-#endif /* _RUNTIME_OBJECT_H_ */
+#endif /* _RT_OBJECT_H_ */

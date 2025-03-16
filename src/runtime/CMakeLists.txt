@@ -2,9 +2,9 @@ project(runtime)
 
 add_library(${PROJECT_NAME} STATIC
     runtime.c
-    memory.c
-    strings.c
-    object.c
+    rt_memory.c
+    rt_strings.c
+    rt_object.c
 )
 
 target_include_directories(${PROJECT_NAME}

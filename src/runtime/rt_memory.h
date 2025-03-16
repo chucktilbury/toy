@@ -1,5 +1,5 @@
-#ifndef _RUNTIME_MEMORY_H_
-#define _RUNTIME_MEMORY_H_
+#ifndef _RT_MEMORY_H_
+#define _RT_MEMORY_H_
 
 //-----------------------------------------------------------------------------
 // garbage collection API
@@ -48,4 +48,4 @@ void* runtime_gc_alloc_child(void*, unsigned long);
 void runtime_gc_free(void*);
 
 
-#endif /* _RUNTIME_MEMORY_H_ */
+#endif /* _RT_MEMORY_H_ */

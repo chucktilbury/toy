@@ -21,9 +21,9 @@
  * @param ...
  * @return const char*
  */
-runtime_string_t* runtime_string_format(const char* fmt, ...) {
+rt_string_t* rt_string_format(const char* fmt, ...) {
 
-    runtime_string_t* ptr = NULL;
+    rt_string_t* ptr = NULL;
 
     return ptr;
 }
@@ -33,7 +33,7 @@ runtime_string_t* runtime_string_format(const char* fmt, ...) {
  *
  * @param str
  */
-void runtime_string_print(runtime_string_t* str) {
+void rt_string_print(rt_string_t* str) {
 
 }
 
