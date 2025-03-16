@@ -27,6 +27,7 @@ typedef enum {
     OBJ_FLOAT_LIT,
     OBJ_STR_LIT,
     OBJ_BOOL_LIT,
+    OBJ_FUNC,
     OBJ_USER,
 } object_type_t;
 
@@ -40,6 +41,7 @@ typedef struct _object_t_ {
         bool boolean;
         void* other;
     } v;
+    struct _object_t_* attributes;
 } runtime_object_t;
 
 

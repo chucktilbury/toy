@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 
+#include "syntax_errors.h"
 #include "errors.h"
 #include "pointer_list.h"
 #include "ast.h"

@@ -1,10 +1,17 @@
 
 TODO:
+* Implement memory
 * Implement objects
+    * Function objects have an arity, an entry pointer, a prototype string, and then function parameters as attributes. In that order.
+* Decide whether objects cast into their own type or out of their own type.
+* Implement call stack
 * Functions that return a value but don't have a "return()" should publish error.
 * Add formatted string introspection to detect unusable format options.
 * Add TEXT data type for multi-line text definition. Use for web templates for example.
 * Either reorganize output so that all definitions are accessible or require that a symbol be defined before it is accessed.
+
+Observation:
+* The function parameters and the formatted strings parameters are actually a ``tuple``. This can be its own object type and use similar semantics as in Python.
 
 -------------
 
@@ -12,7 +19,60 @@ TODO:
 
 The basic unit of data in Toy is the object. All data and functions are bound to an object. When a function is defined as a global, it is bound to the root object, which is nameless.
 
+### Class definitions
+
+Classes are the prototype for an object. They contain only declarations and no initialization is allowed. A class may contain:
+
+* Zero or more scope operators of ``public``, ``private``, and ``protected``.  Default scope is always private.
+* Zero or more data declarations in the form of ``type_name identifier``. The type name can be any accessible name that names a type, including other classes.
+* Zero or more method declarations. Method definitions are not allowed in a class definition.
+
+Example
+```
+class base_class {
+    public ; public scope until specified otherwise
+    int data_var_1
+    virtual nothing method(int)
+    nothing method(string)
+    private
+    int data_var_2
+}
+
+; the word "base" is not accessible from the outside but is from within
+; the child_class.
+class child_class(private base_class as base) {
+    public
+    ; must be declared
+    operator to_string
+    virtual nothing method(int)
+}
+
+nothing base_class.method(string val) {
+    ; convert val to a float and raise 10 by it
+    ; if val cannot be converted then a runtime error is raised.
+    ; if the result of the cast to int is too big, then a runtime error.
+    data_var_2 = int(10^float(val))
+    ; contrived
+    data_var_1 = data_var_2
+}
+
+; implement the virtual function
+nothing child_class.method(int val) {
+    this.base.method(string(val))
+}
+
+; implement the to_string operator, which overrides the default, which
+; simply returns "class child_class".
+string child_class.to_string() {
+    ; calls the string literal operator format()
+    return("class child_class: %d"(base.data_var_1))
+}
+
+```
+
 ### When an object is constructed
+
+Objects are constructed using the syntax that is given by the user. There is no functionality that allows methods or attributes to be added to an object during run time.
 
 * The parent objects are added to the object, according to the scope operators.
 
@@ -24,6 +84,10 @@ The basic unit of data in Toy is the object. All data and functions are bound to
 
 * The default handlers for the operators and the default methods are added to the object by the default constructor. For example, the to-string cast operator is added and for integer literals, the to-float cast operator is added.
 
+* User attribute and method definitions are added to the class definition at compile time.
+
+* Operators that are not implemented for the class cause a runtime error to be generated.
+
 * After that the operator overrides are added to the class, and then the user-defined methods are added.
 
 ### Accessing objects.
@@ -33,20 +97,66 @@ When a class is constructed into an object, the attributes and methods are given
 
 #### Data structure
 ```
-// generic data object struct
-typedef struct _data_object_t_ {
+// Note that this is for Simple, not Toy.
+typedef struct _object_list_t_ {
+    struct _object_t_** list;
+    size_t capacity;
+    size_t count;
+} object_list_t;
+
+// generic data object struct types
+typedef enum {
+    OBJ_INT,
+    OBJ_FLOAT,
+    OBJ_STR,
+    OBJ_BOOL,
+    OBJ_INT_LIT,
+    OBJ_FLOAT_LIT,
+    OBJ_STR_LIT,
+    OBJ_BOOL_LIT,
+    OBJ_FUNC,
+    OBJ_CLASS,
+    OBJ_NAMESPACE,
+    OBJ_USER,
+} object_type_t;
+
+// support generic re-casting
+typedef struct _object_node_t_ {
     object_type_t type;
-    // literal values
-    union {
-        int64_t count;
-        double real;
-        bool boolean;
-    } val;
-    // array of data objects.
-    struct _data_object_t_* attributes;
-    // array of method objects.
-    struct _method_object_t_* methods;
-} data_object_t;
+    size_t line_no;     // line where this object was encountered in user source
+    const char* fname;  // file name in user source
+    const char* name;   // name of object for error msgs
+
+    // state of this node
+    bool is_const;  // if true the value cannot be assigned
+    bool is_init;   // if false the value has never been assigned
+} object_node_t;
+
+// Object data structure for an integer
+// All of these names are reserved for classes. Needs to contrive better names.
+typedef struct _int_object_t_ {
+    object_node_t node;
+
+    int64_t value;
+
+    void (*set_int)(int64_t);
+    void (*set_float)(double);
+    int64_t (*get)(void);
+
+    int64_t (*add)(int64_t);
+    int64_t (*sub)(int64_t);
+    int64_t (*mul)(int64_t);
+    int64_t (*div)(int64_t);
+
+    // other methods and operators that apply to an integer
+    // for example comparisons
+
+    const char* get_type(void);
+    const char* to_string(void);
+    double to_float(void);
+    bool to_bool(void);
+
+} rt_int_object_t;
 
 ```
 
@@ -54,19 +164,22 @@ typedef struct _data_object_t_ {
 
 All user-defined classes and native types are handled exactly the same. Some methods or operators can be overridden at compile time. No "monkey patching" or overriding an existing method is allowed. Overriding virtual methods follows strict rules and is done completely at compile time.
 
-All data in Toy (and in Simple) is an object, including literal values. For example, to add 2 literal numbers, the binary operator is implemented as a method call, such as ``val = 123 + 456`` would translate to something like:
-```
-// objects[] is the object table for objects defined in this GC context.
-int obj1 = create_object(OBJ_INT_LIT);
-objects[obj1]->assign(123);
-int obj2 = create_object(OBJ_INT_LIT);
-objects[obj2]->assign(456);
-int obj3 = create_object(OBJ_INT_VAR);
-// there is a handler for every type of possible object that can be "add"ed. the compiler
-// decides which one to call.
-objects[obj3]->assign(objects[obj1]->add_int(objects[obj2]));
+All data in Toy (and in Simple) is an object, including literal values. For example, to add 2 literal numbers, the binary operator is implemented as a method call, such as ``foo = bar + 456`` would translate to something like:
 
 ```
+// highly contrived example
+rt_int_object_t* TOY_bar = create_int_object();
+
+// source "test1.toy" 12 "foo = bar + 456"
+rt_int_object_t* TOY_foo = create_int_object();
+
+// runtime error because TOY_bar was never assigned a value
+TOY_foo->set_int(TOY_bar->add(456));
+
+```
+
+When an object is created as an integer variable, operators are created for all operations that can be performed on it. In addition to getting and setting the value, converting it to a string or a float are also instantiated and given well-known names which the compiler references to implement the user's source code. The data structures that implement things like the integer and float intrinsic data types are hard coded with the data and methods that are needed to perform operations on them. User defined types have the user's operations defined in addition to certain default operations such as retrieving type information and converting to a string.
+
 
 ### This approach allows several things to happen.
 
@@ -78,7 +191,7 @@ objects[obj3]->assign(objects[obj1]->add_int(objects[obj2]));
 
 ### Inheritance
 
-Multiple inheritance is supported by simply adding the base class to the child class. Virtual functions in the base class may or may not be implemented by the child. If a virtual function is called without an implementation, then that is a runtime error. If a deep child re-implements a virtual method, then only the new implementation is accessible. If a child class implements a non-virtual method, then that is a runtime error because making it a syntax error would require a lot of analysis that is easy at runtime. A non-virtual method that has no implementation is a syntax error.
+Multiple inheritance is supported by simply adding the base class to the child class by name. Virtual functions in the base class may or may not be implemented by the child. If a virtual function is called without an implementation, then that is a runtime error. If a deep child re-implements a virtual method, then only the new implementation is accessible. If a child class implements a non-virtual method, then that is a runtime error because making it a syntax error would require a lot of analysis that is easy at runtime. A non-virtual method that has no implementation is a syntax error.
 
 Constructors are executed in the order they are declared in the class definition. Destructors are executed in the opposite order. The user has no control over it.
 
@@ -90,7 +203,19 @@ In practice, the compiler will assign literal indexes to objects whenever it's p
 
 NOTE: Maybe I need an "override" operator, similar to virtual. But I don't think that native types should be possible to override methods or operators.
 
-### Operators
+### Methods
+
+A method object is the same as a data object in that it has attributes. The attributes are
+* Arity. The number of parameters that the method has.
+* An entry pointer. This is the actual pointer to call to enter the function.
+* A prototype string. This is used by the runtime for error handling and for verifying that the function call is valid.
+* A list of objects that are read-only parameters to the function.
+
+A method is simply a function that operates on an object. The symbols that are defined for the class that implements the object are accessible by methods defined by the class by prefixing the access with the ``this`` keyword. That allows a method to unambiguously use the same name in the local scope as a variable defined by the class. Accessible variables in a base class are accessed using the name that is defined for it; i.e. there is no ``super`` keyword.
+
+Methods can be overridden, similar to C++, by providing different parameter types. The actual name is then decorated using the type names to differentiate the functions as individuals.
+
+#### Operators
 
 An operator is a type of method defined on a class. All operators can be overridden by a user class at compile time, but not at run time. Besides the comparison and arithmetic operators, there are some additional ones.
 
@@ -101,12 +226,6 @@ An operator is a type of method defined on a class. All operators can be overrid
 * exec: provides an operator that allows the class to be executed as a method.
 
 Of course, for user defined types the comparison and arithmetic operators are undefined.
-
-### Methods
-
-A method is simply a function that operates on an object. The symbols that are defined for the class that implements the object are accessible as if they are local variables in Simple, but the compiler inserts a ``this`` pointer as the first parameter, which points to the object. The compiler dereferences this pointer when a class attribute is accessed.
-
-Methods can be overridden, similar to C++, by providing different parameter types. The actual name is then decorated using the type names to differentiate the functions as individuals.
 
 -------------
 
@@ -127,7 +246,7 @@ All memory allocations are kept in a link list that acts like a stack. When a fu
 
 typedef struct _gc_node_t_ {
     char magic[8];
-    unsigned long size;
+    size_t size;
     struct _gc_node_t_* child;
     struct _gc_node_t_* next;
     unsigned char buffer[1];

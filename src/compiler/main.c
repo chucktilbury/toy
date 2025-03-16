@@ -9,7 +9,7 @@
 #include "emit_code.h"
 #include "fileio.h"
 
-#include "errors.h"
+#include "syntax_errors.h"
 // #include "pointer_list.h"
 // #include "ast.h"
 //#include "func_reference.h"

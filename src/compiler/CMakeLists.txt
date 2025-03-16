@@ -25,14 +25,9 @@ add_executable(${PROJECT_NAME}
     main.c
     tokens.c
     fileio.c
-    errors.c
-    memory.c
-    hash.c
+    syntax_errors.c
     ast.c
     ast_tables.c
-    pointer_list.c
-    string_buffer.c
-    string_list.c
     context.c
     trace.c
     symbol.c
@@ -46,12 +41,15 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     gc
     cord
+    common
 )
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR}
         ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/../common
+        ${PROJECT_SOURCE_DIR}/../gc
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

@@ -1,5 +1,6 @@
 
 #include "type_table.h"
+#include "syntax_errors.h"
 #include "errors.h"
 #include "parser.h"
 

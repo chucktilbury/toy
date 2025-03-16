@@ -5,7 +5,7 @@
 #include "scanner.h"
 #include "memory.h"
 #include "fileio.h"
-#include "errors.h"
+#include "syntax_errors.h"
 #include "ast.h"
 //#include "symtab.h"
 

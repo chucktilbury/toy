@@ -1,8 +1,8 @@
 /**
  * @file errors.c
- * 
+ *
  * @brief Error and messaging handlers for the system.
- * 
+ *
  * @author Chuck Tilbury (chucktilbury@gmail.com)
  * @date 2025-02-28
  * @version 0.0.1
@@ -12,17 +12,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "errors.h"
-#include "tokens.h"
+#include "syntax_errors.h"
 
 static int errors   = 0;
 static int warnings = 0;
 
 /**
  * @brief Fatal error aborts the program.
- * 
- * @param fmt 
- * @param ... 
+ *
+ * @param fmt
+ * @param ...
  */
 void fatal_error(const char* fmt, ...) {
 
@@ -40,10 +39,10 @@ void fatal_error(const char* fmt, ...) {
 
 /**
  * @brief Syntax error informs the user that the code will not be generated.
- * 
- * @param tok 
- * @param fmt 
- * @param ... 
+ *
+ * @param tok
+ * @param fmt
+ * @param ...
  */
 void syntax_error(token_t* tok, const char* fmt, ...) {
 
@@ -61,12 +60,12 @@ void syntax_error(token_t* tok, const char* fmt, ...) {
 }
 
 /**
- * @brief Warning informs the user that a problem exists and gives a 
+ * @brief Warning informs the user that a problem exists and gives a
  * corrective action.
- * 
- * @param tok 
- * @param fmt 
- * @param ... 
+ *
+ * @param tok
+ * @param fmt
+ * @param ...
  */
 void syntax_warning(token_t* tok, const char* fmt, ...) {
 
@@ -100,9 +99,9 @@ void node_syntax(ast_node_t* node, const char* fmt, ...) {
 
 /**
  * @brief Misc errors.
- * 
- * @param fmt 
- * @param ... 
+ *
+ * @param fmt
+ * @param ...
  */
 void misc_error(const char* fmt, ...) {
 
@@ -119,8 +118,8 @@ void misc_error(const char* fmt, ...) {
 
 /**
  * @brief Return the number of errors seen so far.
- * 
- * @return int 
+ *
+ * @return int
  */
 int get_errors(void) {
     return errors;
@@ -128,17 +127,17 @@ int get_errors(void) {
 
 /**
  * @brief Return the number of warnings seen so far.
- * 
- * @return int 
+ *
+ * @return int
  */
 int get_warnings(void) {
     return warnings;
 }
 
 /**
- * @brief Bump the error number. The parser does not have access 
+ * @brief Bump the error number. The parser does not have access
  * to the count.
- * 
+ *
  */
 void increment_errors(void) {
 

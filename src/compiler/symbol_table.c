@@ -8,6 +8,7 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
+#include "syntax_errors.h"
 #include "errors.h"
 #include "pointer_list.h"
 #include "ast.h"
