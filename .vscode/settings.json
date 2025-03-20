@@ -17,6 +17,7 @@
         "OPER",
         "packcc",
         "prec",
+        "retv",
         "retval",
         "stdbool",
         "stdint",
@@ -42,5 +43,9 @@
         "yytext",
         "YYTRANSLATE"
     ],
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "files.associations": {
+        "cstdlib": "c",
+        "cmath": "c"
+    }
 }

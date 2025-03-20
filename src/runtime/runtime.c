@@ -1,8 +1,17 @@
-
+/**
+ * @file runtime.c
+ *
+ * @brief Implement the runtime functions that are not really a good fit
+ * for another module.
+ *
+ * @author Chuck Tilbury (chucktilbury@gmail.com)
+ * @date 2025-03-20
+ * @version 0.0.1
+ * @copyright Copyright 2025
+ */
 
 #include "runtime.h"
 
-int rt_error_number = 0;
 
 /**
  * @brief Initialize all of the runtime data structures, including the
@@ -27,10 +36,10 @@ void rt_main_uninit(void) {
 /**
  * @brief Call this function to set up GC and call stack for a function.
  *
- * @param name
- * @param line
+ * @param name -- The proto type name
+ * @param line -- Line number where the function is defined
  */
-void rt_enter_func(const char* name, int line) {
+void rt_enter_func(const char* name, const char* fname, int line) {
 
 }
 

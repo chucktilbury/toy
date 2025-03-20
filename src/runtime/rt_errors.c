@@ -12,14 +12,25 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+
+ void rt_dump_callstack(void) {
+
+   fprintf(stderr, "\n-------------------\nCall Stack\n-------------------\n");
+   fprintf(stderr, "\n");
+   fprintf(stderr, "\n-------------------\n");
+ }
+
  void rt_error(const char* fmt, ...) {
 
-    va_list args;
+   va_list args;
 
-    fprintf(stderr, "runtime error: ");
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
+   fprintf(stderr, "runtime error: ");
+   va_start(args, fmt);
+   vfprintf(stderr, fmt, args);
+   va_end(args);
 
-    exit(1);
- }
+   rt_dump_callstack();
+
+   exit(1);
+}
+

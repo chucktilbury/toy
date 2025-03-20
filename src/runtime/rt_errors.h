@@ -11,7 +11,24 @@
 #ifndef _RT_ERRORS_H_
 #define _RT_ERRORS_H_
 
+#include <stdio.h>
+#include <stdlib.h>
+
 void rt_error(const char* fmt, ...);
+void rt_dump_callstack(void);
+
+#define RT_ASSERT(expr, ...)                                                                                 \
+    do {                                                                                                  \
+        if(!(expr)) {                                                                                     \
+            fprintf(stderr, "runtime assertion failed: (%s): ", #expr); \
+            fprintf(stderr, __VA_ARGS__);                                                                 \
+            fputc('\n', stderr);                                                                          \
+            rt_dump_callstack(); \
+            abort();                                                                                      \
+        }                                                                                                 \
+    } while(0)
+
+
 
 
 #endif /* _RT_ERRORS_H_ */

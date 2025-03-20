@@ -22,3 +22,5 @@ char* _mem_copy_string(const char*);
 void _mem_free(void*);
 
 #endif /* _MEMORY_H_ */
+
+

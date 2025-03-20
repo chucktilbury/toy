@@ -6,6 +6,12 @@ add_library(${PROJECT_NAME} STATIC
     rt_strings.c
     rt_object.c
     rt_errors.c
+    rt_bool_obj.c
+    rt_float_obj.c
+    rt_func_obj.c
+    rt_int_obj.c
+    rt_str_obj.c
+    rt_user_obj.c
 )
 
 target_include_directories(${PROJECT_NAME}
