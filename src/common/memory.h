@@ -4,9 +4,10 @@
 #include <stddef.h>
 
 #define _ALLOC(s) _mem_alloc(s)
-#define _ALLOC_DS(t) (t*)_mem_alloc(sizeof(t))
+#define _ALLOC_TYPE(t) (t*)_mem_alloc(sizeof(t))
 #define _ALLOC_ARRAY(t, n) (t*)_mem_alloc(sizeof(t) * (n))
 #define _REALLOC(p, s) _mem_realloc((void*)(p), (s))
+#define _REALLOC_TYPE(p, t, s) (t*)_mem_realloc((void*)(p), (s))
 #define _REALLOC_ARRAY(p, t, n) (t*)_mem_realloc((void*)(p), sizeof(t) * (n))
 #define _COPY(p, s) _mem_copy((void*)(p), (s))
 #define _COPY_DS(p, t) (t*)_mem_copy((void*)(p), sizeof(t))

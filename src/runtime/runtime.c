@@ -24,4 +24,20 @@ void rt_main_uninit(void) {
 
 }
 
+/**
+ * @brief Call this function to set up GC and call stack for a function.
+ *
+ * @param name
+ * @param line
+ */
+void rt_enter_func(const char* name, int line) {
 
+}
+
+/**
+ * @brief Call this to pop the call stack and collect the garbage.
+ *
+ */
+void rt_leave_func(void) {
+
+}

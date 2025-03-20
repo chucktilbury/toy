@@ -24,7 +24,7 @@ static inline void append_buffer(string_buffer_t* buf, const char* str, int len)
 
 string_buffer_t* create_string_buffer(const char* str) {
 
-    string_buffer_t* ptr = _ALLOC_DS(string_buffer_t);
+    string_buffer_t* ptr = _ALLOC_TYPE(string_buffer_t);
     ptr->len             = 0;
     ptr->cap             = 1 << 3;
     ptr->buf             = _ALLOC_ARRAY(char, ptr->cap);

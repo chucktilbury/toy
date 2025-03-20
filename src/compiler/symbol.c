@@ -8,7 +8,7 @@ const char* token_to_str(int);
 
 symbol_t* create_symbol(symbol_class_t type) {
 
-    symbol_t* ptr = _ALLOC_DS(symbol_t);
+    symbol_t* ptr = _ALLOC_TYPE(symbol_t);
 
     ptr->sym_class = type;
 

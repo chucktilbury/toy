@@ -5,12 +5,14 @@ add_library(${PROJECT_NAME} STATIC
     rt_memory.c
     rt_strings.c
     rt_object.c
+    rt_errors.c
 )
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR}
         ${PROJECT_SOURCE_DIR}
+        ${PROJECT_SOURCE_DIR}/../common
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

@@ -377,7 +377,7 @@ static inline void emit_func_definition(ast_func_definition_t* node) {
     emit_func_name(node->func_name);
     emit_func_params(node->func_params);
 
-    EMIT("{runtime_gc_node_t* runtime_gc_node = runtime_gc_begin();");
+    EMIT("{rt_gc_node_t* runtime_gc_node = rt_gc_begin();");
     if(node->func_name->type_name->token->type != NOTHING)
         EMIT("TOY_%s runtime_return_value;", token_to_str(node->func_name->type_name->token->type));
 
@@ -385,11 +385,11 @@ static inline void emit_func_definition(ast_func_definition_t* node) {
 
     EMIT("runtime_function_return_label:");
     if(node->func_name->type_name->token->type != NOTHING) {
-        EMIT("runtime_gc_end(runtime_gc_node, runtime_return_value);");
+        EMIT("rt_gc_end(runtime_gc_node, runtime_return_value);");
         EMIT("return runtime_return_value;}");
     }
     else {
-        EMIT("runtime_gc_end(runtime_gc_node, NULL);");
+        EMIT("rt_gc_end(runtime_gc_node, NULL);");
         EMIT("return;}");
     }
 

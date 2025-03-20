@@ -106,7 +106,7 @@ static void rehash_table(hash_table_t* tab) {
 
 hash_table_t* create_hashtable(void) {
 
-    hash_table_t* tab = _ALLOC_DS(hash_table_t);
+    hash_table_t* tab = _ALLOC_TYPE(hash_table_t);
 
     tab->count = 0;
     tab->cap   = 0x01 << 2;
@@ -151,7 +151,7 @@ int insert_hashtable(hash_table_t* table, const char* key, void* data) {
         }
     }
     else {
-        table->table[slot] = _ALLOC_DS(_hash_node_t);
+        table->table[slot] = _ALLOC_TYPE(_hash_node_t);
     }
 
     table->table[slot]->key  = _COPY_STRING(key);

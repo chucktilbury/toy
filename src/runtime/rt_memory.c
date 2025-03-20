@@ -10,6 +10,7 @@
  */
 #include <stddef.h>
 #include "runtime.h"
+#include "memory.h"
 
 /*
  * Garbage collection
@@ -43,6 +44,69 @@
  *
  */
 
+#define TO_VOID(p)  ((void*)(((uint64_t)(p))+sizeof(rt_gc_node_t)))
+#define TO_PTR(p)   ((rt_gc_node_t*)(((uint64_t)(p))-sizeof(rt_gc_node_t)))
+rt_gc_node_t* root = NULL;
+rt_gc_node_t* top = NULL;
+
+static void destroy_tree(rt_gc_node_t* node) {
+
+    if(node == NULL)
+        return;
+    else if(node->child != NULL)
+        destroy_tree(node->child);
+    else if(node->next != NULL)
+        destroy_tree(node->next);
+
+    _FREE(node);
+}
+
+static void sweep_tree(rt_gc_node_t* node) {
+
+    if(node == NULL)
+        return;
+    else if(node->inuse == false) {
+        if(node->child != NULL) {
+            sweep_tree(node->child);
+            node->child = NULL;
+        }
+        else if(node->next != NULL) {
+            sweep_tree(node->next);
+            node->next = NULL;
+        }
+
+        _FREE(node);
+    }
+}
+
+static void push_node(rt_gc_node_t* node) {
+
+    node->next = top;
+    top = node;
+}
+
+#if 0
+static rt_gc_node_t* pop_node(void) {
+
+    if(top != NULL)
+        top = top->next;
+    else
+        rt_error("GC stack under-run");
+
+    return top;
+}
+
+static rt_gc_node_t* peek_node(void) {
+
+    if(top != NULL)
+        top = top->next;
+    else
+        rt_error("GC stack internal error");
+
+    return top;
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // garbage collection API
 
@@ -51,8 +115,11 @@
  * structures, which are global to the program. There is only one heap.
  *
  */
-void runtime_gc_init(void) {
+void rt_gc_init(void) {
 
+    root = _ALLOC_TYPE(rt_gc_node_t);
+    root->size = 0;
+    top = root;
 }
 
 /**
@@ -61,21 +128,20 @@ void runtime_gc_init(void) {
  * this does it manually.
  *
  */
-void runtime_gc_uninit(void) {
+void rt_gc_uninit(void) {
 
+    destroy_tree(root);
 }
 
 /**
  * @brief Call this as the first thing in a function. Assign the return value
  * to a local and then use that when calling GC_end().
  *
- * @return runtime_gc_node_t*
+ * @return rt_gc_node_t*
  */
-runtime_gc_node_t* runtime_gc_begin(void) {
+rt_gc_node_t* rt_gc_begin(void) {
 
-    runtime_gc_node_t* p = NULL;
-
-    return p;
+    return top;
 }
 
 /**
@@ -88,8 +154,15 @@ runtime_gc_node_t* runtime_gc_begin(void) {
  * @param node
  * @param ptr
  */
-void runtime_gc_end(runtime_gc_node_t* node, void* ptr) {
+void rt_gc_end(rt_gc_node_t* node, void* ptr) {
 
+    rt_gc_node_t* tmp = TO_PTR(ptr);
+
+    tmp->inuse = true;
+    sweep_tree(node);
+    tmp->inuse = false;
+
+    push_node(tmp);
 }
 
 /**
@@ -99,11 +172,11 @@ void runtime_gc_end(runtime_gc_node_t* node, void* ptr) {
  * @param size
  * @return void*
  */
-void* runtime_gc_alloc(unsigned long size) {
+void* rt_gc_alloc(unsigned long size) {
 
-    void* p = NULL;
-
-    return p;
+    // cleared memory
+    void* p = _ALLOC(size+sizeof(rt_gc_node_t));
+    return TO_VOID(p);
 }
 
 /**
@@ -114,11 +187,12 @@ void* runtime_gc_alloc(unsigned long size) {
  * @param size
  * @return void*
  */
-void* runtime_gc_realloc(void* ptr, unsigned long size) {
+void* rt_gc_realloc(void* ptr, unsigned long size) {
 
-    void* p = NULL;
+    void* v = (void*)TO_PTR(ptr);
+    rt_gc_node_t* p = _REALLOC_TYPE(v, rt_gc_node_t, size);
 
-    return p;
+    return TO_VOID(p);
 }
 
 /**
@@ -129,11 +203,11 @@ void* runtime_gc_realloc(void* ptr, unsigned long size) {
  * @param size
  * @return void*
  */
-void* runtime_gc_alloc_child(void* ptr, unsigned long size) {
+void* rt_gc_alloc_child(void* ptr, unsigned long size) {
 
-    void* p = NULL;
-
-    return p;
+    rt_gc_node_t* p = TO_PTR(ptr);
+    p->child = rt_gc_alloc(size);
+    return TO_VOID(p->child);
 }
 
 /**
@@ -142,6 +216,7 @@ void* runtime_gc_alloc_child(void* ptr, unsigned long size) {
  *
  * @param ptr
  */
-void runtime_gc_free(void* ptr) {
+void rt_gc_free(void* ptr) {
 
+    (void)ptr;
 }

@@ -28,6 +28,7 @@
         "symtab",
         "uninit",
         "Wextra",
+        "Wvisibility",
         "xxfiles",
         "yycolumn",
         "yyerror",
@@ -40,5 +41,6 @@
         "yyterminate",
         "yytext",
         "YYTRANSLATE"
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "enabled"
 }

@@ -8,7 +8,7 @@
 
 pointer_list_t* create_pointer_list(void) {
 
-    pointer_list_t* ptr = _ALLOC_DS(pointer_list_t);
+    pointer_list_t* ptr = _ALLOC_TYPE(pointer_list_t);
     assert(ptr != NULL);
     ptr->cap  = 1 << 3;
     ptr->len  = 0;

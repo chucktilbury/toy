@@ -10,7 +10,7 @@
 token_t* create_token(const char* text, int type) {
 
 
-    token_t* tok = _ALLOC_DS(token_t);
+    token_t* tok = _ALLOC_TYPE(token_t);
     tok->raw     = _COPY_STRING(text);
     tok->type    = type;
 

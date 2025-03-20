@@ -1,10 +1,10 @@
 /**
  * @file context.c
- * 
- * @brief This manages the symbolic context. The actual forward or "next" 
- * pointer is located in the AST. The "prev" pointer is located in the context 
- * data structure. When a symbol is looked up, it is only searched from the 
- * current context toward the root, so the prev pointer if the one that 
+ *
+ * @brief This manages the symbolic context. The actual forward or "next"
+ * pointer is located in the AST. The "prev" pointer is located in the context
+ * data structure. When a symbol is looked up, it is only searched from the
+ * current context toward the root, so the prev pointer if the one that
  * matters for this data structure.
  *
  * @author Chuck Tilbury (chucktilbury@gmail.com)
@@ -30,12 +30,12 @@ static context_t* crnt_context = NULL;
 
 /**
  * @brief Create a context object
- * 
- * @return context_t* 
+ *
+ * @return context_t*
  */
 context_t* create_context(void) {
 
-    context_t* ptr = _ALLOC_DS(context_t);
+    context_t* ptr = _ALLOC_TYPE(context_t);
     ptr->table     = create_hashtable();
     ptr->prev      = peek_context();
 
@@ -46,8 +46,8 @@ context_t* create_context(void) {
 
 /**
  * @brief Push a context on the context stack.
- * 
- * @param ptr 
+ *
+ * @param ptr
  */
 void push_context(context_t* ptr) {
 
@@ -60,8 +60,8 @@ void push_context(context_t* ptr) {
 
 /**
  * @brief Pop a context object and return the new top of stack.
- * 
- * @return context_t* 
+ *
+ * @return context_t*
  */
 context_t* pop_context(void) {
 
@@ -74,10 +74,10 @@ context_t* pop_context(void) {
 }
 
 /**
- * @brief Return the context object that is on the top of the stack without 
+ * @brief Return the context object that is on the top of the stack without
  * changing the stack.
- * 
- * @return context_t* 
+ *
+ * @return context_t*
  */
 context_t* peek_context(void) {
 
@@ -87,8 +87,8 @@ context_t* peek_context(void) {
 
 /**
  * @brief Set the current top of stack to the root object.
- * 
- * @return context_t* 
+ *
+ * @return context_t*
  */
 context_t* reset_context(void) {
 

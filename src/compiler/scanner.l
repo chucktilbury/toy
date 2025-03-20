@@ -321,7 +321,7 @@ void open_file(const char* fn) {
     if(yyin == NULL)
         FATAL("cannot open input file: \"%s\": %s\n", fname, strerror(errno));
 
-    file_stack_t* fs = _ALLOC_DS(file_stack_t);
+    file_stack_t* fs = _ALLOC_TYPE(file_stack_t);
     fs->fname = fname;
     fs->next = NULL;
     fs->line = 1;
