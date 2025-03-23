@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #include "scanner.h"
-#include "memory.h"
+#include "common_memory.h"
 #include "fileio.h"
 #include "syntax_errors.h"
 #include "ast.h"
@@ -159,20 +159,20 @@ program
 
 program_item_list
     : program_item {
-        TRACE("program_item_list:CREATE");
+        TRACE("program_item_list CREATE");
         $$ = (ast_program_item_list_t*)create_ast_node(AST_PROGRAM_ITEM_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | program_item_list program_item {
-        TRACE("program_item_list:ADD");
+        TRACE("program_item_list ADD");
         add_pointer_list($1->list, $2);
     }
     ;
 
 import_statement
     : IMPORT STRING_LIT {
-        TRACE("import_statement: %s", $2->raw);
+        TRACE("import_statement %s", $2->raw);
         // All processing happens here, and not in an AST pass.
         $$ = (ast_import_statement_t*)create_ast_node(AST_IMPORT_STATEMENT);
         $$->STRING_LIT = $2;
@@ -184,22 +184,22 @@ import_statement
 
 program_item
     : data_declaration {
-        TRACE("program_item:data_declaration");
+        TRACE("program_item data_declaration");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | func_definition {
-        TRACE("program_item:func_definition");
+        TRACE("program_item func_definition");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | import_statement {
-        TRACE("program_item:import_statement");
+        TRACE("program_item import_statement");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | start_block {
-        TRACE("program_item:start_block");
+        TRACE("program_item start_block");
         $$ = (ast_program_item_t*)create_ast_node(AST_PROGRAM_ITEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -215,22 +215,22 @@ start_block
 
 type_name
     : INTEGER {
-        TRACE("type_name:INTEGER");
+        TRACE("type_name INTEGER");
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
     | FLOAT {
-        TRACE("type_name:FLOAT");
+        TRACE("type_name FLOAT");
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
     | STRING {
-        TRACE("type_name:STRING");
+        TRACE("type_name STRING");
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
     | BOOL {
-        TRACE("type_name:BOOL");
+        TRACE("type_name BOOL");
         $$ = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
         $$->token = $1;
     }
@@ -238,13 +238,13 @@ type_name
 
 formatted_string
     : STRING_LIT expression_list_param {
-        TRACE("formatted_string:expression_list_param %s", $1->raw);
+        TRACE("formatted_string expression_list_param %s", $1->raw);
         $$ = (ast_formatted_string_t*)create_ast_node(AST_FORMATTED_STRING);
         $$->STRING_LIT = $1;
         $$->expression_list_param = $2;
     }
     | STRING_LIT {
-        TRACE("formatted_string:nothing %s", $1->raw);
+        TRACE("formatted_string nothing %s", $1->raw);
         $$ = (ast_formatted_string_t*)create_ast_node(AST_FORMATTED_STRING);
         $$->STRING_LIT = $1;
     }
@@ -255,14 +255,14 @@ formatted_string
      */
 data_declaration
     : type_name IDENTIFIER {
-        TRACE("data_declaration: %s", $2->raw);
+        TRACE("data_declaration %s", $2->raw);
         $$ = (ast_data_declaration_t*)create_ast_node(AST_DATA_DECLARATION);
         $$->type_name = $1;
         $$->IDENTIFIER = $2;
         $$->is_const = false;
     }
     | CONST type_name IDENTIFIER {
-        TRACE("data_declaration: %s", $3->raw);
+        TRACE("data_declaration %s", $3->raw);
         $$ = (ast_data_declaration_t*)create_ast_node(AST_DATA_DECLARATION);
         $$->type_name = $2;
         $$->IDENTIFIER = $3;
@@ -272,20 +272,20 @@ data_declaration
 
 data_declaration_list
     : data_declaration {
-        TRACE("data_declaration_list:CREATE");
+        TRACE("data_declaration_list CREATE");
         $$ = (ast_data_declaration_list_t*)create_ast_node(AST_DATA_DECLARATION_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | data_declaration_list ',' data_declaration {
-        TRACE("data_declaration_list:ADD");
+        TRACE("data_declaration_list ADD");
         add_pointer_list($1->list, $3);
     }
     ;
 
 data_definition
     : data_declaration '=' expression {
-        TRACE("data_definition: with expression");
+        TRACE("data_definition with expression");
         $$ = (ast_data_definition_t*)create_ast_node(AST_DATA_DEFINITION);
         $$->data_declaration = $1;
         $$->expression = $3;
@@ -299,13 +299,13 @@ data_definition
      */
 func_name
     : type_name IDENTIFIER {
-        TRACE("func_name: type_name %s", $2->raw);
+        TRACE("func_name type_name %s", $2->raw);
         $$ = (ast_func_name_t*)create_ast_node(AST_FUNC_NAME);
         $$->IDENTIFIER = $2;
         $$->type_name = $1;
     }
     | NOTHING IDENTIFIER {
-        TRACE("func_name: NOTHING %s", $2->raw);
+        TRACE("func_name NOTHING %s", $2->raw);
         $$ = (ast_func_name_t*)create_ast_node(AST_FUNC_NAME);
         $$->IDENTIFIER = $2;
         ast_type_name_t* ptr = (ast_type_name_t*)create_ast_node(AST_TYPE_NAME);
@@ -330,12 +330,12 @@ func_definition
 
 func_params
     : '(' data_declaration_list ')' {
-        TRACE("func_params: with decls");
+        TRACE("func_params with decls");
         $$ = (ast_func_params_t*)create_ast_node(AST_FUNC_PARAMS);
         $$->data_declaration_list = $2;
     }
     | '(' ')' {
-        TRACE("func_params: bare");
+        TRACE("func_params bare");
         $$ = (ast_func_params_t*)create_ast_node(AST_FUNC_PARAMS);
         // this creates a symbol context, so we need a dummy DDL
         $$->data_declaration_list = (ast_data_declaration_list_t*)create_ast_node(AST_DATA_DECLARATION_LIST);
@@ -345,7 +345,7 @@ func_params
 
 func_body
     : '{' func_body_list '}' {
-        TRACE("func_body: with body");
+        TRACE("func_body with body");
         $$ = (ast_func_body_t*)create_ast_node(AST_FUNC_BODY);
         $$->func_body_list = $2;
     }
@@ -353,24 +353,24 @@ func_body
 
 func_body_list
     : func_body_elem {
-        TRACE("func_body_list:CREATE");
+        TRACE("func_body_list CREATE");
         $$ = (ast_func_body_list_t*)create_ast_node(AST_FUNC_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | func_body_list func_body_elem {
-        TRACE("func_body_list:ADD");
+        TRACE("func_body_list ADD");
         add_pointer_list($1->list, $2);
     }
     ;
 
 loop_body
     : '{' '}' {
-        TRACE("loop_body: bare");
+        TRACE("loop_body bare");
         $$ = (ast_loop_body_t*)create_ast_node(AST_LOOP_BODY);
     }
     | '{' loop_body_list '}' {
-        TRACE("loop_body: with body");
+        TRACE("loop_body with body");
         $$ = (ast_loop_body_t*)create_ast_node(AST_LOOP_BODY);
         $$->loop_body_list = $2;
     }
@@ -378,25 +378,25 @@ loop_body
 
 loop_body_list
     : loop_body_elem {
-        TRACE("loop_body_list:CREATE");
+        TRACE("loop_body_list CREATE");
         $$ = (ast_loop_body_list_t*)create_ast_node(AST_LOOP_BODY_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | loop_body_list loop_body_elem {
-        TRACE("loop_body_list:ADD");
+        TRACE("loop_body_list ADD");
         add_pointer_list($1->list, $2);
     }
     ;
 
 loop_body_diffs
     : BREAK {
-        TRACE("loop_body_diffs:BREAK");
+        TRACE("loop_body_diffs BREAK");
         $$ = (ast_loop_body_diffs_t*)create_ast_node(AST_LOOP_BODY_DIFFS);
         $$->type = BREAK;
     }
     | CONTINUE {
-        TRACE("loop_body_diffs:CONTINUE");
+        TRACE("loop_body_diffs CONTINUE");
         $$ = (ast_loop_body_diffs_t*)create_ast_node(AST_LOOP_BODY_DIFFS);
         $$->type = CONTINUE;
     }
@@ -404,12 +404,12 @@ loop_body_diffs
 
 loop_body_elem
     : func_body_elem {
-        TRACE("loop_body_elem:func_body_elem");
+        TRACE("loop_body_elem func_body_elem");
         $$ = (ast_loop_body_elem_t*)create_ast_node(AST_LOOP_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | loop_body_diffs {
-        TRACE("loop_body_elem:loop_body_diffs");
+        TRACE("loop_body_elem loop_body_diffs");
         $$ = (ast_loop_body_elem_t*)create_ast_node(AST_LOOP_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -417,52 +417,52 @@ loop_body_elem
 
 func_body_elem
     : data_definition {
-        TRACE("func_body_elem:data_definition");
+        TRACE("func_body_elem data_definition");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | data_declaration {
-        TRACE("func_body_elem:data_declaration");
+        TRACE("func_body_elem data_declaration");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | func_reference {
-        TRACE("func_body_elem:func_reference");
+        TRACE("func_body_elem func_reference");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | assignment {
-        TRACE("func_body_elem:assignment");
+        TRACE("func_body_elem assignment");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | while_statement {
-        TRACE("func_body_elem:while_statement");
+        TRACE("func_body_elem while_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | do_statement {
-        TRACE("func_body_elem:do_statement");
+        TRACE("func_body_elem do_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | ifelse_statement {
-        TRACE("func_body_elem:ifelse_statement");
+        TRACE("func_body_elem ifelse_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | return_statement {
-        TRACE("func_body_elem:return_statement");
+        TRACE("func_body_elem return_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | inline_statement {
-        TRACE("func_body_elem:inline_statement");
+        TRACE("func_body_elem inline_statement");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
     | func_body {
-        TRACE("func_body_elem:func_body");
+        TRACE("func_body_elem func_body");
         $$ = (ast_func_body_elem_t*)create_ast_node(AST_FUNC_BODY_ELEM);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -470,7 +470,7 @@ func_body_elem
 
 inline_statement
     : INLINE {
-        TRACE("trace_statement: with params");
+        TRACE("trace_statement with params");
         $$ = (ast_inline_statement_t*)create_ast_node(AST_INLINE_STATEMENT);
         $$->token = $1;
     }
@@ -478,12 +478,12 @@ inline_statement
 
 return_statement
     : RETURN expression_param {
-        TRACE("return_statement: with param");
+        TRACE("return_statement with param");
         $$ = (ast_return_statement_t*)create_ast_node(AST_RETURN_STATEMENT);
         $$->expression_param = $2;
     }
     | RETURN {
-        TRACE("return_statement: bare");
+        TRACE("return_statement bare");
         $$ = (ast_return_statement_t*)create_ast_node(AST_RETURN_STATEMENT);
     }
     ;
@@ -499,12 +499,12 @@ if_clause
 
 ifelse_statement
     : if_clause {
-        TRACE("ifelse_statement: bare");
+        TRACE("ifelse_statement bare");
         $$ = (ast_ifelse_statement_t*)create_ast_node(AST_IFELSE_STATEMENT);
         $$->if_clause = $1;
     }
     | if_clause else_clause {
-        TRACE("ifelse_statement: with else");
+        TRACE("ifelse_statement with else");
         $$ = (ast_ifelse_statement_t*)create_ast_node(AST_IFELSE_STATEMENT);
         $$->if_clause = $1;
         $$->else_clause = $2;
@@ -522,12 +522,12 @@ else_segment
 
 final_else_segment
     : ELSE '(' ')' func_body {
-        TRACE("final_else_segment: with parens");
+        TRACE("final_else_segment with parens");
         $$ = (ast_final_else_segment_t*)create_ast_node(AST_FINAL_ELSE_SEGMENT);
         $$->func_body = $4;
     }
     | ELSE func_body {
-        TRACE("final_else_segment: bare");
+        TRACE("final_else_segment bare");
         $$ = (ast_final_else_segment_t*)create_ast_node(AST_FINAL_ELSE_SEGMENT);
         $$->func_body = $2;
     }
@@ -535,31 +535,31 @@ final_else_segment
 
 else_clause_list
     : else_segment {
-        TRACE("else_clause_list:CREATE");
+        TRACE("else_clause_list CREATE");
         $$ = (ast_else_clause_list_t*)create_ast_node(AST_ELSE_CLAUSE_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | else_clause_list else_segment {
-        TRACE("else_clause_list:ADD");
+        TRACE("else_clause_list ADD");
         add_pointer_list($1->list, $2);
     }
     ;
 
 else_clause
     : else_clause_list {
-        TRACE("else_clause: bare");
+        TRACE("else_clause bare");
         $$ = (ast_else_clause_t*)create_ast_node(AST_ELSE_CLAUSE);
         $$->else_clause_list = $1;
     }
     | else_clause_list final_else_segment {
-        TRACE("else_clause: with final");
+        TRACE("else_clause with final");
         $$ = (ast_else_clause_t*)create_ast_node(AST_ELSE_CLAUSE);
         $$->else_clause_list = $1;
         $$->final_else_segment = $2;
     }
     | final_else_segment {
-        TRACE("else_clause:final_else_segment");
+        TRACE("else_clause final_else_segment");
         $$ = (ast_else_clause_t*)create_ast_node(AST_ELSE_CLAUSE);
         $$->final_else_segment = $1;
     }
@@ -567,12 +567,12 @@ else_clause
 
 while_clause
     : WHILE expression_param {
-        TRACE("while_clause: with expr");
+        TRACE("while_clause with expr");
         $$ = (ast_while_clause_t*)create_ast_node(AST_WHILE_CLAUSE);
         $$->expression_param = $2;
     }
     | WHILE {
-        TRACE("while_clause: bare");
+        TRACE("while_clause bare");
         $$ = (ast_while_clause_t*)create_ast_node(AST_WHILE_CLAUSE);
     }
     ;
@@ -602,7 +602,7 @@ assignment_right
         $$->expression = $1;
     }
     | type_name ':' expression {
-        TRACE("assignment_right: as a cast");
+        TRACE("assignment_right as a cast");
         $$ = (ast_assignment_right_t*)create_ast_node(AST_ASSIGNMENT_RIGHT);
         $$->expression = $3;
         $$->type_name = $1;
@@ -623,25 +623,25 @@ assignment
      */
 raw_value
     : IDENTIFIER {
-        TRACE("raw_value:IDENTIFIER %s", $1->raw);
+        TRACE("raw_value IDENTIFIER %s", $1->raw);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
         $$->type = 0; // unknown, determined later
     }
     | INTEGER_LIT {
-        TRACE("raw_value:INTEGER_LIT %ld", $1->val.integer_lit);
+        TRACE("raw_value INTEGER_LIT %ld", $1->val.integer_lit);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
         $$->type = INTEGER;
     }
     | FLOAT_LIT {
-        TRACE("raw_value:FLOAT_LIT %lf", $1->val.float_lit);
+        TRACE("raw_value FLOAT_LIT %lf", $1->val.float_lit);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
         $$->type = FLOAT;
     }
     | BOOL_LIT {
-        TRACE("raw_value:BOOL_LIT %lf", $1->val.float_lit);
+        TRACE("raw_value BOOL_LIT %lf", $1->val.float_lit);
         $$ = (ast_raw_value_t*)create_ast_node(AST_RAW_VALUE);
         $$->token = $1;
         $$->type = BOOL;
@@ -650,17 +650,17 @@ raw_value
 
 expr_primary
     : raw_value {
-        TRACE("expr_primary:raw_value");
+        TRACE("expr_primary raw_value");
         $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
         $$->nterm = (ast_node_t*)$1;
     }
     | formatted_string {
-        TRACE("expr_primary:formatted_string");
+        TRACE("expr_primary formatted_string");
         $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
         $$->nterm = (ast_node_t*)$1;
     }
     | func_reference {
-        TRACE("expr_primary:func_reference");
+        TRACE("expr_primary func_reference");
         $$ = (ast_expr_primary_t*)create_ast_node(AST_EXPR_PRIMARY);
         $$->nterm = (ast_node_t*)$1;
     }
@@ -677,116 +677,116 @@ func_reference
 
 expression
     : expr_primary {
-        TRACE("expression:expr_primary");
+        TRACE("expression expr_primary");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->expr_primary = $1;
     }
     | expression ADD_OPER expression {
-        TRACE("expression:+");
+        TRACE("expression +");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression SUB_OPER expression {
-        TRACE("expression:-");
+        TRACE("expression -");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression MUL_OPER expression {
-        TRACE("expression:*");
+        TRACE("expression *");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression DIV_OPER expression {
-        TRACE("expression:/");
+        TRACE("expression /");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression MOD_OPER expression {
-        TRACE("expression:%%");
+        TRACE("expression %%");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression POW_OPER expression {
-        TRACE("expression:^");
+        TRACE("expression ^");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression GT_OPER expression {
-        TRACE("expression:GT_OPER");
+        TRACE("expression GT_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression LT_OPER expression {
-        TRACE("expression:LT_OPER");
+        TRACE("expression LT_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression EQU_OPER expression {
-        TRACE("expression:EQU_OPER");
+        TRACE("expression EQU_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression NEQ_OPER expression {
-        TRACE("expression:NEQ_OPER");
+        TRACE("expression NEQ_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression LTE_OPER expression {
-        TRACE("expression:LTE_OPER");
+        TRACE("expression LTE_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression GTE_OPER expression {
-        TRACE("expression:GTE_OPER");
+        TRACE("expression GTE_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression OR_OPER expression {
-        TRACE("expression:OR_OPER");
+        TRACE("expression OR_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | expression AND_OPER expression {
-        TRACE("expression:AND_OPER");
+        TRACE("expression AND_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->left = $1;
         $$->right = $3;
         $$->oper = $2;
     }
     | NOT_OPER expression %prec UNARY {
-        TRACE("expression:unary NOT_OPER");
+        TRACE("expression unary NOT_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->right = $2;
         $$->oper = $1;
     }
     | SUB_OPER expression %prec UNARY {
-        TRACE("expression:unary SUB_OPER");
+        TRACE("expression unary SUB_OPER");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->right = $2;
         $1->type = UNARY_MINUS_OPER;
@@ -794,7 +794,7 @@ expression
 
     }
     | '(' expression ')' {
-        TRACE("expr_primary:(expression)");
+        TRACE("expr_primary (expression)");
         $$ = (ast_expression_t*)create_ast_node(AST_EXPRESSION);
         $$->expression = $2;
     }
@@ -802,25 +802,25 @@ expression
 
 expression_list
     : expression {
-        TRACE("expression_list: CREATE");
+        TRACE("expression_list CREATE");
         $$ = (ast_expression_list_t*)create_ast_node(AST_EXPRESSION_LIST);
         $$->list = create_pointer_list();
         add_pointer_list($$->list, $1);
     }
     | expression_list ',' expression {
-        TRACE("expression_list: ADD");
+        TRACE("expression_list ADD");
         add_pointer_list($1->list, $3);
     }
     ;
 
 expression_list_param
     : '(' expression_list ')' {
-        TRACE("expression_list_param: with params");
+        TRACE("expression_list_param with params");
         $$ = (ast_expression_list_param_t*)create_ast_node(AST_EXPRESSION_LIST_PARAM);
         $$->expression_list = $2;
     }
     | '(' ')' {
-        TRACE("expression_list_param: bare");
+        TRACE("expression_list_param bare");
         $$ = (ast_expression_list_param_t*)create_ast_node(AST_EXPRESSION_LIST_PARAM);
         $$->expression_list = (ast_expression_list_t*)create_ast_node(AST_EXPRESSION_LIST);
         $$->expression_list->list = create_pointer_list();
@@ -829,12 +829,12 @@ expression_list_param
 
 expression_param
     : '(' expression ')' {
-        TRACE("expression_param: with expression");
+        TRACE("expression_param with expression");
         $$ = (ast_expression_param_t*)create_ast_node(AST_EXPRESSION_PARAM);
         $$->expression = $2;
     }
     | '(' ')' {
-        TRACE("expression_param: bare");
+        TRACE("expression_param bare");
         $$ = (ast_expression_param_t*)create_ast_node(AST_EXPRESSION_PARAM);
     }
     ;

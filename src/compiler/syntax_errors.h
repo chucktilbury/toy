@@ -1,7 +1,7 @@
 
 
-#ifndef _SYNTAX_ERRORS_H_
-#define _SYNTAX_ERRORS_H_
+#ifndef _SYNTAX_ERRORS_
+#define _SYNTAX_ERRORS_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,4 +17,4 @@ int get_errors(void);
 int get_warnings(void);
 void increment_errors(void);
 
-#endif /* _SYNTAX_ERRORS_H_ */
+#endif /* _SYNTAX_ERRORS_ */

@@ -1,6 +1,6 @@
 
-#ifndef _POINTER_LIST_H_
-#define _POINTER_LIST_H_
+#ifndef _COMMON_POINTER_LIST_
+#define _COMMON_POINTER_LIST_
 
 typedef struct {
     void** list;
@@ -19,4 +19,4 @@ void push_pointer_list(pointer_list_t*, void*);
 void* pop_pointer_list(pointer_list_t*);
 void* peek_pointer_list(pointer_list_t*);
 
-#endif /* _POINTER_LIST_H_ */
+#endif /* _COMMON_POINTER_LIST_ */

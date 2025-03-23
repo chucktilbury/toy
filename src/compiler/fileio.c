@@ -17,9 +17,9 @@
 #include <sys/stat.h>
 #include <linux/limits.h>
 
-#include "string_list.h"
-#include "memory.h"
-#include "errors.h"
+#include "common_string_list.h"
+#include "common_memory.h"
+#include "common_errors.h"
 
 //#define USE_TRACE
 #include "trace.h"

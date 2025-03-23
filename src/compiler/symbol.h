@@ -1,5 +1,5 @@
-#ifndef _SYMBOL_H_
-#define _SYMBOL_H_
+#ifndef _SYMBOL_
+#define _SYMBOL_
 
 #include <stdbool.h>
 #include "ast.h"
@@ -26,4 +26,4 @@ symbol_t* create_symbol(symbol_class_t type);
 void add_symbol(context_t* ctx, const char* name, symbol_t* node);
 symbol_t* find_symbol(context_t* ctx, const char* name);
 
-#endif /* _SYMBOL_H_ */
+#endif /* _SYMBOL_ */

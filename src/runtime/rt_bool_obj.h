@@ -9,8 +9,8 @@
  * @copyright Copyright 2025
  */
 
-#ifndef _RT_BOOL_OBJ_H_
-#define _RT_BOOL_OBJ_H_
+#ifndef _RT_BOOL_OBJ_
+#define _RT_BOOL_OBJ_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -22,4 +22,4 @@ typedef struct _rt_bool_obj_t_ {
     bool value;
 } rt_bool_obj_t;
 
-#endif /* _RT_BOOL_OBJ_H_ */
+#endif /* _RT_BOOL_OBJ_ */

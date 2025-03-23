@@ -1,7 +1,28 @@
-#ifndef _RT_MEMORY_H_
-#define _RT_MEMORY_H_
+#ifndef _RT_MEMORY_
+#define _RT_MEMORY_
 
+#include <stddef.h>
 #include <stdbool.h>
+
+//-----------------------------------------------------------------------------
+// System memory wrapper for C runtime
+#define RT_ALLOC(s) rt_mem_alloc(s)
+#define RT_ALLOC_TYPE(t) (t*)rt_mem_alloc(sizeof(t))
+#define RT_ALLOC_ARRAY(t, n) (t*)rt_mem_alloc(sizeof(t) * (n))
+#define RT_REALLOC(p, s) rt_mem_realloc((void*)(p), (s))
+#define RT_REALLOC_TYPE(p, t, s) (t*)rt_mem_realloc((void*)(p), (s))
+#define RT_REALLOC_ARRAY(p, t, n) (t*)rt_mem_realloc((void*)(p), sizeof(t) * (n))
+#define RT_COPY(p, s) rt_mem_copy((void*)(p), (s))
+#define RT_COPY_DS(p, t) (t*)rt_mem_copy((void*)(p), sizeof(t))
+#define RT_COPY_ARRAY(p, t, n) (t*)rt_mem_copy((void*)(p), sizeof(t) * (n))
+#define RT_COPY_STRING(s) rt_mem_copy_string(s)
+#define RT_FREE(p) rt_mem_free((void*)(p))
+
+void* rt_mem_alloc(size_t);
+void* rt_mem_realloc(void*, size_t);
+void* rt_mem_copy(void*, size_t);
+char* rt_mem_copy_string(const char*);
+void rt_mem_free(void*);
 
 //-----------------------------------------------------------------------------
 // garbage collection API
@@ -51,4 +72,4 @@ void* rt_gc_alloc_child(void*, unsigned long);
 void rt_gc_free(void*);
 
 
-#endif /* _RT_MEMORY_H_ */
+#endif /* _RT_MEMORY_ */

@@ -15,7 +15,7 @@
 
 #include "ast.h"
 #include "syntax_errors.h"
-#include "errors.h"
+#include "common_errors.h"
 #include "context.h"
 #include "symbol.h"
 

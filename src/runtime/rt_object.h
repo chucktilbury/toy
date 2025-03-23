@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RT_OBJECT_H_
-#define _RT_OBJECT_H_
+#ifndef _RT_OBJECT_
+#define _RT_OBJECT_
 
 #include <stdint.h>
 #include <stddef.h>
@@ -135,5 +135,5 @@ typedef struct _base_object_t {
 base_object_t* rt_create_object(obj_type_t type, const char* name, const char* fname, int line);
 void rt_destroy_object(base_object_t* obj);
 
-#endif /* _RT_OBJECT_H_ */
+#endif /* _RT_OBJECT_ */
 

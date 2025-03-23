@@ -1,5 +1,5 @@
-#ifndef _TRACE_H_
-#define _TRACE_H_
+#ifndef _TRACE_
+#define _TRACE_
 
 #include <stdio.h>
 
@@ -41,4 +41,4 @@ extern int trace_depth;
 
 #endif
 
-#endif /* _TRACE_H_ */
+#endif /* _TRACE_ */

@@ -10,7 +10,7 @@
  */
 
  #include "value.h"
- #include "memory.h"
+ #include "common_memory.h"
 
  value_t* create_value(int type) {
 

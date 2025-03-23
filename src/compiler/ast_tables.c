@@ -10,7 +10,7 @@
  */
 #include <stddef.h>
 #include "ast.h"
-#include "memory.h"
+#include "common_memory.h"
 
 /**
  * @brief Convert the AST type to a string.

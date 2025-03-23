@@ -1,11 +1,11 @@
 project(common)
 
 add_library(${PROJECT_NAME} STATIC
-    hash.c
-    memory.c
-    pointer_list.c
-    string_buffer.c
-    string_list.c
+    common_hash.c
+    common_memory.c
+    common_pointer_list.c
+    common_string_buffer.c
+    common_string_list.c
 )
 
 target_include_directories(${PROJECT_NAME}

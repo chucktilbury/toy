@@ -1,7 +1,7 @@
 
 #include "type_table.h"
 #include "syntax_errors.h"
-#include "errors.h"
+#include "common_errors.h"
 #include "parser.h"
 
 // #define USE_TRACE

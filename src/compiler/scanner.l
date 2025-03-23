@@ -3,13 +3,13 @@
 #include <string.h>
 #include <errno.h>
 
+#include "common_string_buffer.h"
+#include "common_memory.h"
+#include "common_errors.h"
 #include "ast.h"
 #include "parser.h"
-#include "memory.h"
-#include "errors.h"
 #include "fileio.h"
 #include "tokens.h"
-#include "string_buffer.h"
 
 int yycolumn = 1;
 int inline_depth = 0;

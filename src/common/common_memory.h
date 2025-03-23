@@ -1,5 +1,5 @@
-#ifndef _MEMORY_H_
-#define _MEMORY_H_
+#ifndef _COMMON_MEMORY_
+#define _COMMON_MEMORY_
 
 #include <stddef.h>
 
@@ -21,6 +21,6 @@ void* _mem_copy(void*, size_t);
 char* _mem_copy_string(const char*);
 void _mem_free(void*);
 
-#endif /* _MEMORY_H_ */
+#endif /* _COMMON_MEMORY_ */
 
 

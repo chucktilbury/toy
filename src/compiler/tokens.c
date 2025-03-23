@@ -3,7 +3,7 @@
  */
 
 #include "tokens.h"
-#include "memory.h"
+#include "common_memory.h"
 #include "fileio.h"
 
 

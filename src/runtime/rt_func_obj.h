@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RT_FUNC_OBJ_H_
-#define _RT_FUNC_OBJ_H_
+#ifndef _RT_FUNC_OBJ_
+#define _RT_FUNC_OBJ_
 
 #include "rt_object.h"
 
@@ -18,6 +18,6 @@ typedef struct _rt_func_obj_t_ {
     base_object_t obj;
 } rt_func_obj_t;
 
-#endif /* _RT_FUNC_OBJ_H_ */
+#endif /* _RT_FUNC_OBJ_ */
 
 

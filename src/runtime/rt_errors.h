@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RT_ERRORS_H_
-#define _RT_ERRORS_H_
+#ifndef _RT_ERRORS_
+#define _RT_ERRORS_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,4 +31,4 @@ void rt_dump_callstack(void);
 
 
 
-#endif /* _RT_ERRORS_H_ */
+#endif /* _RT_ERRORS_ */

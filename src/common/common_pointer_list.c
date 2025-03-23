@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "memory.h"
-#include "pointer_list.h"
+#include "common_memory.h"
+#include "common_pointer_list.h"
 
 pointer_list_t* create_pointer_list(void) {
 

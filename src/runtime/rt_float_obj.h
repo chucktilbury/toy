@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RT_FLOAT_OBJ_H_
-#define _RT_FLOAT_OBJ_H_
+#ifndef _RT_FLOAT_OBJ_
+#define _RT_FLOAT_OBJ_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -22,4 +22,4 @@ typedef struct _rt_float_obj_t_ {
 } rt_float_obj_t;
 
 
-#endif /* _RT_FLOAT_OBJ_H_ */
+#endif /* _RT_FLOAT_OBJ_ */

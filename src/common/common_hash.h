@@ -1,8 +1,8 @@
 /*
  * Public interface for hash tables.
  */
-#ifndef _HASH_H_
-#define _HASH_H_
+#ifndef _COMMON_HASH_
+#define _COMMON_HASH_
 
 #include <stdlib.h> // size_t
 
@@ -32,4 +32,4 @@ int hash_name_exists(hash_table_t* tab, const char* key);
 
 void dump_hashtable(hash_table_t* tab);
 
-#endif
+#endif /* _COMMON_HASH_ */

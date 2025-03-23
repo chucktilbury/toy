@@ -11,7 +11,7 @@
 
 #include "rt_object.h"
 #include "rt_errors.h"
-#include "memory.h"
+#include "common_memory.h"
 
 static base_object_t* create(const char* name, const char* fname, int line, base_object_t* obj);
 static void destroy(base_object_t* obj);
@@ -215,7 +215,7 @@ static base_object_t* to_str(base_object_t* obj) {
 
     rt_bool_obj_t* ptr = (rt_bool_obj_t*)obj;
     rt_str_obj_t* retv = (rt_str_obj_t*)rt_create_object(OBJ_STR, NULL, NULL, 0);
-    retv->value = (int64_t)ptr->value;
+    //retv->value = (int64_t)ptr->value;
 
     return retv;
 }

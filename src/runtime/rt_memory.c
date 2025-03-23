@@ -9,8 +9,11 @@
  * @copyright Copyright 2025
  */
 #include <stddef.h>
+#include <string.h>
+
 #include "runtime.h"
-#include "memory.h"
+#include "rt_memory.h"
+#include "common_errors.h"
 
 /*
  * Garbage collection
@@ -48,6 +51,56 @@
 #define TO_PTR(p)   ((rt_gc_node_t*)(((uint64_t)(p))-sizeof(rt_gc_node_t)))
 rt_gc_node_t* root = NULL;
 rt_gc_node_t* top = NULL;
+
+#define _MALLOC malloc
+#define _REALLOC realloc
+#define _FREE free
+
+void* _mem_alloc(size_t size) {
+
+    void* ptr = _MALLOC(size);
+    if(ptr == NULL)
+        FATAL("cannot allocate %lu bytes", size);
+
+    memset(ptr, 0, size);
+    return ptr;
+}
+
+void* _mem_realloc(void* optr, size_t size) {
+
+    void* nptr = _REALLOC(optr, size);
+    if(nptr == NULL)
+        FATAL("cannot re-allocate %lu bytes", size);
+
+    return nptr;
+}
+
+void* _mem_copy(void* optr, size_t size) {
+
+    void* nptr = _MALLOC(size);
+    if(nptr == NULL)
+        FATAL("cannot allocate to copy %lu bytes", size);
+
+    memcpy(nptr, optr, size);
+    return nptr;
+}
+
+char* _mem_copy_string(const char* str) {
+
+    size_t len = strlen(str) + 1;
+    char* ptr  = _MALLOC(len);
+    if(ptr == NULL)
+        FATAL("cannot allocate %lu bytes for string", len);
+
+    memcpy(ptr, str, len);
+    return ptr;
+}
+
+void _mem_free(void* ptr) {
+
+    if(ptr != NULL)
+        _FREE(ptr);
+}
 
 static void destroy_tree(rt_gc_node_t* node) {
 
@@ -117,7 +170,7 @@ static rt_gc_node_t* peek_node(void) {
  */
 void rt_gc_init(void) {
 
-    root = _ALLOC_TYPE(rt_gc_node_t);
+    root = RT_ALLOC_TYPE(rt_gc_node_t);
     root->size = 0;
     top = root;
 }
@@ -175,7 +228,7 @@ void rt_gc_end(rt_gc_node_t* node, void* ptr) {
 void* rt_gc_alloc(unsigned long size) {
 
     // cleared memory
-    void* p = _ALLOC(size+sizeof(rt_gc_node_t));
+    void* p = RT_ALLOC(size+sizeof(rt_gc_node_t));
     return TO_VOID(p);
 }
 
@@ -190,7 +243,7 @@ void* rt_gc_alloc(unsigned long size) {
 void* rt_gc_realloc(void* ptr, unsigned long size) {
 
     void* v = (void*)TO_PTR(ptr);
-    rt_gc_node_t* p = _REALLOC_TYPE(v, rt_gc_node_t, size);
+    rt_gc_node_t* p = RT_REALLOC_TYPE(v, rt_gc_node_t, size);
 
     return TO_VOID(p);
 }

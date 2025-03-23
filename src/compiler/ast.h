@@ -1,12 +1,12 @@
-#ifndef _AST_H_
-#define _AST_H_
+#ifndef _AST_
+#define _AST_
 
 #include <stdbool.h>
 
-#include "pointer_list.h"
+#include "common_pointer_list.h"
 #include "tokens.h"
 #include "context.h"
-#include "string_buffer.h"
+#include "common_string_buffer.h"
 
 typedef enum {
     AST_PROGRAM,
@@ -571,4 +571,4 @@ const char* node_type_to_name(ast_node_t* node);
 ast_node_t* alloc_ast_node(ast_type_t type);
 ast_program_t* get_program(void);
 
-#endif /* _AST_H_ */
+#endif /* _AST_ */

@@ -1,8 +1,8 @@
-#ifndef _STRING_LIST_H_
-#define _STRING_LIST_H_
+#ifndef _COMMON_STRING_LIST_
+#define _COMMON_STRING_LIST_
 
-#include "string_buffer.h"
-#include "pointer_list.h"
+#include "common_string_buffer.h"
+#include "common_pointer_list.h"
 
 typedef pointer_list_t string_list_t;
 
@@ -18,4 +18,4 @@ string_buffer_t* pop_string_list(string_list_t*);
 string_buffer_t* peek_string_list(string_list_t*);
 
 
-#endif /* _STRING_LIST_H_ */
+#endif /* _COMMON_STRING_LIST_ */

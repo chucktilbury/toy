@@ -9,8 +9,8 @@
  * @copyright Copyright 2025
  */
 #include "syntax_errors.h"
-#include "errors.h"
-#include "pointer_list.h"
+#include "common_errors.h"
+#include "common_pointer_list.h"
 #include "ast.h"
 #include "parser.h"
 #include "context.h"

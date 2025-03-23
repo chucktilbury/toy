@@ -1,7 +1,7 @@
 
-#include "memory.h"
+#include "common_memory.h"
 #include "symbol.h"
-#include "hash.h"
+#include "common_hash.h"
 #include "syntax_errors.h"
 
 const char* token_to_str(int);

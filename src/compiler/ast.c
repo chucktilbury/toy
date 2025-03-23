@@ -8,11 +8,11 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#include "errors.h"
-#include "pointer_list.h"
+#include "common_errors.h"
+#include "common_pointer_list.h"
 #include "ast.h"
 #include "parser.h"
-#include "memory.h"
+#include "common_memory.h"
 
 // #define AST_TRACE
 

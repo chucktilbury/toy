@@ -31,8 +31,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hash.h"
-#include "memory.h"
+#include "common_hash.h"
+#include "common_memory.h"
 
 // #define TEST_HASH
 

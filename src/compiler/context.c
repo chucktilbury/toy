@@ -15,8 +15,8 @@
 #include <stdbool.h>
 
 #include "context.h"
-#include "memory.h"
-#include "errors.h"
+#include "common_memory.h"
+#include "common_errors.h"
 
 // #define TRACE_CONTEXT
 

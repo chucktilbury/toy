@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "errors.h"
+#include "common_errors.h"
 #include "gc.h"
 
 #ifdef USE_GC

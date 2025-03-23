@@ -1,5 +1,5 @@
-#ifndef _TOKENS_H_
-#define _TOKENS_H_
+#ifndef _TOKENS_
+#define _TOKENS_
 
 #include "value.h"
 
@@ -22,4 +22,4 @@ typedef struct {
 
 token_t* create_token(const char* text, int type);
 
-#endif /* _TOKENS_H_ */
+#endif /* _TOKENS_ */

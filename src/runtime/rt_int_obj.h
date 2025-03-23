@@ -8,8 +8,8 @@
  * @version 0.0.1
  * @copyright Copyright 2025
  */
-#ifndef _RT_INT_OBJ_H_
-#define _RT_INT_OBJ_H_
+#ifndef _RT_INT_OBJ_
+#define _RT_INT_OBJ_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -21,4 +21,4 @@ typedef struct _rt_int_obj_t_ {
     int64_t value;
 } rt_int_obj_t;
 
-#endif /* _RT_INT_OBJ_H_ */
+#endif /* _RT_INT_OBJ_ */

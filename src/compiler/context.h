@@ -1,7 +1,7 @@
-#ifndef _CONTEXT_H_
-#define _CONTEXT_H_
+#ifndef _CONTEXT_
+#define _CONTEXT_
 
-#include "hash.h"
+#include "common_hash.h"
 
 typedef struct _context_t_ {
     hash_table_t* table;
@@ -18,4 +18,4 @@ context_t* peek_context(void);
 // void* seek_context_item(const char*);
 context_t* reset_context(void);
 
-#endif /* _CONTEXT_H_ */
+#endif /* _CONTEXT_ */

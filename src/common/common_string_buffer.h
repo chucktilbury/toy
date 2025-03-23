@@ -1,5 +1,5 @@
-#ifndef _STRING_BUFFER_H_
-#define _STRING_BUFFER_H_
+#ifndef _COMMON_STRING_BUFFER_
+#define _COMMON_STRING_BUFFER_
 
 typedef struct {
     char* buf;
@@ -25,4 +25,4 @@ void write_string_buffer(string_buffer_t*, const char*);
 void print_string_buffer(string_buffer_t*);
 string_buffer_t* read_string_buffer(const char*);
 
-#endif /* _STRING_BUFFER_H_ */
+#endif /* _COMMON_STRING_BUFFER_ */

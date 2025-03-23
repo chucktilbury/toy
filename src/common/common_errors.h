@@ -1,7 +1,7 @@
 
 
-#ifndef _ERRORS_H_
-#define _ERRORS_H_
+#ifndef _COMMON_ERRORS_
+#define _COMMON_ERRORS_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,4 +24,4 @@
         exit(1);                                                                    \
     } while(0)
 
-#endif /* _ERRORS_H_ */
+#endif /* _COMMON_ERRORS_ */

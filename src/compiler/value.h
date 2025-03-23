@@ -9,8 +9,8 @@
  * @copyright Copyright 2025
  */
 
-#ifndef _VALUE_H_
-#define _VALUE_H_
+#ifndef _VALUE_
+#define _VALUE_
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -29,4 +29,4 @@ typedef struct {
 
 value_t* create_value(int type);
 
-#endif /* _VALUE_H_ */
+#endif /* _VALUE_ */

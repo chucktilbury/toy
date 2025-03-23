@@ -3,9 +3,9 @@
 #include <string.h>
 #include <errno.h>
 
-#include "string_buffer.h"
-#include "memory.h"
-#include "errors.h"
+#include "common_string_buffer.h"
+#include "common_memory.h"
+#include "common_errors.h"
 
 static inline void append_buffer(string_buffer_t* buf, const char* str, int len) {
 

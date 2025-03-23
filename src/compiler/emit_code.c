@@ -13,8 +13,8 @@
 #include <unistd.h>
 
 #include "syntax_errors.h"
-#include "errors.h"
-#include "pointer_list.h"
+#include "common_errors.h"
+#include "common_pointer_list.h"
 #include "ast.h"
 #include "parser.h"
 #include "fileio.h"
@@ -1057,7 +1057,7 @@ static inline void emit_expression_param(ast_expression_param_t* node) {
 /******************************************************************************
  * PUBLIC INTERFACE
  *****************************************************************************/
-#include "string_buffer.h"
+#include "common_string_buffer.h"
 
 void emit_code(const char* fname) {
 
