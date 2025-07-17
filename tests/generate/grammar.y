@@ -1,0 +1,302 @@
+/*
+ *  This is a YACC style grammar for TOY.
+ *  Keeping the rules small and simple for implementation by hand, since
+ *  LALR(1) wil not parse this grammar. The generated parser does not
+ *  "do the right thing", so a hand-written parser is called for.
+ */
+%{
+#include "tokens.h"
+%}
+
+%token CONST NOTHING IMPORT INT FLOAT STRING BOOL LIST DICT STRUCT DO WHILE
+%token FOR IN IF ELSE RETURN EXIT IDENTIFIER INT_LITERAL FLOAT_LITERAL
+%token STRING_LITERAL INLINE COLON OR AND EQU NEQU GT LT GTE LTE PLUS MINUS
+%token STAR SLASH PERCENT CARAT NOT DOT OSBRACE CSBRACE COMMA OCBRACE CCBRACE
+%token EQUAL OPAREN CPAREN CONTINUE BREAK
+
+%left OSBRACE CSBRACE OPAREN CPAREN
+%left DOT
+%left OR
+%left AND
+%left EQU NEQU
+%left LTE GTE LT GT
+%left PLUS MINUS
+%left STAR SLASH PERCENT
+%right CARAT NOT
+%precedence UNARY
+
+%%
+
+translation_unit
+    : translation_unit_element
+    | translation_unit translation_unit_element
+    ;
+
+translation_unit_element
+    : import_statement
+    | data_definition
+    | function_definition
+    | struct_definition
+    ;
+
+import_statement
+    : IMPORT STRING_LITERAL
+    ;
+
+data_declaration
+    : type_name IDENTIFIER
+    ;
+
+data_definition
+    : data_declaration
+    | data_declaration EQUAL initializer
+    | CONST data_declaration EQUAL initializer
+    ;
+
+initializer
+    : expression
+    | OSBRACE list_initializer CSBRACE
+    | OSBRACE dss_initializer CSBRACE { /* dict init */ }
+    | OCBRACE dss_initializer CCBRACE { /* struct init */ }
+    ;
+
+list_initializer
+    : expression
+    | list_initializer COMMA expression
+    ;
+
+dss_initializer_item
+    : STRING_LITERAL COLON expression
+    ;
+
+dss_initializer
+    : dss_initializer_item
+    | dss_initializer COMMA dss_initializer_item
+    ;
+
+formatted_string
+    : STRING_LITERAL
+    | STRING_LITERAL OPAREN CPAREN
+    | STRING_LITERAL OPAREN dss_initializer CPAREN
+    ;
+
+type_name
+    : INT
+    | FLOAT
+    | STRING
+    | LIST
+    | DICT
+    | BOOL
+    | compound_name
+    ;
+
+    /*
+     * 2 R/R conflicts (as expected) between compound_name and
+     * compound_reference
+     */
+compound_name
+    : IDENTIFIER
+    | compound_name DOT IDENTIFIER
+    ;
+
+function_name
+    : type_name IDENTIFIER
+    | NOTHING IDENTIFIER
+    ;
+
+function_definition
+    : function_name function_parameters function_body
+    ;
+
+function_parameters
+    : OPAREN function_parameter_list CPAREN
+    | OPAREN CPAREN
+    ;
+
+function_parameter_list
+    : data_declaration
+    | function_parameter_list COMMA data_declaration
+    ;
+
+struct_data_list
+    : data_definition
+    | struct_data_list data_definition
+    ;
+
+struct_body
+    : OCBRACE struct_data_list CCBRACE
+    ;
+
+struct_definition
+    : STRUCT IDENTIFIER struct_body
+    ;
+
+    /*
+     * Expressions are parsed using Dijkstra's switching yard algorithm.
+     */
+expression
+    : expression STAR expression
+    | expression SLASH expression
+    | expression PERCENT expression
+    | expression PLUS expression
+    | expression MINUS expression
+    | expression GT expression
+    | expression LT expression
+    | expression GTE expression
+    | expression LTE expression
+    | expression EQU expression
+    | expression NEQU expression
+    | expression AND expression
+    | expression OR expression
+    | expression CARAT expression
+    | NOT expression %prec UNARY
+    | MINUS expression %prec UNARY
+    | primary_expression
+    ;
+
+primary_expression
+    : INT_LITERAL
+    | FLOAT_LITERAL
+    | formatted_string
+    | OPAREN expression CPAREN
+    | compound_reference
+    ;
+
+expression_list
+    : expression
+    | expression_list COMMA expression
+    ;
+
+compound_reference
+    : compound_reference_element
+    | compound_reference DOT compound_reference_element
+    ;
+
+compound_reference_element
+    : IDENTIFIER
+    | function_reference
+    | list_reference
+    ;
+
+function_reference
+    : IDENTIFIER OPAREN expression_list CPAREN
+    ;
+
+list_reference
+    : IDENTIFIER list_ref_parms
+
+list_ref_parms
+    : OSBRACE expression CSBRACE
+    | list_ref_parms OSBRACE expression CSBRACE
+    ;
+
+function_body_element
+    : assignment
+    | compound_reference
+    | data_definition
+    | struct_definition
+    | if_clause
+    | while_clause
+    | do_clause
+    | for_clause
+    | return_statement
+    | exit_statement
+    | INLINE
+    ;
+
+function_body_prelist
+    : function_body_element
+    | function_body
+    ;
+
+function_body_list
+    : function_body_prelist
+    | function_body_list function_body_prelist
+    ;
+
+function_body
+    : OCBRACE function_body_list CCBRACE
+    ;
+
+loop_body_element
+    : function_body_element
+    | CONTINUE
+    | BREAK
+    ;
+
+loop_body_prelist
+    : loop_body_element
+    | loop_body
+    ;
+
+loop_body_list
+    : loop_body_prelist
+    | loop_body_list loop_body_prelist
+    ;
+
+loop_body
+    : OCBRACE loop_body_list CCBRACE
+    ;
+
+assignment
+    : compound_name EQUAL expression
+    ;
+
+if_clause
+    : IF OPAREN expression CPAREN function_body
+    | IF OPAREN expression CPAREN function_body else_clause_follow
+    ;
+
+else_clause
+    : ELSE OPAREN expression CPAREN function_body
+    ;
+
+else_clause_list
+    : else_clause
+    | else_clause_list else_clause
+    ;
+
+final_else_clause
+    : ELSE OPAREN CPAREN function_body
+    | ELSE function_body
+    ;
+
+else_clause_follow
+    : else_clause_list final_else_clause
+    | final_else_clause
+    ;
+
+while_clause
+    : WHILE OPAREN expression CPAREN loop_body
+    | WHILE OPAREN CPAREN loop_body
+    | WHILE loop_body
+    ;
+
+do_clause
+    : DO loop_body WHILE OPAREN expression CPAREN
+    | DO loop_body WHILE OPAREN CPAREN
+    | DO loop_body WHILE
+    ;
+
+    /*
+     * 1 R/R conflict with type_name and IDENTIFIER through compound_name
+     */
+for_clause
+    : FOR loop_body
+    | FOR OPAREN CPAREN loop_body
+    | FOR OPAREN expression CPAREN loop_body
+    | FOR OPAREN IDENTIFIER IN expression CPAREN loop_body
+    | FOR OPAREN type_name IDENTIFIER IN expression CPAREN loop_body
+    ;
+
+return_statement
+    : RETURN
+    | RETURN OPAREN CPAREN
+    | RETURN OPAREN expression CPAREN
+    ;
+
+exit_statement
+    : EXIT OPAREN expression CPAREN
+    ;
+
+%%
