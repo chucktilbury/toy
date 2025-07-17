@@ -1,0 +1,3797 @@
+State 101 conflicts: 2 reduce/reduce
+State 179 conflicts: 1 reduce/reduce
+
+
+Grammar
+
+    0 $accept: translation_unit $end
+
+    1 translation_unit: translation_unit_element
+    2                 | translation_unit translation_unit_element
+
+    3 translation_unit_element: import_statement
+    4                         | data_definition
+    5                         | function_definition
+    6                         | struct_definition
+
+    7 import_statement: IMPORT STRING_LITERAL
+
+    8 data_declaration: type_name IDENTIFIER
+
+    9 data_definition: data_declaration
+   10                | data_declaration EQUAL initializer
+   11                | CONST data_declaration EQUAL initializer
+
+   12 initializer: expression
+   13            | OSBRACE list_initializer CSBRACE
+   14            | OSBRACE dss_initializer CSBRACE
+   15            | OCBRACE dss_initializer CCBRACE
+
+   16 list_initializer: expression
+   17                 | list_initializer COMMA expression
+
+   18 dss_initializer_item: STRING_LITERAL COLON expression
+
+   19 dss_initializer: dss_initializer_item
+   20                | dss_initializer COMMA dss_initializer_item
+
+   21 formatted_string: STRING_LITERAL
+   22                 | STRING_LITERAL OPAREN CPAREN
+   23                 | STRING_LITERAL OPAREN dss_initializer CPAREN
+
+   24 type_name: INT
+   25          | FLOAT
+   26          | STRING
+   27          | LIST
+   28          | DICT
+   29          | BOOL
+   30          | compound_name
+
+   31 compound_name: IDENTIFIER
+   32              | compound_name DOT IDENTIFIER
+
+   33 function_name: type_name IDENTIFIER
+   34              | NOTHING IDENTIFIER
+
+   35 function_definition: function_name function_parameters function_body
+
+   36 function_parameters: OPAREN function_parameter_list CPAREN
+   37                    | OPAREN CPAREN
+
+   38 function_parameter_list: data_declaration
+   39                        | function_parameter_list COMMA data_declaration
+
+   40 struct_data_list: data_definition
+   41                 | struct_data_list data_definition
+
+   42 struct_body: OCBRACE struct_data_list CCBRACE
+
+   43 struct_definition: STRUCT IDENTIFIER struct_body
+
+   44 expression: expression STAR expression
+   45           | expression SLASH expression
+   46           | expression PERCENT expression
+   47           | expression PLUS expression
+   48           | expression MINUS expression
+   49           | expression GT expression
+   50           | expression LT expression
+   51           | expression GTE expression
+   52           | expression LTE expression
+   53           | expression EQU expression
+   54           | expression NEQU expression
+   55           | expression AND expression
+   56           | expression OR expression
+   57           | expression CARAT expression
+   58           | NOT expression
+   59           | MINUS expression
+   60           | primary_expression
+
+   61 primary_expression: INT_LITERAL
+   62                   | FLOAT_LITERAL
+   63                   | formatted_string
+   64                   | OPAREN expression CPAREN
+   65                   | compound_reference
+
+   66 expression_list: expression
+   67                | expression_list COMMA expression
+
+   68 compound_reference: compound_reference_element
+   69                   | compound_reference DOT compound_reference_element
+
+   70 compound_reference_element: IDENTIFIER
+   71                           | function_reference
+   72                           | list_reference
+
+   73 function_reference: IDENTIFIER OPAREN expression_list CPAREN
+
+   74 list_reference: IDENTIFIER list_ref_parms
+
+   75 list_ref_parms: OSBRACE expression CSBRACE
+   76               | list_ref_parms OSBRACE expression CSBRACE
+
+   77 function_body_element: assignment
+   78                      | compound_reference
+   79                      | data_definition
+   80                      | struct_definition
+   81                      | if_clause
+   82                      | while_clause
+   83                      | do_clause
+   84                      | for_clause
+   85                      | return_statement
+   86                      | exit_statement
+   87                      | INLINE
+
+   88 function_body_prelist: function_body_element
+   89                      | function_body
+
+   90 function_body_list: function_body_prelist
+   91                   | function_body_list function_body_prelist
+
+   92 function_body: OCBRACE function_body_list CCBRACE
+
+   93 loop_body_element: function_body_element
+   94                  | CONTINUE
+   95                  | BREAK
+
+   96 loop_body_prelist: loop_body_element
+   97                  | loop_body
+
+   98 loop_body_list: loop_body_prelist
+   99               | loop_body_list loop_body_prelist
+
+  100 loop_body: OCBRACE loop_body_list CCBRACE
+
+  101 assignment: compound_name EQUAL expression
+
+  102 if_clause: IF OPAREN expression CPAREN function_body
+  103          | IF OPAREN expression CPAREN function_body else_clause_follow
+
+  104 else_clause: ELSE OPAREN expression CPAREN function_body
+
+  105 else_clause_list: else_clause
+  106                 | else_clause_list else_clause
+
+  107 final_else_clause: ELSE OPAREN CPAREN function_body
+  108                  | ELSE function_body
+
+  109 else_clause_follow: else_clause_list final_else_clause
+  110                   | final_else_clause
+
+  111 while_clause: WHILE OPAREN expression CPAREN loop_body
+  112             | WHILE OPAREN CPAREN loop_body
+  113             | WHILE loop_body
+
+  114 do_clause: DO loop_body WHILE OPAREN expression CPAREN
+  115          | DO loop_body WHILE OPAREN CPAREN
+  116          | DO loop_body WHILE
+
+  117 for_clause: FOR loop_body
+  118           | FOR OPAREN CPAREN loop_body
+  119           | FOR OPAREN expression CPAREN loop_body
+  120           | FOR OPAREN IDENTIFIER IN expression CPAREN loop_body
+  121           | FOR OPAREN type_name IDENTIFIER IN expression CPAREN loop_body
+
+  122 return_statement: RETURN
+  123                 | RETURN OPAREN CPAREN
+  124                 | RETURN OPAREN expression CPAREN
+
+  125 exit_statement: EXIT OPAREN expression CPAREN
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    error (256)
+    CONST (258) 11
+    NOTHING (259) 34
+    IMPORT (260) 7
+    INT (261) 24
+    FLOAT (262) 25
+    STRING (263) 26
+    BOOL (264) 29
+    LIST (265) 27
+    DICT (266) 28
+    STRUCT (267) 43
+    DO (268) 114 115 116
+    WHILE (269) 111 112 113 114 115 116
+    FOR (270) 117 118 119 120 121
+    IN (271) 120 121
+    IF (272) 102 103
+    ELSE (273) 104 107 108
+    RETURN (274) 122 123 124
+    EXIT (275) 125
+    IDENTIFIER (276) 8 31 32 33 34 43 70 73 74 120 121
+    INT_LITERAL (277) 61
+    FLOAT_LITERAL (278) 62
+    STRING_LITERAL (279) 7 18 21 22 23
+    INLINE (280) 87
+    COLON (281) 18
+    OR (282) 56
+    AND (283) 55
+    EQU (284) 53
+    NEQU (285) 54
+    GT (286) 49
+    LT (287) 50
+    GTE (288) 51
+    LTE (289) 52
+    PLUS (290) 47
+    MINUS (291) 48 59
+    STAR (292) 44
+    SLASH (293) 45
+    PERCENT (294) 46
+    CARAT (295) 57
+    NOT (296) 58
+    DOT (297) 32 69
+    OSBRACE (298) 13 14 75 76
+    CSBRACE (299) 13 14 75 76
+    COMMA (300) 17 20 39 67
+    OCBRACE (301) 15 42 92 100
+    CCBRACE (302) 15 42 92 100
+    EQUAL (303) 10 11 101
+    OPAREN (304) 22 23 36 37 64 73 102 103 104 107 111 112 114 115 118 119 120 121 123 124 125
+    CPAREN (305) 22 23 36 37 64 73 102 103 104 107 111 112 114 115 118 119 120 121 123 124 125
+    CONTINUE (306) 94
+    BREAK (307) 95
+    UNARY (308)
+
+
+Nonterminals, with rules where they appear
+
+    $accept (54)
+        on left: 0
+    translation_unit (55)
+        on left: 1 2
+        on right: 0 2
+    translation_unit_element (56)
+        on left: 3 4 5 6
+        on right: 1 2
+    import_statement (57)
+        on left: 7
+        on right: 3
+    data_declaration (58)
+        on left: 8
+        on right: 9 10 11 38 39
+    data_definition (59)
+        on left: 9 10 11
+        on right: 4 40 41 79
+    initializer (60)
+        on left: 12 13 14 15
+        on right: 10 11
+    list_initializer (61)
+        on left: 16 17
+        on right: 13 17
+    dss_initializer_item (62)
+        on left: 18
+        on right: 19 20
+    dss_initializer (63)
+        on left: 19 20
+        on right: 14 15 20 23
+    formatted_string (64)
+        on left: 21 22 23
+        on right: 63
+    type_name (65)
+        on left: 24 25 26 27 28 29 30
+        on right: 8 33 121
+    compound_name (66)
+        on left: 31 32
+        on right: 30 32 101
+    function_name (67)
+        on left: 33 34
+        on right: 35
+    function_definition (68)
+        on left: 35
+        on right: 5
+    function_parameters (69)
+        on left: 36 37
+        on right: 35
+    function_parameter_list (70)
+        on left: 38 39
+        on right: 36 39
+    struct_data_list (71)
+        on left: 40 41
+        on right: 41 42
+    struct_body (72)
+        on left: 42
+        on right: 43
+    struct_definition (73)
+        on left: 43
+        on right: 6 80
+    expression (74)
+        on left: 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60
+        on right: 12 16 17 18 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 64 66 67 75 76 101 102 103 104 111 114 119 120 121 124 125
+    primary_expression (75)
+        on left: 61 62 63 64 65
+        on right: 60
+    expression_list (76)
+        on left: 66 67
+        on right: 67 73
+    compound_reference (77)
+        on left: 68 69
+        on right: 65 69 78
+    compound_reference_element (78)
+        on left: 70 71 72
+        on right: 68 69
+    function_reference (79)
+        on left: 73
+        on right: 71
+    list_reference (80)
+        on left: 74
+        on right: 72
+    list_ref_parms (81)
+        on left: 75 76
+        on right: 74 76
+    function_body_element (82)
+        on left: 77 78 79 80 81 82 83 84 85 86 87
+        on right: 88 93
+    function_body_prelist (83)
+        on left: 88 89
+        on right: 90 91
+    function_body_list (84)
+        on left: 90 91
+        on right: 91 92
+    function_body (85)
+        on left: 92
+        on right: 35 89 102 103 104 107 108
+    loop_body_element (86)
+        on left: 93 94 95
+        on right: 96
+    loop_body_prelist (87)
+        on left: 96 97
+        on right: 98 99
+    loop_body_list (88)
+        on left: 98 99
+        on right: 99 100
+    loop_body (89)
+        on left: 100
+        on right: 97 111 112 113 114 115 116 117 118 119 120 121
+    assignment (90)
+        on left: 101
+        on right: 77
+    if_clause (91)
+        on left: 102 103
+        on right: 81
+    else_clause (92)
+        on left: 104
+        on right: 105 106
+    else_clause_list (93)
+        on left: 105 106
+        on right: 106 109
+    final_else_clause (94)
+        on left: 107 108
+        on right: 109 110
+    else_clause_follow (95)
+        on left: 109 110
+        on right: 103
+    while_clause (96)
+        on left: 111 112 113
+        on right: 82
+    do_clause (97)
+        on left: 114 115 116
+        on right: 83
+    for_clause (98)
+        on left: 117 118 119 120 121
+        on right: 84
+    return_statement (99)
+        on left: 122 123 124
+        on right: 85
+    exit_statement (100)
+        on left: 125
+        on right: 86
+
+
+State 0
+
+    0 $accept: • translation_unit $end
+
+    CONST       shift, and go to state 1
+    NOTHING     shift, and go to state 2
+    IMPORT      shift, and go to state 3
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    IDENTIFIER  shift, and go to state 11
+
+    translation_unit          go to state 12
+    translation_unit_element  go to state 13
+    import_statement          go to state 14
+    data_declaration          go to state 15
+    data_definition           go to state 16
+    type_name                 go to state 17
+    compound_name             go to state 18
+    function_name             go to state 19
+    function_definition       go to state 20
+    struct_definition         go to state 21
+
+
+State 1
+
+   11 data_definition: CONST • data_declaration EQUAL initializer
+
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 11
+
+    data_declaration  go to state 22
+    type_name         go to state 23
+    compound_name     go to state 18
+
+
+State 2
+
+   34 function_name: NOTHING • IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 24
+
+
+State 3
+
+    7 import_statement: IMPORT • STRING_LITERAL
+
+    STRING_LITERAL  shift, and go to state 25
+
+
+State 4
+
+   24 type_name: INT •
+
+    $default  reduce using rule 24 (type_name)
+
+
+State 5
+
+   25 type_name: FLOAT •
+
+    $default  reduce using rule 25 (type_name)
+
+
+State 6
+
+   26 type_name: STRING •
+
+    $default  reduce using rule 26 (type_name)
+
+
+State 7
+
+   29 type_name: BOOL •
+
+    $default  reduce using rule 29 (type_name)
+
+
+State 8
+
+   27 type_name: LIST •
+
+    $default  reduce using rule 27 (type_name)
+
+
+State 9
+
+   28 type_name: DICT •
+
+    $default  reduce using rule 28 (type_name)
+
+
+State 10
+
+   43 struct_definition: STRUCT • IDENTIFIER struct_body
+
+    IDENTIFIER  shift, and go to state 26
+
+
+State 11
+
+   31 compound_name: IDENTIFIER •
+
+    $default  reduce using rule 31 (compound_name)
+
+
+State 12
+
+    0 $accept: translation_unit • $end
+    2 translation_unit: translation_unit • translation_unit_element
+
+    $end        shift, and go to state 27
+    CONST       shift, and go to state 1
+    NOTHING     shift, and go to state 2
+    IMPORT      shift, and go to state 3
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    IDENTIFIER  shift, and go to state 11
+
+    translation_unit_element  go to state 28
+    import_statement          go to state 14
+    data_declaration          go to state 15
+    data_definition           go to state 16
+    type_name                 go to state 17
+    compound_name             go to state 18
+    function_name             go to state 19
+    function_definition       go to state 20
+    struct_definition         go to state 21
+
+
+State 13
+
+    1 translation_unit: translation_unit_element •
+
+    $default  reduce using rule 1 (translation_unit)
+
+
+State 14
+
+    3 translation_unit_element: import_statement •
+
+    $default  reduce using rule 3 (translation_unit_element)
+
+
+State 15
+
+    9 data_definition: data_declaration •
+   10                | data_declaration • EQUAL initializer
+
+    EQUAL  shift, and go to state 29
+
+    $default  reduce using rule 9 (data_definition)
+
+
+State 16
+
+    4 translation_unit_element: data_definition •
+
+    $default  reduce using rule 4 (translation_unit_element)
+
+
+State 17
+
+    8 data_declaration: type_name • IDENTIFIER
+   33 function_name: type_name • IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 30
+
+
+State 18
+
+   30 type_name: compound_name •
+   32 compound_name: compound_name • DOT IDENTIFIER
+
+    DOT  shift, and go to state 31
+
+    $default  reduce using rule 30 (type_name)
+
+
+State 19
+
+   35 function_definition: function_name • function_parameters function_body
+
+    OPAREN  shift, and go to state 32
+
+    function_parameters  go to state 33
+
+
+State 20
+
+    5 translation_unit_element: function_definition •
+
+    $default  reduce using rule 5 (translation_unit_element)
+
+
+State 21
+
+    6 translation_unit_element: struct_definition •
+
+    $default  reduce using rule 6 (translation_unit_element)
+
+
+State 22
+
+   11 data_definition: CONST data_declaration • EQUAL initializer
+
+    EQUAL  shift, and go to state 34
+
+
+State 23
+
+    8 data_declaration: type_name • IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 35
+
+
+State 24
+
+   34 function_name: NOTHING IDENTIFIER •
+
+    $default  reduce using rule 34 (function_name)
+
+
+State 25
+
+    7 import_statement: IMPORT STRING_LITERAL •
+
+    $default  reduce using rule 7 (import_statement)
+
+
+State 26
+
+   43 struct_definition: STRUCT IDENTIFIER • struct_body
+
+    OCBRACE  shift, and go to state 36
+
+    struct_body  go to state 37
+
+
+State 27
+
+    0 $accept: translation_unit $end •
+
+    $default  accept
+
+
+State 28
+
+    2 translation_unit: translation_unit translation_unit_element •
+
+    $default  reduce using rule 2 (translation_unit)
+
+
+State 29
+
+   10 data_definition: data_declaration EQUAL • initializer
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OSBRACE         shift, and go to state 44
+    OCBRACE         shift, and go to state 45
+    OPAREN          shift, and go to state 46
+
+    initializer                 go to state 47
+    formatted_string            go to state 48
+    expression                  go to state 49
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 30
+
+    8 data_declaration: type_name IDENTIFIER •
+   33 function_name: type_name IDENTIFIER •
+
+    OPAREN    reduce using rule 33 (function_name)
+    $default  reduce using rule 8 (data_declaration)
+
+
+State 31
+
+   32 compound_name: compound_name DOT • IDENTIFIER
+
+    IDENTIFIER  shift, and go to state 55
+
+
+State 32
+
+   36 function_parameters: OPAREN • function_parameter_list CPAREN
+   37                    | OPAREN • CPAREN
+
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 11
+    CPAREN      shift, and go to state 56
+
+    data_declaration         go to state 57
+    type_name                go to state 23
+    compound_name            go to state 18
+    function_parameter_list  go to state 58
+
+
+State 33
+
+   35 function_definition: function_name function_parameters • function_body
+
+    OCBRACE  shift, and go to state 59
+
+    function_body  go to state 60
+
+
+State 34
+
+   11 data_definition: CONST data_declaration EQUAL • initializer
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OSBRACE         shift, and go to state 44
+    OCBRACE         shift, and go to state 45
+    OPAREN          shift, and go to state 46
+
+    initializer                 go to state 61
+    formatted_string            go to state 48
+    expression                  go to state 49
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 35
+
+    8 data_declaration: type_name IDENTIFIER •
+
+    $default  reduce using rule 8 (data_declaration)
+
+
+State 36
+
+   42 struct_body: OCBRACE • struct_data_list CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 11
+
+    data_declaration  go to state 15
+    data_definition   go to state 62
+    type_name         go to state 23
+    compound_name     go to state 18
+    struct_data_list  go to state 63
+
+
+State 37
+
+   43 struct_definition: STRUCT IDENTIFIER struct_body •
+
+    $default  reduce using rule 43 (struct_definition)
+
+
+State 38
+
+   70 compound_reference_element: IDENTIFIER •
+   73 function_reference: IDENTIFIER • OPAREN expression_list CPAREN
+   74 list_reference: IDENTIFIER • list_ref_parms
+
+    OSBRACE  shift, and go to state 64
+    OPAREN   shift, and go to state 65
+
+    $default  reduce using rule 70 (compound_reference_element)
+
+    list_ref_parms  go to state 66
+
+
+State 39
+
+   61 primary_expression: INT_LITERAL •
+
+    $default  reduce using rule 61 (primary_expression)
+
+
+State 40
+
+   62 primary_expression: FLOAT_LITERAL •
+
+    $default  reduce using rule 62 (primary_expression)
+
+
+State 41
+
+   21 formatted_string: STRING_LITERAL •
+   22                 | STRING_LITERAL • OPAREN CPAREN
+   23                 | STRING_LITERAL • OPAREN dss_initializer CPAREN
+
+    OPAREN  shift, and go to state 67
+
+    $default  reduce using rule 21 (formatted_string)
+
+
+State 42
+
+   59 expression: MINUS • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 68
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 43
+
+   58 expression: NOT • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 69
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 44
+
+   13 initializer: OSBRACE • list_initializer CSBRACE
+   14            | OSBRACE • dss_initializer CSBRACE
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 70
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    list_initializer            go to state 71
+    dss_initializer_item        go to state 72
+    dss_initializer             go to state 73
+    formatted_string            go to state 48
+    expression                  go to state 74
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 45
+
+   15 initializer: OCBRACE • dss_initializer CCBRACE
+
+    STRING_LITERAL  shift, and go to state 75
+
+    dss_initializer_item  go to state 72
+    dss_initializer       go to state 76
+
+
+State 46
+
+   64 primary_expression: OPAREN • expression CPAREN
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 77
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 47
+
+   10 data_definition: data_declaration EQUAL initializer •
+
+    $default  reduce using rule 10 (data_definition)
+
+
+State 48
+
+   63 primary_expression: formatted_string •
+
+    $default  reduce using rule 63 (primary_expression)
+
+
+State 49
+
+   12 initializer: expression •
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 12 (initializer)
+
+
+State 50
+
+   60 expression: primary_expression •
+
+    $default  reduce using rule 60 (expression)
+
+
+State 51
+
+   65 primary_expression: compound_reference •
+   69 compound_reference: compound_reference • DOT compound_reference_element
+
+    DOT  shift, and go to state 92
+
+    $default  reduce using rule 65 (primary_expression)
+
+
+State 52
+
+   68 compound_reference: compound_reference_element •
+
+    $default  reduce using rule 68 (compound_reference)
+
+
+State 53
+
+   71 compound_reference_element: function_reference •
+
+    $default  reduce using rule 71 (compound_reference_element)
+
+
+State 54
+
+   72 compound_reference_element: list_reference •
+
+    $default  reduce using rule 72 (compound_reference_element)
+
+
+State 55
+
+   32 compound_name: compound_name DOT IDENTIFIER •
+
+    $default  reduce using rule 32 (compound_name)
+
+
+State 56
+
+   37 function_parameters: OPAREN CPAREN •
+
+    $default  reduce using rule 37 (function_parameters)
+
+
+State 57
+
+   38 function_parameter_list: data_declaration •
+
+    $default  reduce using rule 38 (function_parameter_list)
+
+
+State 58
+
+   36 function_parameters: OPAREN function_parameter_list • CPAREN
+   39 function_parameter_list: function_parameter_list • COMMA data_declaration
+
+    COMMA   shift, and go to state 93
+    CPAREN  shift, and go to state 94
+
+
+State 59
+
+   92 function_body: OCBRACE • function_body_list CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    DO          shift, and go to state 95
+    WHILE       shift, and go to state 96
+    FOR         shift, and go to state 97
+    IF          shift, and go to state 98
+    RETURN      shift, and go to state 99
+    EXIT        shift, and go to state 100
+    IDENTIFIER  shift, and go to state 101
+    INLINE      shift, and go to state 102
+    OCBRACE     shift, and go to state 59
+
+    data_declaration            go to state 15
+    data_definition             go to state 103
+    type_name                   go to state 23
+    compound_name               go to state 104
+    struct_definition           go to state 105
+    compound_reference          go to state 106
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+    function_body_element       go to state 107
+    function_body_prelist       go to state 108
+    function_body_list          go to state 109
+    function_body               go to state 110
+    assignment                  go to state 111
+    if_clause                   go to state 112
+    while_clause                go to state 113
+    do_clause                   go to state 114
+    for_clause                  go to state 115
+    return_statement            go to state 116
+    exit_statement              go to state 117
+
+
+State 60
+
+   35 function_definition: function_name function_parameters function_body •
+
+    $default  reduce using rule 35 (function_definition)
+
+
+State 61
+
+   11 data_definition: CONST data_declaration EQUAL initializer •
+
+    $default  reduce using rule 11 (data_definition)
+
+
+State 62
+
+   40 struct_data_list: data_definition •
+
+    $default  reduce using rule 40 (struct_data_list)
+
+
+State 63
+
+   41 struct_data_list: struct_data_list • data_definition
+   42 struct_body: OCBRACE struct_data_list • CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 11
+    CCBRACE     shift, and go to state 118
+
+    data_declaration  go to state 15
+    data_definition   go to state 119
+    type_name         go to state 23
+    compound_name     go to state 18
+
+
+State 64
+
+   75 list_ref_parms: OSBRACE • expression CSBRACE
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 120
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 65
+
+   73 function_reference: IDENTIFIER OPAREN • expression_list CPAREN
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 121
+    primary_expression          go to state 50
+    expression_list             go to state 122
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 66
+
+   74 list_reference: IDENTIFIER list_ref_parms •
+   76 list_ref_parms: list_ref_parms • OSBRACE expression CSBRACE
+
+    OSBRACE  shift, and go to state 123
+
+    $default  reduce using rule 74 (list_reference)
+
+
+State 67
+
+   22 formatted_string: STRING_LITERAL OPAREN • CPAREN
+   23                 | STRING_LITERAL OPAREN • dss_initializer CPAREN
+
+    STRING_LITERAL  shift, and go to state 75
+    CPAREN          shift, and go to state 124
+
+    dss_initializer_item  go to state 72
+    dss_initializer       go to state 125
+
+
+State 68
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   59           | MINUS expression •
+
+    $default  reduce using rule 59 (expression)
+
+
+State 69
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   58           | NOT expression •
+
+    $default  reduce using rule 58 (expression)
+
+
+State 70
+
+   18 dss_initializer_item: STRING_LITERAL • COLON expression
+   21 formatted_string: STRING_LITERAL •
+   22                 | STRING_LITERAL • OPAREN CPAREN
+   23                 | STRING_LITERAL • OPAREN dss_initializer CPAREN
+
+    COLON   shift, and go to state 126
+    OPAREN  shift, and go to state 67
+
+    $default  reduce using rule 21 (formatted_string)
+
+
+State 71
+
+   13 initializer: OSBRACE list_initializer • CSBRACE
+   17 list_initializer: list_initializer • COMMA expression
+
+    CSBRACE  shift, and go to state 127
+    COMMA    shift, and go to state 128
+
+
+State 72
+
+   19 dss_initializer: dss_initializer_item •
+
+    $default  reduce using rule 19 (dss_initializer)
+
+
+State 73
+
+   14 initializer: OSBRACE dss_initializer • CSBRACE
+   20 dss_initializer: dss_initializer • COMMA dss_initializer_item
+
+    CSBRACE  shift, and go to state 129
+    COMMA    shift, and go to state 130
+
+
+State 74
+
+   16 list_initializer: expression •
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 16 (list_initializer)
+
+
+State 75
+
+   18 dss_initializer_item: STRING_LITERAL • COLON expression
+
+    COLON  shift, and go to state 126
+
+
+State 76
+
+   15 initializer: OCBRACE dss_initializer • CCBRACE
+   20 dss_initializer: dss_initializer • COMMA dss_initializer_item
+
+    COMMA    shift, and go to state 130
+    CCBRACE  shift, and go to state 131
+
+
+State 77
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   64 primary_expression: OPAREN expression • CPAREN
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 132
+
+
+State 78
+
+   56 expression: expression OR • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 133
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 79
+
+   55 expression: expression AND • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 134
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 80
+
+   53 expression: expression EQU • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 135
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 81
+
+   54 expression: expression NEQU • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 136
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 82
+
+   49 expression: expression GT • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 137
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 83
+
+   50 expression: expression LT • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 138
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 84
+
+   51 expression: expression GTE • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 139
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 85
+
+   52 expression: expression LTE • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 140
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 86
+
+   47 expression: expression PLUS • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 141
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 87
+
+   48 expression: expression MINUS • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 142
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 88
+
+   44 expression: expression STAR • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 143
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 89
+
+   45 expression: expression SLASH • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 144
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 90
+
+   46 expression: expression PERCENT • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 145
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 91
+
+   57 expression: expression CARAT • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 146
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 92
+
+   69 compound_reference: compound_reference DOT • compound_reference_element
+
+    IDENTIFIER  shift, and go to state 38
+
+    compound_reference_element  go to state 147
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 93
+
+   39 function_parameter_list: function_parameter_list COMMA • data_declaration
+
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    IDENTIFIER  shift, and go to state 11
+
+    data_declaration  go to state 148
+    type_name         go to state 23
+    compound_name     go to state 18
+
+
+State 94
+
+   36 function_parameters: OPAREN function_parameter_list CPAREN •
+
+    $default  reduce using rule 36 (function_parameters)
+
+
+State 95
+
+  114 do_clause: DO • loop_body WHILE OPAREN expression CPAREN
+  115          | DO • loop_body WHILE OPAREN CPAREN
+  116          | DO • loop_body WHILE
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 150
+
+
+State 96
+
+  111 while_clause: WHILE • OPAREN expression CPAREN loop_body
+  112             | WHILE • OPAREN CPAREN loop_body
+  113             | WHILE • loop_body
+
+    OCBRACE  shift, and go to state 149
+    OPAREN   shift, and go to state 151
+
+    loop_body  go to state 152
+
+
+State 97
+
+  117 for_clause: FOR • loop_body
+  118           | FOR • OPAREN CPAREN loop_body
+  119           | FOR • OPAREN expression CPAREN loop_body
+  120           | FOR • OPAREN IDENTIFIER IN expression CPAREN loop_body
+  121           | FOR • OPAREN type_name IDENTIFIER IN expression CPAREN loop_body
+
+    OCBRACE  shift, and go to state 149
+    OPAREN   shift, and go to state 153
+
+    loop_body  go to state 154
+
+
+State 98
+
+  102 if_clause: IF • OPAREN expression CPAREN function_body
+  103          | IF • OPAREN expression CPAREN function_body else_clause_follow
+
+    OPAREN  shift, and go to state 155
+
+
+State 99
+
+  122 return_statement: RETURN •
+  123                 | RETURN • OPAREN CPAREN
+  124                 | RETURN • OPAREN expression CPAREN
+
+    OPAREN  shift, and go to state 156
+
+    $default  reduce using rule 122 (return_statement)
+
+
+State 100
+
+  125 exit_statement: EXIT • OPAREN expression CPAREN
+
+    OPAREN  shift, and go to state 157
+
+
+State 101
+
+   31 compound_name: IDENTIFIER •
+   70 compound_reference_element: IDENTIFIER •
+   73 function_reference: IDENTIFIER • OPAREN expression_list CPAREN
+   74 list_reference: IDENTIFIER • list_ref_parms
+
+    OSBRACE  shift, and go to state 64
+    OPAREN   shift, and go to state 65
+
+    IDENTIFIER  reduce using rule 31 (compound_name)
+    IDENTIFIER  [reduce using rule 70 (compound_reference_element)]
+    DOT         reduce using rule 31 (compound_name)
+    DOT         [reduce using rule 70 (compound_reference_element)]
+    EQUAL       reduce using rule 31 (compound_name)
+    $default    reduce using rule 70 (compound_reference_element)
+
+    list_ref_parms  go to state 66
+
+
+State 102
+
+   87 function_body_element: INLINE •
+
+    $default  reduce using rule 87 (function_body_element)
+
+
+State 103
+
+   79 function_body_element: data_definition •
+
+    $default  reduce using rule 79 (function_body_element)
+
+
+State 104
+
+   30 type_name: compound_name •
+   32 compound_name: compound_name • DOT IDENTIFIER
+  101 assignment: compound_name • EQUAL expression
+
+    DOT    shift, and go to state 31
+    EQUAL  shift, and go to state 158
+
+    $default  reduce using rule 30 (type_name)
+
+
+State 105
+
+   80 function_body_element: struct_definition •
+
+    $default  reduce using rule 80 (function_body_element)
+
+
+State 106
+
+   69 compound_reference: compound_reference • DOT compound_reference_element
+   78 function_body_element: compound_reference •
+
+    DOT  shift, and go to state 92
+
+    $default  reduce using rule 78 (function_body_element)
+
+
+State 107
+
+   88 function_body_prelist: function_body_element •
+
+    $default  reduce using rule 88 (function_body_prelist)
+
+
+State 108
+
+   90 function_body_list: function_body_prelist •
+
+    $default  reduce using rule 90 (function_body_list)
+
+
+State 109
+
+   91 function_body_list: function_body_list • function_body_prelist
+   92 function_body: OCBRACE function_body_list • CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    DO          shift, and go to state 95
+    WHILE       shift, and go to state 96
+    FOR         shift, and go to state 97
+    IF          shift, and go to state 98
+    RETURN      shift, and go to state 99
+    EXIT        shift, and go to state 100
+    IDENTIFIER  shift, and go to state 101
+    INLINE      shift, and go to state 102
+    OCBRACE     shift, and go to state 59
+    CCBRACE     shift, and go to state 159
+
+    data_declaration            go to state 15
+    data_definition             go to state 103
+    type_name                   go to state 23
+    compound_name               go to state 104
+    struct_definition           go to state 105
+    compound_reference          go to state 106
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+    function_body_element       go to state 107
+    function_body_prelist       go to state 160
+    function_body               go to state 110
+    assignment                  go to state 111
+    if_clause                   go to state 112
+    while_clause                go to state 113
+    do_clause                   go to state 114
+    for_clause                  go to state 115
+    return_statement            go to state 116
+    exit_statement              go to state 117
+
+
+State 110
+
+   89 function_body_prelist: function_body •
+
+    $default  reduce using rule 89 (function_body_prelist)
+
+
+State 111
+
+   77 function_body_element: assignment •
+
+    $default  reduce using rule 77 (function_body_element)
+
+
+State 112
+
+   81 function_body_element: if_clause •
+
+    $default  reduce using rule 81 (function_body_element)
+
+
+State 113
+
+   82 function_body_element: while_clause •
+
+    $default  reduce using rule 82 (function_body_element)
+
+
+State 114
+
+   83 function_body_element: do_clause •
+
+    $default  reduce using rule 83 (function_body_element)
+
+
+State 115
+
+   84 function_body_element: for_clause •
+
+    $default  reduce using rule 84 (function_body_element)
+
+
+State 116
+
+   85 function_body_element: return_statement •
+
+    $default  reduce using rule 85 (function_body_element)
+
+
+State 117
+
+   86 function_body_element: exit_statement •
+
+    $default  reduce using rule 86 (function_body_element)
+
+
+State 118
+
+   42 struct_body: OCBRACE struct_data_list CCBRACE •
+
+    $default  reduce using rule 42 (struct_body)
+
+
+State 119
+
+   41 struct_data_list: struct_data_list data_definition •
+
+    $default  reduce using rule 41 (struct_data_list)
+
+
+State 120
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   75 list_ref_parms: OSBRACE expression • CSBRACE
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CSBRACE  shift, and go to state 161
+
+
+State 121
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   66 expression_list: expression •
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 66 (expression_list)
+
+
+State 122
+
+   67 expression_list: expression_list • COMMA expression
+   73 function_reference: IDENTIFIER OPAREN expression_list • CPAREN
+
+    COMMA   shift, and go to state 162
+    CPAREN  shift, and go to state 163
+
+
+State 123
+
+   76 list_ref_parms: list_ref_parms OSBRACE • expression CSBRACE
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 164
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 124
+
+   22 formatted_string: STRING_LITERAL OPAREN CPAREN •
+
+    $default  reduce using rule 22 (formatted_string)
+
+
+State 125
+
+   20 dss_initializer: dss_initializer • COMMA dss_initializer_item
+   23 formatted_string: STRING_LITERAL OPAREN dss_initializer • CPAREN
+
+    COMMA   shift, and go to state 130
+    CPAREN  shift, and go to state 165
+
+
+State 126
+
+   18 dss_initializer_item: STRING_LITERAL COLON • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 166
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 127
+
+   13 initializer: OSBRACE list_initializer CSBRACE •
+
+    $default  reduce using rule 13 (initializer)
+
+
+State 128
+
+   17 list_initializer: list_initializer COMMA • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 167
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 129
+
+   14 initializer: OSBRACE dss_initializer CSBRACE •
+
+    $default  reduce using rule 14 (initializer)
+
+
+State 130
+
+   20 dss_initializer: dss_initializer COMMA • dss_initializer_item
+
+    STRING_LITERAL  shift, and go to state 75
+
+    dss_initializer_item  go to state 168
+
+
+State 131
+
+   15 initializer: OCBRACE dss_initializer CCBRACE •
+
+    $default  reduce using rule 15 (initializer)
+
+
+State 132
+
+   64 primary_expression: OPAREN expression CPAREN •
+
+    $default  reduce using rule 64 (primary_expression)
+
+
+State 133
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   56           | expression OR expression •
+   57           | expression • CARAT expression
+
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 56 (expression)
+
+
+State 134
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   55           | expression AND expression •
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 55 (expression)
+
+
+State 135
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   53           | expression EQU expression •
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 53 (expression)
+
+
+State 136
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   54           | expression NEQU expression •
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 54 (expression)
+
+
+State 137
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   49           | expression GT expression •
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 49 (expression)
+
+
+State 138
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   50           | expression LT expression •
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 50 (expression)
+
+
+State 139
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   51           | expression GTE expression •
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 51 (expression)
+
+
+State 140
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   52           | expression LTE expression •
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 52 (expression)
+
+
+State 141
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   47           | expression PLUS expression •
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 47 (expression)
+
+
+State 142
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   48           | expression MINUS expression •
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 48 (expression)
+
+
+State 143
+
+   44 expression: expression • STAR expression
+   44           | expression STAR expression •
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    CARAT  shift, and go to state 91
+
+    $default  reduce using rule 44 (expression)
+
+
+State 144
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   45           | expression SLASH expression •
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    CARAT  shift, and go to state 91
+
+    $default  reduce using rule 45 (expression)
+
+
+State 145
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   46           | expression PERCENT expression •
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    CARAT  shift, and go to state 91
+
+    $default  reduce using rule 46 (expression)
+
+
+State 146
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   57           | expression CARAT expression •
+
+    CARAT  shift, and go to state 91
+
+    $default  reduce using rule 57 (expression)
+
+
+State 147
+
+   69 compound_reference: compound_reference DOT compound_reference_element •
+
+    $default  reduce using rule 69 (compound_reference)
+
+
+State 148
+
+   39 function_parameter_list: function_parameter_list COMMA data_declaration •
+
+    $default  reduce using rule 39 (function_parameter_list)
+
+
+State 149
+
+  100 loop_body: OCBRACE • loop_body_list CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    DO          shift, and go to state 95
+    WHILE       shift, and go to state 96
+    FOR         shift, and go to state 97
+    IF          shift, and go to state 98
+    RETURN      shift, and go to state 99
+    EXIT        shift, and go to state 100
+    IDENTIFIER  shift, and go to state 101
+    INLINE      shift, and go to state 102
+    OCBRACE     shift, and go to state 149
+    CONTINUE    shift, and go to state 169
+    BREAK       shift, and go to state 170
+
+    data_declaration            go to state 15
+    data_definition             go to state 103
+    type_name                   go to state 23
+    compound_name               go to state 104
+    struct_definition           go to state 105
+    compound_reference          go to state 106
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+    function_body_element       go to state 171
+    loop_body_element           go to state 172
+    loop_body_prelist           go to state 173
+    loop_body_list              go to state 174
+    loop_body                   go to state 175
+    assignment                  go to state 111
+    if_clause                   go to state 112
+    while_clause                go to state 113
+    do_clause                   go to state 114
+    for_clause                  go to state 115
+    return_statement            go to state 116
+    exit_statement              go to state 117
+
+
+State 150
+
+  114 do_clause: DO loop_body • WHILE OPAREN expression CPAREN
+  115          | DO loop_body • WHILE OPAREN CPAREN
+  116          | DO loop_body • WHILE
+
+    WHILE  shift, and go to state 176
+
+
+State 151
+
+  111 while_clause: WHILE OPAREN • expression CPAREN loop_body
+  112             | WHILE OPAREN • CPAREN loop_body
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+    CPAREN          shift, and go to state 177
+
+    formatted_string            go to state 48
+    expression                  go to state 178
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 152
+
+  113 while_clause: WHILE loop_body •
+
+    $default  reduce using rule 113 (while_clause)
+
+
+State 153
+
+  118 for_clause: FOR OPAREN • CPAREN loop_body
+  119           | FOR OPAREN • expression CPAREN loop_body
+  120           | FOR OPAREN • IDENTIFIER IN expression CPAREN loop_body
+  121           | FOR OPAREN • type_name IDENTIFIER IN expression CPAREN loop_body
+
+    INT             shift, and go to state 4
+    FLOAT           shift, and go to state 5
+    STRING          shift, and go to state 6
+    BOOL            shift, and go to state 7
+    LIST            shift, and go to state 8
+    DICT            shift, and go to state 9
+    IDENTIFIER      shift, and go to state 179
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+    CPAREN          shift, and go to state 180
+
+    formatted_string            go to state 48
+    type_name                   go to state 181
+    compound_name               go to state 18
+    expression                  go to state 182
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 154
+
+  117 for_clause: FOR loop_body •
+
+    $default  reduce using rule 117 (for_clause)
+
+
+State 155
+
+  102 if_clause: IF OPAREN • expression CPAREN function_body
+  103          | IF OPAREN • expression CPAREN function_body else_clause_follow
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 183
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 156
+
+  123 return_statement: RETURN OPAREN • CPAREN
+  124                 | RETURN OPAREN • expression CPAREN
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+    CPAREN          shift, and go to state 184
+
+    formatted_string            go to state 48
+    expression                  go to state 185
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 157
+
+  125 exit_statement: EXIT OPAREN • expression CPAREN
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 186
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 158
+
+  101 assignment: compound_name EQUAL • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 187
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 159
+
+   92 function_body: OCBRACE function_body_list CCBRACE •
+
+    $default  reduce using rule 92 (function_body)
+
+
+State 160
+
+   91 function_body_list: function_body_list function_body_prelist •
+
+    $default  reduce using rule 91 (function_body_list)
+
+
+State 161
+
+   75 list_ref_parms: OSBRACE expression CSBRACE •
+
+    $default  reduce using rule 75 (list_ref_parms)
+
+
+State 162
+
+   67 expression_list: expression_list COMMA • expression
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 188
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 163
+
+   73 function_reference: IDENTIFIER OPAREN expression_list CPAREN •
+
+    $default  reduce using rule 73 (function_reference)
+
+
+State 164
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   76 list_ref_parms: list_ref_parms OSBRACE expression • CSBRACE
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CSBRACE  shift, and go to state 189
+
+
+State 165
+
+   23 formatted_string: STRING_LITERAL OPAREN dss_initializer CPAREN •
+
+    $default  reduce using rule 23 (formatted_string)
+
+
+State 166
+
+   18 dss_initializer_item: STRING_LITERAL COLON expression •
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 18 (dss_initializer_item)
+
+
+State 167
+
+   17 list_initializer: list_initializer COMMA expression •
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 17 (list_initializer)
+
+
+State 168
+
+   20 dss_initializer: dss_initializer COMMA dss_initializer_item •
+
+    $default  reduce using rule 20 (dss_initializer)
+
+
+State 169
+
+   94 loop_body_element: CONTINUE •
+
+    $default  reduce using rule 94 (loop_body_element)
+
+
+State 170
+
+   95 loop_body_element: BREAK •
+
+    $default  reduce using rule 95 (loop_body_element)
+
+
+State 171
+
+   93 loop_body_element: function_body_element •
+
+    $default  reduce using rule 93 (loop_body_element)
+
+
+State 172
+
+   96 loop_body_prelist: loop_body_element •
+
+    $default  reduce using rule 96 (loop_body_prelist)
+
+
+State 173
+
+   98 loop_body_list: loop_body_prelist •
+
+    $default  reduce using rule 98 (loop_body_list)
+
+
+State 174
+
+   99 loop_body_list: loop_body_list • loop_body_prelist
+  100 loop_body: OCBRACE loop_body_list • CCBRACE
+
+    CONST       shift, and go to state 1
+    INT         shift, and go to state 4
+    FLOAT       shift, and go to state 5
+    STRING      shift, and go to state 6
+    BOOL        shift, and go to state 7
+    LIST        shift, and go to state 8
+    DICT        shift, and go to state 9
+    STRUCT      shift, and go to state 10
+    DO          shift, and go to state 95
+    WHILE       shift, and go to state 96
+    FOR         shift, and go to state 97
+    IF          shift, and go to state 98
+    RETURN      shift, and go to state 99
+    EXIT        shift, and go to state 100
+    IDENTIFIER  shift, and go to state 101
+    INLINE      shift, and go to state 102
+    OCBRACE     shift, and go to state 149
+    CCBRACE     shift, and go to state 190
+    CONTINUE    shift, and go to state 169
+    BREAK       shift, and go to state 170
+
+    data_declaration            go to state 15
+    data_definition             go to state 103
+    type_name                   go to state 23
+    compound_name               go to state 104
+    struct_definition           go to state 105
+    compound_reference          go to state 106
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+    function_body_element       go to state 171
+    loop_body_element           go to state 172
+    loop_body_prelist           go to state 191
+    loop_body                   go to state 175
+    assignment                  go to state 111
+    if_clause                   go to state 112
+    while_clause                go to state 113
+    do_clause                   go to state 114
+    for_clause                  go to state 115
+    return_statement            go to state 116
+    exit_statement              go to state 117
+
+
+State 175
+
+   97 loop_body_prelist: loop_body •
+
+    $default  reduce using rule 97 (loop_body_prelist)
+
+
+State 176
+
+  114 do_clause: DO loop_body WHILE • OPAREN expression CPAREN
+  115          | DO loop_body WHILE • OPAREN CPAREN
+  116          | DO loop_body WHILE •
+
+    OPAREN  shift, and go to state 192
+
+    $default  reduce using rule 116 (do_clause)
+
+
+State 177
+
+  112 while_clause: WHILE OPAREN CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 193
+
+
+State 178
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  111 while_clause: WHILE OPAREN expression • CPAREN loop_body
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 194
+
+
+State 179
+
+   31 compound_name: IDENTIFIER •
+   70 compound_reference_element: IDENTIFIER •
+   73 function_reference: IDENTIFIER • OPAREN expression_list CPAREN
+   74 list_reference: IDENTIFIER • list_ref_parms
+  120 for_clause: FOR OPAREN IDENTIFIER • IN expression CPAREN loop_body
+
+    IN       shift, and go to state 195
+    OSBRACE  shift, and go to state 64
+    OPAREN   shift, and go to state 65
+
+    IDENTIFIER  reduce using rule 31 (compound_name)
+    DOT         reduce using rule 31 (compound_name)
+    DOT         [reduce using rule 70 (compound_reference_element)]
+    $default    reduce using rule 70 (compound_reference_element)
+
+    list_ref_parms  go to state 66
+
+
+State 180
+
+  118 for_clause: FOR OPAREN CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 196
+
+
+State 181
+
+  121 for_clause: FOR OPAREN type_name • IDENTIFIER IN expression CPAREN loop_body
+
+    IDENTIFIER  shift, and go to state 197
+
+
+State 182
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  119 for_clause: FOR OPAREN expression • CPAREN loop_body
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 198
+
+
+State 183
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  102 if_clause: IF OPAREN expression • CPAREN function_body
+  103          | IF OPAREN expression • CPAREN function_body else_clause_follow
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 199
+
+
+State 184
+
+  123 return_statement: RETURN OPAREN CPAREN •
+
+    $default  reduce using rule 123 (return_statement)
+
+
+State 185
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  124 return_statement: RETURN OPAREN expression • CPAREN
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 200
+
+
+State 186
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  125 exit_statement: EXIT OPAREN expression • CPAREN
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 201
+
+
+State 187
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  101 assignment: compound_name EQUAL expression •
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 101 (assignment)
+
+
+State 188
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+   67 expression_list: expression_list COMMA expression •
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+
+    $default  reduce using rule 67 (expression_list)
+
+
+State 189
+
+   76 list_ref_parms: list_ref_parms OSBRACE expression CSBRACE •
+
+    $default  reduce using rule 76 (list_ref_parms)
+
+
+State 190
+
+  100 loop_body: OCBRACE loop_body_list CCBRACE •
+
+    $default  reduce using rule 100 (loop_body)
+
+
+State 191
+
+   99 loop_body_list: loop_body_list loop_body_prelist •
+
+    $default  reduce using rule 99 (loop_body_list)
+
+
+State 192
+
+  114 do_clause: DO loop_body WHILE OPAREN • expression CPAREN
+  115          | DO loop_body WHILE OPAREN • CPAREN
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+    CPAREN          shift, and go to state 202
+
+    formatted_string            go to state 48
+    expression                  go to state 203
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 193
+
+  112 while_clause: WHILE OPAREN CPAREN loop_body •
+
+    $default  reduce using rule 112 (while_clause)
+
+
+State 194
+
+  111 while_clause: WHILE OPAREN expression CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 204
+
+
+State 195
+
+  120 for_clause: FOR OPAREN IDENTIFIER IN • expression CPAREN loop_body
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 205
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 196
+
+  118 for_clause: FOR OPAREN CPAREN loop_body •
+
+    $default  reduce using rule 118 (for_clause)
+
+
+State 197
+
+  121 for_clause: FOR OPAREN type_name IDENTIFIER • IN expression CPAREN loop_body
+
+    IN  shift, and go to state 206
+
+
+State 198
+
+  119 for_clause: FOR OPAREN expression CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 207
+
+
+State 199
+
+  102 if_clause: IF OPAREN expression CPAREN • function_body
+  103          | IF OPAREN expression CPAREN • function_body else_clause_follow
+
+    OCBRACE  shift, and go to state 59
+
+    function_body  go to state 208
+
+
+State 200
+
+  124 return_statement: RETURN OPAREN expression CPAREN •
+
+    $default  reduce using rule 124 (return_statement)
+
+
+State 201
+
+  125 exit_statement: EXIT OPAREN expression CPAREN •
+
+    $default  reduce using rule 125 (exit_statement)
+
+
+State 202
+
+  115 do_clause: DO loop_body WHILE OPAREN CPAREN •
+
+    $default  reduce using rule 115 (do_clause)
+
+
+State 203
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  114 do_clause: DO loop_body WHILE OPAREN expression • CPAREN
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 209
+
+
+State 204
+
+  111 while_clause: WHILE OPAREN expression CPAREN loop_body •
+
+    $default  reduce using rule 111 (while_clause)
+
+
+State 205
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  120 for_clause: FOR OPAREN IDENTIFIER IN expression • CPAREN loop_body
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 210
+
+
+State 206
+
+  121 for_clause: FOR OPAREN type_name IDENTIFIER IN • expression CPAREN loop_body
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+
+    formatted_string            go to state 48
+    expression                  go to state 211
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 207
+
+  119 for_clause: FOR OPAREN expression CPAREN loop_body •
+
+    $default  reduce using rule 119 (for_clause)
+
+
+State 208
+
+  102 if_clause: IF OPAREN expression CPAREN function_body •
+  103          | IF OPAREN expression CPAREN function_body • else_clause_follow
+
+    ELSE  shift, and go to state 212
+
+    $default  reduce using rule 102 (if_clause)
+
+    else_clause         go to state 213
+    else_clause_list    go to state 214
+    final_else_clause   go to state 215
+    else_clause_follow  go to state 216
+
+
+State 209
+
+  114 do_clause: DO loop_body WHILE OPAREN expression CPAREN •
+
+    $default  reduce using rule 114 (do_clause)
+
+
+State 210
+
+  120 for_clause: FOR OPAREN IDENTIFIER IN expression CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 217
+
+
+State 211
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  121 for_clause: FOR OPAREN type_name IDENTIFIER IN expression • CPAREN loop_body
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 218
+
+
+State 212
+
+  104 else_clause: ELSE • OPAREN expression CPAREN function_body
+  107 final_else_clause: ELSE • OPAREN CPAREN function_body
+  108                  | ELSE • function_body
+
+    OCBRACE  shift, and go to state 59
+    OPAREN   shift, and go to state 219
+
+    function_body  go to state 220
+
+
+State 213
+
+  105 else_clause_list: else_clause •
+
+    $default  reduce using rule 105 (else_clause_list)
+
+
+State 214
+
+  106 else_clause_list: else_clause_list • else_clause
+  109 else_clause_follow: else_clause_list • final_else_clause
+
+    ELSE  shift, and go to state 212
+
+    else_clause        go to state 221
+    final_else_clause  go to state 222
+
+
+State 215
+
+  110 else_clause_follow: final_else_clause •
+
+    $default  reduce using rule 110 (else_clause_follow)
+
+
+State 216
+
+  103 if_clause: IF OPAREN expression CPAREN function_body else_clause_follow •
+
+    $default  reduce using rule 103 (if_clause)
+
+
+State 217
+
+  120 for_clause: FOR OPAREN IDENTIFIER IN expression CPAREN loop_body •
+
+    $default  reduce using rule 120 (for_clause)
+
+
+State 218
+
+  121 for_clause: FOR OPAREN type_name IDENTIFIER IN expression CPAREN • loop_body
+
+    OCBRACE  shift, and go to state 149
+
+    loop_body  go to state 223
+
+
+State 219
+
+  104 else_clause: ELSE OPAREN • expression CPAREN function_body
+  107 final_else_clause: ELSE OPAREN • CPAREN function_body
+
+    IDENTIFIER      shift, and go to state 38
+    INT_LITERAL     shift, and go to state 39
+    FLOAT_LITERAL   shift, and go to state 40
+    STRING_LITERAL  shift, and go to state 41
+    MINUS           shift, and go to state 42
+    NOT             shift, and go to state 43
+    OPAREN          shift, and go to state 46
+    CPAREN          shift, and go to state 224
+
+    formatted_string            go to state 48
+    expression                  go to state 225
+    primary_expression          go to state 50
+    compound_reference          go to state 51
+    compound_reference_element  go to state 52
+    function_reference          go to state 53
+    list_reference              go to state 54
+
+
+State 220
+
+  108 final_else_clause: ELSE function_body •
+
+    $default  reduce using rule 108 (final_else_clause)
+
+
+State 221
+
+  106 else_clause_list: else_clause_list else_clause •
+
+    $default  reduce using rule 106 (else_clause_list)
+
+
+State 222
+
+  109 else_clause_follow: else_clause_list final_else_clause •
+
+    $default  reduce using rule 109 (else_clause_follow)
+
+
+State 223
+
+  121 for_clause: FOR OPAREN type_name IDENTIFIER IN expression CPAREN loop_body •
+
+    $default  reduce using rule 121 (for_clause)
+
+
+State 224
+
+  107 final_else_clause: ELSE OPAREN CPAREN • function_body
+
+    OCBRACE  shift, and go to state 59
+
+    function_body  go to state 226
+
+
+State 225
+
+   44 expression: expression • STAR expression
+   45           | expression • SLASH expression
+   46           | expression • PERCENT expression
+   47           | expression • PLUS expression
+   48           | expression • MINUS expression
+   49           | expression • GT expression
+   50           | expression • LT expression
+   51           | expression • GTE expression
+   52           | expression • LTE expression
+   53           | expression • EQU expression
+   54           | expression • NEQU expression
+   55           | expression • AND expression
+   56           | expression • OR expression
+   57           | expression • CARAT expression
+  104 else_clause: ELSE OPAREN expression • CPAREN function_body
+
+    OR       shift, and go to state 78
+    AND      shift, and go to state 79
+    EQU      shift, and go to state 80
+    NEQU     shift, and go to state 81
+    GT       shift, and go to state 82
+    LT       shift, and go to state 83
+    GTE      shift, and go to state 84
+    LTE      shift, and go to state 85
+    PLUS     shift, and go to state 86
+    MINUS    shift, and go to state 87
+    STAR     shift, and go to state 88
+    SLASH    shift, and go to state 89
+    PERCENT  shift, and go to state 90
+    CARAT    shift, and go to state 91
+    CPAREN   shift, and go to state 227
+
+
+State 226
+
+  107 final_else_clause: ELSE OPAREN CPAREN function_body •
+
+    $default  reduce using rule 107 (final_else_clause)
+
+
+State 227
+
+  104 else_clause: ELSE OPAREN expression CPAREN • function_body
+
+    OCBRACE  shift, and go to state 59
+
+    function_body  go to state 228
+
+
+State 228
+
+  104 else_clause: ELSE OPAREN expression CPAREN function_body •
+
+    $default  reduce using rule 104 (else_clause)

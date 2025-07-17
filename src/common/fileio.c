@@ -9,6 +9,7 @@
 #include <limits.h>
 
 #include "string_list.h"
+#include "pointer_list.h"
 #include "alloc.h"
 #include "errors.h"
 
@@ -105,7 +106,7 @@ static void setup_env(void) {
 
     common_env = create_string_list();
 
-    add_env("PGEN_PATH");
+    add_env("TOY_PATH");
     add_dirs("..");
     add_env("PATH");
 }
@@ -180,3 +181,4 @@ void set_base_file_name(const char* fname) {
 
     base_file_name = _COPY_STRING(fname);
 }
+

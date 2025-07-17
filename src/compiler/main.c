@@ -6,12 +6,15 @@
 
 #include "cmdline.h"
 #include "trace.h"
+#include "errors.h"
+#include "parser.h"
+#include "file_io.h"
 
-extern FILE* yyin; // would be defined in a FLEX scanner.
+#include "tokens.h"
 
 void cmdline(int argc, char** argv, char** env) {
 
-    init_cmdline("template", "template project", "0.1");
+    init_cmdline("toy", "Toy is a small C-like language compiler", "0.1");
     add_cmdline('v', "verbosity", "verbosity", "From 0 to 10. Print more information", "0", NULL, CMD_NUM | CMD_ARGS);
     add_cmdline('p', "path", "path", "Add to the import path", "", NULL, CMD_STR | CMD_ARGS | CMD_LIST);
     add_cmdline('d', "dump", "dump", "Dump text as the parser is generated", "", NULL, CMD_STR | CMD_ARGS | CMD_LIST);
@@ -30,17 +33,23 @@ int main(int argc, char** argv, char** env) {
     cmdline(argc, argv, env);
 
     const char* fname = raw_string(get_cmd_opt("files"));
-    if(fname != NULL) {
-        yyin = fopen(fname, "r");
-        if(yyin == NULL) {
-            fprintf(stderr, "cannot open input file \"%s\": %s\n", fname, strerror(errno));
-            cmdline_help();
-        }
-    }
+    if(fname != NULL)
+        open_file(fname, ".toy");
     else
         FATAL("internal error in %s: command line failed", __func__);
 
-    printf("Hello Template: %s\n", argv[1]);
+    token_t* tok;
+    init_token_queue();
+    while(true) {
+        tok = get_token();
+        if(tok->type == END_OF_FILE)
+            break;
+        fprintf(stderr, "%s \"%s\" \"%s\" %d %d\n",
+                    tok_type_to_str(tok), tok_type_to_str(tok),
+                    raw_string(tok->str), tok->line_no, tok->col_no);
+        consume_token();
+
+    }
 
     return 0;
 }

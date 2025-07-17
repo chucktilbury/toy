@@ -30,6 +30,7 @@ string_t* strip_char(string_t* buf, int ch);
 string_t* upcase(string_t* buf);
 string_t* downcase(string_t* buf);
 string_t* strip_space(string_t* buf);
+string_t* strip_ends(string_t* buf, int ch);
 string_t* convert(string_t* str);
 string_t* copy_string(string_t* buf);
 

@@ -1,0 +1,168 @@
+unit
+    <- (data_definition
+    / function_definition
+    / struct_declaration
+    import_statement)+
+
+data_declaration:
+    <- 'const'? type_definition IDENTIFIER
+
+data_definition
+    <- data_declaration ('=' initializer)?
+
+function_definition
+    <- (type_definition | 'nothing') IDENTIFIER function_decl_parameters function_body
+
+function_decl_parameters
+    <- '(' (type_definition IDENTIFIER (',' type_definition IDENTIFIER)*)? ')'
+
+import_statement
+    <- 'import' STRING_LITERAL
+
+type_definition
+    <- 'int'
+    / 'float'
+    / 'string'
+    / 'bool'
+    / 'list'
+    / 'dict'
+    / compound_name
+
+compound_name
+    <- IDENTIFIER ('.' IDENTIFIER)*
+
+struct_declaration
+    <- 'struct' IDENTIFIER '{' data_declaration* '}'
+
+initializer
+    <- list_initializer
+    / dict_initializer
+    / literal_value
+    / expression
+
+literal_value
+    <- INT_LITERAL
+    / FLOAT_LITERAL
+    / STRING_LITERAL
+
+list_initializer_item
+    <- literal_value / list_initializer
+
+list_initializer
+    <- '[' list_initializer_item (',' list_initializer_item)* ']'
+
+dict_initializer_item
+    <- IDENTIFIER ':' (literal_value | dict_initializer)
+
+dict_initializer
+    <- '[' dict_initializer_item (',' dict_initializer_item)* ']'
+
+# Note that expressions are parsed via the shunting yard algorithm
+expression
+    <- ('(' type_definition ')' expression) / logical_or_expr
+
+logical_or_expr
+    <- (logical_or_expr ('or' | '|') logical_and_expr)
+    / logical_and_expr
+
+logical_and_expr
+    <- (logical_and_expr ('and' | '&' ) equality_expr)
+    / equality_expr
+
+equality_expr
+    <- (equality_expr ('equ' | 'nequ' | '==' | '!=' ) magnitude_expr)
+    / magnitude_expr
+
+magnitude_expr
+    <- (magnitude_expr ('gt' | 'lt' | '>' | '<' | 'gte' | 'lte' | '>=' | '<=') term_expr)
+    / term_expr
+
+term_expr
+    <- (term_expr ('+' | '-' ) factor_expr)
+    / factor_expr
+
+factor_expr
+    <- (factor_expr ('*' | '/' | '%') power_expr)
+    / power_expr
+
+power_expr
+    <- (power_expr '^' unary_expr)
+    / unary_expr
+
+unary_expr
+    <- (('-' | 'not' | '!') unary_expr)
+    / primary_expr
+
+primary_expr
+    <- literal_value
+    / compound_reference
+    / formatted_string
+    / ('(' expression ')')
+
+formatted_string
+    <- STRING_LITERAL ('(' (IDENTIFIER ':' expression (',' IDENTIFIER ':' expression)*)? ')')?
+
+compound_reference
+    <- compound_reference_item ('.' compound_reference_item)*
+
+compound_reference_item
+    <- IDENTIFIER
+    / list_reference
+    / function_reference
+
+list_reference_item
+    <- '[' expression ']'
+
+list_reference
+    <- IDENTIFIER list_reference_item (list_reference_item)*
+
+function_reference
+    <- IDENTIFIER '(' (expression (',' expression)*)? ')'
+
+function_body_item
+    <- data_definition
+    / struct_declaration
+    / assignment
+    / compound_reference
+    / while_clause
+    / do_clause
+    / for_clause
+    / if_clause
+    / inline_clause
+    / return_statement
+    / exit_statement
+
+loop_body_item
+    <- function_body_item
+    / break_statement
+    / continue_statement
+
+function_body:
+    <- '{' function_body_item* '}'
+
+loop_body
+    <- '{' loop_body_item* '}'
+
+assignment
+    <- compound_name '=' expression
+
+while_clause
+    <- 'while' ('(' expression? ')')? loop_body
+
+do_clause
+    <- 'do' loop_body 'while' ('(' expression? ')')?
+
+for_clause
+    <- 'for' ('(' ((type_definition? IDENTIFIER 'in')? expression)? ')')? loop_body
+
+if_clause
+    <- 'if' '(' expression ')' function_body ('else' '(' expression ')' function_body)* ('else' ('(' ')')? function_body)?
+
+inline_clause
+    <- INLINE
+
+return_statement
+    <- 'return' ('(' expression? ')')?
+
+exit_statement
+    <- 'exit' '(' expression ')'

@@ -8,6 +8,7 @@ add_library(${PROJECT_NAME} STATIC
     array.c
     fileio.c
     hash.c
+    dl_list.c
     pointer_list.c
     string_list.c
     string_buffer.c

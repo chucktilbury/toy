@@ -132,13 +132,29 @@ const char* raw_string(string_t* str) {
 
 string_t* strip_char(string_t* buf, int ch) {
 
-    strip_space(buf);
+    //strip_space(buf);
 
     char* temp;
     while((temp = strrchr(buf->buffer, ch)) != NULL)
         memmove(temp, temp + 1, strlen(temp) + 1);
 
     buf->len = strlen(buf->buffer);
+
+    return buf;
+}
+
+// strip the single character from the ends, such as quotes
+string_t* strip_ends(string_t* buf, int ch) {
+
+    if(buf->buffer[buf->len-1] == ch) {
+        buf->buffer[buf->len-1] = '\0';
+        buf->len--;
+    }
+
+    if(buf->buffer[0] == ch) {
+        memmove(buf->buffer, &buf->buffer[1], buf->len);
+        buf->len--;
+    }
 
     return buf;
 }

@@ -1,26 +1,3 @@
-# Toy
-Toy is a small C-like programming language that is intended to be too useful by half. It implements a single pass compiler that compiles to bytecode. The output can then be run on the virtual machine that is provided in this repository.
-
-## Features
-* Managed memory
-* No pointers
-* Blank expressions are always "true"
-* Structures can be global or local to a function
-* Strings, Lists, and Dictionaries are native types
-* Formatting strings is built in to the language
-* Strings in double quotes expand escape sequences
-* Strings in single quotes are absolute literals
-* Strings started with three quotes are multi-line (like Python)
-* Strong types
-* Cast from/to a string
-* Constant values with runtime assignment
-* Minimal text
-* Access to external C libraries
-* Single line comments are introduced with ';' or '#'
-* White space is ignored whenever possible
-
-## Grammar
-```
 /*
  *  This is a YACC style grammar for TOY.
  *  Keeping the rules small and simple for implementation by hand, since
@@ -323,6 +300,3 @@ exit_statement
     ;
 
 %%
-
-```
-
