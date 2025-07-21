@@ -8,9 +8,9 @@
 #include "trace.h"
 #include "errors.h"
 #include "parser.h"
-#include "file_io.h"
 
 #include "tokens.h"
+#include "file_io.h"
 
 void cmdline(int argc, char** argv, char** env) {
 
@@ -34,7 +34,7 @@ int main(int argc, char** argv, char** env) {
 
     const char* fname = raw_string(get_cmd_opt("files"));
     if(fname != NULL)
-        open_file(fname, ".toy");
+        open_file(fname);
     else
         FATAL("internal error in %s: command line failed", __func__);
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv, char** env) {
     init_token_queue();
     while(true) {
         tok = get_token();
-        if(tok->type == END_OF_FILE)
+        if(tok->type == TOK_END_OF_FILE)
             break;
         fprintf(stderr, "%s \"%s\" \"%s\" %d %d\n",
                     tok_type_to_str(tok), tok_type_to_str(tok),

@@ -1,20 +1,24 @@
 cmake_minimum_required(VERSION 3.10)
+project(parser)
 
 file(GLOB_RECURSE ${PROJECT_NAME}_files
     ${PROJECT_SOURCE_DIR}/*.c
 )
 
+add_library(${PROJECT_NAME} STATIC
+    ${${PROJECT_NAME}_files}
+)
+
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}/../parser
-    ${CMAKE_CURRENT_BINARY_DIR}/../templates
-    ${CMAKE_SOURCE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/../ast
+    ${CMAKE_CURRENT_BINARY_DIR}/../scanner
+    ${PROJECT_SOURCE_DIR}
     ${CMAKE_SOURCE_DIR}/src/common
-    ${CMAKE_SOURCE_DIR}/src/compiler/main
     ${CMAKE_SOURCE_DIR}/src/compiler/ast
+    ${CMAKE_SOURCE_DIR}/src/compiler/scanner
     ${CMAKE_SOURCE_DIR}/src/compiler/parser
-    ${CMAKE_SOURCE_DIR}/src/compiler/ast
-    ${CMAKE_SOURCE_DIR}/src/gc
     "/usr/local/include"
 )
 
@@ -47,3 +51,5 @@ elseif(CMAKE_BUILD_TYPE STREQUAL "profile")
         -pg
     )
 endif()
+
+

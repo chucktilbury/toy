@@ -28,4 +28,35 @@ int main(int argc, char** argv, char** env) {
 }
 
 bacon.eggs.and.ham
-0.123e-12 0 inline { this is some raw text } "this is a string literal"
+0.123e-12 0 inline { this is some raw text }
+
+"this is"\
+" a line"\
+" continuation"
+
+
+'this is a line with a literal "\n" embedded in it'
+
+''''''''''''''"""""This is a
+multi\nline
+text block
+'''
+
+"""
+This is a
+multi line \x1b[1;31;47mwith a color\e[0m line
+text block \x \y
+"""
+
+'''
+This is a
+multi\nline
+text block
+'''
+
+"this is a line \x1B[1;47;31mwith a color\x1b[0m embedded \in \it\""
+101.01e-12
+101.01e12
+101.01
+some.var.name = "this is a string literal"
+
