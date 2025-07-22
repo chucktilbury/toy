@@ -44,8 +44,8 @@ void traverse_formatted_string(ast_formatted_string_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_TOKEN(node->STRING_LITERAL);
+    TRAVERSE_NODE(dss_initializer);
 
     RETURN();
 }

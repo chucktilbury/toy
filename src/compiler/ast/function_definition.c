@@ -37,8 +37,9 @@ void traverse_function_definition(ast_function_definition_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(function_name);
+    TRAVERSE_NODE(function_parameters);
+    TRAVERSE_NODE(function_body);
 
     RETURN();
 }

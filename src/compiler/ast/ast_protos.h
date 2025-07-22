@@ -61,5 +61,18 @@ void traverse_translation_unit_element(ast_translation_unit_element_t* node);
 void traverse_type_name(ast_type_name_t* node);
 void traverse_while_clause(ast_while_clause_t* node);
 
+#define TRAVERSE_TOKEN(t) PRINT("token: \"%s\": %s: %d\n", t->str->buffer, tok_type_to_str(t), t->line_no)
+
+#define TRAVERSE_LIST(name) \
+    do { \
+        int mark = 0; \
+        ast_##name##_t* item; \
+        while(NULL != (item = iterate_ptr_list(node->list, &mark))) \
+            traverse_##name(item); \
+    } while(0)
+
+#define TRAVERSE_NODE(name) traverse_##name(node->name)
+
+#define TRAVERSE_NTERM(type) traverse_##type((ast_##type##_t*)node->nterm)
 
 #endif /* _AST_PROTOS_H_ */

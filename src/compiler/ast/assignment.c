@@ -37,8 +37,10 @@ void traverse_assignment(ast_assignment_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    TRAVERSE_NODE(compound_name);
+    TRAVERSE_NODE(expression);
 
 
     RETURN();
 }
+

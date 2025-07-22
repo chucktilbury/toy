@@ -38,8 +38,7 @@ void traverse_exit_statement(ast_exit_statement_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression);
 
     RETURN();
 }

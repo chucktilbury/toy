@@ -37,8 +37,7 @@ void traverse_translation_unit(ast_translation_unit_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(translation_unit_element);
 
     RETURN();
 }

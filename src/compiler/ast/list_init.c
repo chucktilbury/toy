@@ -20,7 +20,7 @@
  * Traverse the list_init data structure.
  *
  * list_init (
- *     TOK_OSBRACE expression ( TOK_COMMA expression ) * TOK_CSBRACE
+ *     TOK_OSBRACE expression_list TOK_CSBRACE
  * )
  *
  *
@@ -43,8 +43,7 @@ void traverse_list_init(ast_list_init_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression_list);
 
     RETURN();
 }

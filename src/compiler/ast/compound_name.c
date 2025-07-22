@@ -41,7 +41,10 @@ void traverse_compound_name(ast_compound_name_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    int mark = 0;
+    token_t* tok;
+    while(NULL != (tok = iterate_ptr_list(node->list, &mark)))
+        TRAVERSE_TOKEN(tok);
 
 
     RETURN();

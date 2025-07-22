@@ -43,8 +43,10 @@ void traverse_loop_body_element(ast_loop_body_element_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    if(node->tok != NULL)
+        TRAVERSE_TOKEN(node->tok);
+    else
+        TRAVERSE_NODE(function_body_element);
 
     RETURN();
 }

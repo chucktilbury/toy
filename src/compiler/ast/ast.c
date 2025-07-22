@@ -16,6 +16,8 @@
 #include "ast.h"
 #include "ast_protos.h"
 #include "alloc.h"
+#include "cmdline.h"
+#include "trace.h"
 
 /*
  * public interface
@@ -30,7 +32,14 @@ ast_node_t* create_ast_node(ast_type_t type) {
 
 void traverse_ast(ast_node_t* node) {
 
+    if(in_cmd_list("trace", "ast"))
+        push_trace_state(1);
+    else
+        push_trace_state(0);
+
     traverse_translation_unit((ast_translation_unit_t*)node);
+
+    pop_trace_state();
 }
 
 const char* node_type_to_str(ast_type_t type) {

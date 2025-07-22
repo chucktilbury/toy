@@ -42,8 +42,7 @@ void traverse_final_else_clause(ast_final_else_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(function_body);
 
     RETURN();
 }

@@ -39,7 +39,7 @@ void traverse_bool_literal(ast_bool_literal_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    TRAVERSE_TOKEN(node->tok);
 
 
     RETURN();

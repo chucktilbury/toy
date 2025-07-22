@@ -43,7 +43,12 @@ void traverse_compound_reference_element(ast_compound_reference_element_t* node)
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    if(node->function_reference != NULL)
+        TRAVERSE_NODE(function_reference);
+    else if(node->list_reference != NULL)
+        TRAVERSE_NODE(list_reference);
+    else if(node->IDENTIFIER != NULL)
+        TRAVERSE_TOKEN(node->IDENTIFIER);
 
 
     RETURN();

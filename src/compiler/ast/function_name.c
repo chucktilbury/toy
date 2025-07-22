@@ -45,8 +45,12 @@ void traverse_function_name(ast_function_name_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    if(node->type_name != NULL)
+        TRAVERSE_NODE(type_name);
+    else
+        PRINT("function returns \"nothing\"\n");
 
+    TRAVERSE_TOKEN(node->IDENTIFIER);
 
     RETURN();
 }

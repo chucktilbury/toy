@@ -36,7 +36,8 @@ void traverse_data_declaration(ast_data_declaration_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    TRAVERSE_NODE(type_name);
+    TRAVERSE_TOKEN(node->IDENTIFIER);
 
 
     RETURN();

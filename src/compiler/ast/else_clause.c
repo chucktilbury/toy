@@ -39,8 +39,8 @@ void traverse_else_clause(ast_else_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression);
+    TRAVERSE_NODE(function_body);
 
     RETURN();
 }

@@ -38,8 +38,7 @@ void traverse_loop_body_list(ast_loop_body_list_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(loop_body_prelist);
 
     RETURN();
 }

@@ -52,8 +52,10 @@ void traverse_for_clause(ast_for_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(literal_type_name);
+    TRAVERSE_TOKEN(node->IDENTIFIER);
+    TRAVERSE_NODE(expression);
+    TRAVERSE_NODE(loop_body);
 
     RETURN();
 }

@@ -38,7 +38,8 @@ void traverse_function_reference(ast_function_reference_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    TRAVERSE_TOKEN(node->IDENTIFIER);
+    TRAVERSE_NODE(expression_list);
 
 
     RETURN();

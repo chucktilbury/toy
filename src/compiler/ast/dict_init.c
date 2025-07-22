@@ -37,8 +37,8 @@ void traverse_dict_init(ast_dict_init_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(dss_initializer);
 
     RETURN();
 }
+

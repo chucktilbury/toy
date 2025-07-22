@@ -55,8 +55,7 @@ void traverse_literal_type_name(ast_literal_type_name_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_TOKEN(node->tok);
 
     RETURN();
 }

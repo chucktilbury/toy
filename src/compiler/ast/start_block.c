@@ -36,8 +36,7 @@ void traverse_start_block(ast_start_block_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(function_body);
 
     RETURN();
 }

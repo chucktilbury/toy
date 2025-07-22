@@ -8,6 +8,7 @@
 static int trace_depth = 0;
 static int trace_increment = 2;
 static FILE* trace_file_handle = NULL;
+static int verbosity = 0;
 
 typedef struct _verbosity_stack_t_ {
     int verbosity;
@@ -16,7 +17,7 @@ typedef struct _verbosity_stack_t_ {
 
 static verbosity_stack_t* stack;
 
-void push_trace_verbosity(int num) {
+void push_trace_state(int num) {
 
     verbosity_stack_t* ptr = _ALLOC_TYPE(verbosity_stack_t);
     ptr->verbosity = num;
@@ -26,7 +27,7 @@ void push_trace_verbosity(int num) {
     stack = ptr;
 }
 
-void pop_trace_verbosity(void) {
+void pop_trace_state(void) {
 
     if(stack != NULL) {
         verbosity_stack_t* ptr = stack;
@@ -35,7 +36,7 @@ void pop_trace_verbosity(void) {
     }
 }
 
-int peek_trace_verbosity(void) {
+int peek_trace_state(void) {
 
     if(stack != NULL)
         return stack->verbosity;
@@ -71,13 +72,18 @@ void init_trace(FILE* fp) {
     else
         trace_file_handle = fp;
 
-    int verbo = (int)strtol(raw_string(get_cmd_opt("verbosity")), NULL, 10);
-    push_trace_verbosity(verbo);
+    verbosity = (int)strtol(raw_string(get_cmd_opt("verbosity")), NULL, 10);
+    push_trace_state(0);
 }
 
 FILE* get_trace_handle(void) {
 
     return trace_file_handle;
+}
+
+int get_verbosity(void) {
+
+    return verbosity;
 }
 
 void print_indent(const char* fmt, ...) {

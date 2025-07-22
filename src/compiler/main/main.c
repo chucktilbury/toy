@@ -17,7 +17,7 @@ void cmdline(int argc, char** argv, char** env) {
     init_cmdline("toy", "Toy is a small C-like language compiler", "0.1");
     add_cmdline('v', "verbosity", "verbosity", "From 0 to 10. Print more information", "0", NULL, CMD_NUM | CMD_ARGS);
     add_cmdline('p', "path", "path", "Add to the import path", "", NULL, CMD_STR | CMD_ARGS | CMD_LIST);
-    add_cmdline('d', "dump", "dump", "Dump text as the parser is generated", "", NULL, CMD_STR | CMD_ARGS | CMD_LIST);
+    add_cmdline('t', "trace", "trace", "Trace the state as compiler runs", "", NULL, CMD_STR | CMD_ARGS | CMD_LIST);
     add_cmdline('h', "help", NULL, "Print this helpful information", NULL, cmdline_help, CMD_NONE);
     add_cmdline('V', "version", NULL, "Show the program version", NULL, cmdline_vers, CMD_NONE);
     add_cmdline(0, NULL, NULL, NULL, NULL, NULL, CMD_DIV);

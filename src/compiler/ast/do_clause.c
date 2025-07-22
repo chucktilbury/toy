@@ -46,8 +46,9 @@ void traverse_do_clause(ast_do_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(loop_body);
+    TRAVERSE_NODE(expression);
 
     RETURN();
 }
+

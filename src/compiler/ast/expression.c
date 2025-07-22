@@ -39,133 +39,8 @@
  *     primary_expression
  * )
  *
- *
- * begin grouping_function (1000)
- *   non-terminal rule element: expression
- *   terminal rule element: TOK_STAR
- *   begin or_function (1100)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1100)
- *   terminal rule element: TOK_SLASH
- *   begin or_function (1200)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1200)
- *   terminal rule element: TOK_PERCENT
- *   begin or_function (1300)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1300)
- *   terminal rule element: TOK_PLUS
- *   begin or_function (1400)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1400)
- *   terminal rule element: TOK_MINUS
- *   begin or_function (1500)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1500)
- *   begin grouping_function (1600)
- *     begin or_function (1700)
- *       terminal rule element: TOK_CPBRACE
- *       terminal rule element: TOK_GT
- *     end or_function (1700)
- *   end grouping_function (1600)
- *   begin or_function (1800)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (1800)
- *   begin grouping_function (1900)
- *     begin or_function (2000)
- *       terminal rule element: TOK_OPBRACE
- *       terminal rule element: TOK_LT
- *     end or_function (2000)
- *   end grouping_function (1900)
- *   begin or_function (2100)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (2100)
- *   begin grouping_function (2200)
- *     begin or_function (2300)
- *       terminal rule element: TOK_CPBRACE_EQUAL
- *       terminal rule element: TOK_GTE
- *     end or_function (2300)
- *   end grouping_function (2200)
- *   begin or_function (2400)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (2400)
- *   begin grouping_function (2500)
- *     begin or_function (2600)
- *       terminal rule element: TOK_OPBRACE_EQUAL
- *       terminal rule element: TOK_LTE
- *     end or_function (2600)
- *   end grouping_function (2500)
- *   begin or_function (2700)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (2700)
- *   begin grouping_function (2800)
- *     begin or_function (2900)
- *       terminal rule element: TOK_EQUAL_EQUAL
- *       terminal rule element: TOK_EQU
- *     end or_function (2900)
- *   end grouping_function (2800)
- *   begin or_function (3000)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (3000)
- *   begin grouping_function (3100)
- *     begin or_function (3200)
- *       terminal rule element: TOK_BANG_EQUAL
- *       terminal rule element: TOK_NEQU
- *     end or_function (3200)
- *   end grouping_function (3100)
- *   begin or_function (3300)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (3300)
- *   begin grouping_function (3400)
- *     begin or_function (3500)
- *       terminal rule element: TOK_AMP
- *       terminal rule element: TOK_AND
- *     end or_function (3500)
- *   end grouping_function (3400)
- *   begin or_function (3600)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (3600)
- *   begin grouping_function (3700)
- *     begin or_function (3800)
- *       terminal rule element: TOK_BAR
- *       terminal rule element: TOK_OR
- *     end or_function (3800)
- *   end grouping_function (3700)
- *   begin or_function (3900)
- *     non-terminal rule element: expression
- *     non-terminal rule element: expression
- *   end or_function (3900)
- *   terminal rule element: TOK_CARET
- *   begin or_function (4000)
- *     non-terminal rule element: expression
- *     begin grouping_function (4100)
- *       begin or_function (4200)
- *         terminal rule element: TOK_BANG
- *         terminal rule element: TOK_NOT
- *       end or_function (4200)
- *     end grouping_function (4100)
- *   end or_function (4000)
- *   begin or_function (4300)
- *     non-terminal rule element: expression
- *     terminal rule element: TOK_MINUS
- *   end or_function (4300)
- *   begin or_function (4400)
- *     non-terminal rule element: expression
- *     non-terminal rule element: primary_expression
- *   end or_function (4400)
- * end grouping_function (1000)
+ * Expressions are parsed using Dijkstra's shunting yard algorithm and
+ * so are given by a list of primary_expressions in postfix format.
  *
  */
 void traverse_expression(ast_expression_t* node) {
@@ -174,8 +49,7 @@ void traverse_expression(ast_expression_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(primary_expression);
 
     RETURN();
 }

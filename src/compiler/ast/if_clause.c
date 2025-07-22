@@ -45,8 +45,10 @@ void traverse_if_clause(ast_if_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression);
+    TRAVERSE_NODE(function_body);
+    TRAVERSE_NODE(else_clause);
+    TRAVERSE_NODE(final_else_clause);
 
     RETURN();
 }

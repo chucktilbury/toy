@@ -33,41 +33,6 @@
  *     TOK_INLINE
  * )
  *
- *
- * begin grouping_function (1000)
- *   begin or_function (1100)
- *     begin or_function (1200)
- *       begin or_function (1300)
- *         begin or_function (1400)
- *           begin or_function (1500)
- *             begin or_function (1600)
- *               begin or_function (1700)
- *                 begin or_function (1800)
- *                   begin or_function (1900)
- *                     begin or_function (2000)
- *                       non-terminal rule element: assignment
- *                       non-terminal rule element: compound_reference
- *                     end or_function (2000)
- *                     non-terminal rule element: data_definition
- *                   end or_function (1900)
- *                   non-terminal rule element: struct_definition
- *                 end or_function (1800)
- *                 non-terminal rule element: if_clause
- *               end or_function (1700)
- *               non-terminal rule element: while_clause
- *             end or_function (1600)
- *             non-terminal rule element: do_clause
- *           end or_function (1500)
- *           non-terminal rule element: for_clause
- *         end or_function (1400)
- *         non-terminal rule element: return_statement
- *       end or_function (1300)
- *       non-terminal rule element: exit_statement
- *     end or_function (1200)
- *     terminal rule element: TOK_INLINE
- *   end or_function (1100)
- * end grouping_function (1000)
- *
  */
 void traverse_function_body_element(ast_function_body_element_t* node) {
 
@@ -75,8 +40,23 @@ void traverse_function_body_element(ast_function_body_element_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    if(node->INLINE != NULL)
+        PRINT("token: INLINE {}\n");
+    else {
+        switch(node->nterm->type) {
+            case AST_ASSIGNMENT: TRAVERSE_NTERM(assignment); break;
+            case AST_COMPOUND_REFERENCE: TRAVERSE_NTERM(compound_reference); break;
+            case AST_DATA_DEFINITION: TRAVERSE_NTERM(data_definition); break;
+            case AST_STRUCT_DEFINITION: TRAVERSE_NTERM(struct_definition); break;
+            case AST_IF_CLAUSE: TRAVERSE_NTERM(if_clause); break;
+            case AST_WHILE_CLAUSE: TRAVERSE_NTERM(while_clause); break;
+            case AST_DO_CLAUSE: TRAVERSE_NTERM(do_clause); break;
+            case AST_FOR_CLAUSE: TRAVERSE_NTERM(for_clause); break;
+            case AST_RETURN_STATEMENT: TRAVERSE_NTERM(return_statement); break;
+            case AST_EXIT_STATEMENT: TRAVERSE_NTERM(exit_statement); break;
+            default: FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
+        }
+    }
 
     RETURN();
 }

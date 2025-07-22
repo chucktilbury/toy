@@ -45,8 +45,8 @@ void traverse_list_reference(ast_list_reference_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_TOKEN(node->IDENTIFIER);
+    TRAVERSE_LIST(expression);
 
     RETURN();
 }

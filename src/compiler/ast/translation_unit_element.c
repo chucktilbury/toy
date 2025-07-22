@@ -48,7 +48,13 @@ void traverse_translation_unit_element(ast_translation_unit_element_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
+    switch(node->nterm->type) {
+        case AST_DATA_DEFINITION: TRAVERSE_NTERM(data_definition); break;
+        case AST_FUNCTION_DEFINITION: TRAVERSE_NTERM(function_definition); break;
+        case AST_STRUCT_DEFINITION: TRAVERSE_NTERM(struct_definition); break;
+        case AST_START_BLOCK: TRAVERSE_NTERM(start_block); break;
+        default: FATAL("internal AST error: Unknown translation_unit_element type: %d", node->nterm->type);
+    }
 
 
     RETURN();

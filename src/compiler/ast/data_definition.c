@@ -44,8 +44,9 @@ void traverse_data_definition(ast_data_definition_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    PRINT("value: is_const is %s\n", node->is_const? "TRUE": "FALSE");
+    TRAVERSE_NODE(data_declaration);
+    TRAVERSE_NODE(initializer);
 
     RETURN();
 }

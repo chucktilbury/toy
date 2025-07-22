@@ -37,8 +37,7 @@ void traverse_struct_init(ast_struct_init_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(dss_initializer);
 
     RETURN();
 }

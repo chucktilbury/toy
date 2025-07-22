@@ -39,8 +39,11 @@ void traverse_type_name(ast_type_name_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    switch(node->nterm->type) {
+        case AST_LITERAL_TYPE_NAME: TRAVERSE_NTERM(literal_type_name); break;
+        case AST_COMPOUND_NAME: TRAVERSE_NTERM(compound_name); break;
+        default: FATAL("internal AST error: Unknown type_name type: %d", node->nterm->type);
+    }
 
     RETURN();
 }

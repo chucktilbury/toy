@@ -41,8 +41,7 @@ void traverse_dss_initializer(ast_dss_initializer_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(dss_initializer_item);
 
     RETURN();
 }

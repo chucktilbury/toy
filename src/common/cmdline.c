@@ -597,6 +597,15 @@ string_t* get_cmd_opt(const char* name) {
         return NULL;
 }
 
+int get_cmd_int(const char* name) {
+
+    string_t* s = get_cmd_opt(name);
+    if(s)
+        return strtol(s->buffer, NULL, 10);
+    else
+        return -1;
+}
+
 /*
  * Iterate the option as a list.
  */

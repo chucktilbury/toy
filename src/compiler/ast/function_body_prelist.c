@@ -39,8 +39,11 @@ void traverse_function_body_prelist(ast_function_body_prelist_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    switch(node->nterm->type) {
+        case AST_FUNCTION_BODY_ELEMENT: TRAVERSE_NTERM(function_body_element); break;
+        case AST_FUNCTION_BODY: TRAVERSE_NTERM(function_body); break;
+        default: FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
+    }
 
     RETURN();
 }

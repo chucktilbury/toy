@@ -45,8 +45,8 @@ void traverse_while_clause(ast_while_clause_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression);
+    TRAVERSE_NODE(loop_body);
 
     RETURN();
 }

@@ -46,6 +46,7 @@ void add_cmdline(int short_opt,
 void destroy_cmdline(void);
 void parse_cmdline(int argc, char** argv, char** env);
 string_t* get_cmd_opt(const char* name);
+int get_cmd_int(const char* name);
 string_t* iterate_cmd_opt(const char* name, int* mark);
 int in_cmd_list(const char* name, const char* item);
 

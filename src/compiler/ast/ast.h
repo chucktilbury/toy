@@ -14,6 +14,7 @@
 #define _AST_H_
 
 #include "tokens.h"
+#include "errors.h"
 #include "pointer_list.h"
 
 typedef enum {
@@ -391,7 +392,7 @@ typedef struct _ast_exit_statement_t_ {
 typedef struct _ast_expression_t_ {
     ast_node_t node;
     // list of tokens in postfix format
-    pointer_list_t* expr;
+    pointer_list_t* list;
 } ast_expression_t;
 
 
@@ -718,6 +719,7 @@ typedef struct _ast_function_parameters_t_ {
  */
 typedef struct _ast_function_reference_t_ {
     ast_node_t node;
+    token_t* IDENTIFIER;
     struct _ast_expression_list_t_* expression_list;
 } ast_function_reference_t;
 
@@ -803,7 +805,7 @@ typedef struct _ast_initializer_t_ {
 
 /*
  * list_init (
- *     TOK_OSBRACE expression ( TOK_COMMA expression ) * TOK_CSBRACE
+ *     TOK_OSBRACE expression_list TOK_CSBRACE
  * )
  *
  *
@@ -822,7 +824,7 @@ typedef struct _ast_initializer_t_ {
  */
 typedef struct _ast_list_init_t_ {
     ast_node_t node;
-    pointer_list_t* list;
+    struct _ast_expression_list_t_* expression_list;
 } ast_list_init_t;
 
 
@@ -849,6 +851,7 @@ typedef struct _ast_list_init_t_ {
  */
 typedef struct _ast_list_reference_t_ {
     ast_node_t node;
+    token_t* IDENTIFIER;
     pointer_list_t* list;
 } ast_list_reference_t;
 

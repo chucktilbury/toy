@@ -44,8 +44,7 @@ void traverse_return_statement(ast_return_statement_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(expression);
 
     RETURN();
 }

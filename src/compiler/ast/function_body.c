@@ -37,8 +37,7 @@ void traverse_function_body(ast_function_body_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_NODE(function_body_list);
 
     RETURN();
 }

@@ -44,8 +44,8 @@ void traverse_struct_definition(ast_struct_definition_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_TOKEN(node->IDENTIFIER);
+    TRAVERSE_LIST(data_declaration);
 
     RETURN();
 }

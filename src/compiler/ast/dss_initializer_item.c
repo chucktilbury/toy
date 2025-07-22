@@ -37,8 +37,8 @@ void traverse_dss_initializer_item(ast_dss_initializer_item_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_TOKEN(node->STRING_LITERAL);
+    TRAVERSE_NODE(expression);
 
     RETURN();
 }

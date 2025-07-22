@@ -47,8 +47,7 @@ void traverse_function_parameters(ast_function_parameters_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(data_declaration);
 
     RETURN();
 }

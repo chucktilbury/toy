@@ -41,8 +41,7 @@ void traverse_compound_reference(ast_compound_reference_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(compound_reference_element);
 
     RETURN();
 }

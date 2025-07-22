@@ -41,8 +41,7 @@ void traverse_expression_list(ast_expression_list_t* node) {
     if(node == NULL)
         RETURN();
 
-    // ast implementation is TBD
-
+    TRAVERSE_LIST(expression);
 
     RETURN();
 }
