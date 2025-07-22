@@ -63,11 +63,20 @@ void traverse_primary_expression(ast_primary_expression_t* node) {
         TRAVERSE_TOKEN(node->token);
     else {
         switch(node->nterm->type) {
-            case AST_FORMATTED_STRING: TRAVERSE_NTERM(formatted_string); break;
-            case AST_BOOL_LITERAL: TRAVERSE_NTERM(bool_literal); break;
-            case AST_EXPRESSION: TRAVERSE_NTERM(expression); break;
-            case AST_COMPOUND_REFERENCE: TRAVERSE_NTERM(compound_reference); break;
-            default: FATAL("internal AST error: Unknown primary expression type: %d", node->nterm->type);
+            case AST_FORMATTED_STRING:
+                TRAVERSE_NTERM(formatted_string);
+                break;
+            case AST_BOOL_LITERAL:
+                TRAVERSE_NTERM(bool_literal);
+                break;
+            case AST_EXPRESSION:
+                TRAVERSE_NTERM(expression);
+                break;
+            case AST_COMPOUND_REFERENCE:
+                TRAVERSE_NTERM(compound_reference);
+                break;
+            default:
+                FATAL("internal AST error: Unknown primary expression type: %d", node->nterm->type);
         }
     }
 

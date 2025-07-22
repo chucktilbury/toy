@@ -132,7 +132,7 @@ const char* raw_string(string_t* str) {
 
 string_t* strip_char(string_t* buf, int ch) {
 
-    //strip_space(buf);
+    // strip_space(buf);
 
     char* temp;
     while((temp = strrchr(buf->buffer, ch)) != NULL)
@@ -146,8 +146,8 @@ string_t* strip_char(string_t* buf, int ch) {
 // strip the single character from the ends, such as quotes
 string_t* strip_ends(string_t* buf, int ch) {
 
-    if(buf->buffer[buf->len-1] == ch) {
-        buf->buffer[buf->len-1] = '\0';
+    if(buf->buffer[buf->len - 1] == ch) {
+        buf->buffer[buf->len - 1] = '\0';
         buf->len--;
     }
 

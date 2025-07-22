@@ -41,4 +41,3 @@ void traverse_dict_init(ast_dict_init_t* node) {
 
     RETURN();
 }
-

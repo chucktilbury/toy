@@ -19,7 +19,7 @@
 
 #define MSG(n, ...)                                   \
     do {                                              \
-        if((n) < get_verbosity())            \
+        if((n) < get_verbosity())                     \
             fprintf(get_trace_handle(), __VA_ARGS__); \
     } while(0)
 
@@ -28,42 +28,42 @@ void init_trace(FILE* fp);
 // defined in trace.c
 extern int trace_depth;
 
-#define PRINT(...)                                     \
-    do {                                               \
-        if(peek_trace_state()) { \
-            print_indent(__VA_ARGS__);                 \
-        }                                              \
+#define PRINT(...)                     \
+    do {                               \
+        if(peek_trace_state()) {       \
+            print_indent(__VA_ARGS__); \
+        }                              \
     } while(0)
 
-#define TRACE(...)                                     \
-    do {                                               \
-        if(peek_trace_state()) { \
-            print_trace(__VA_ARGS__);                  \
-        }                                              \
+#define TRACE(...)                    \
+    do {                              \
+        if(peek_trace_state()) {      \
+            print_trace(__VA_ARGS__); \
+        }                             \
     } while(0)
 
 #define ENTER                                          \
     do {                                               \
-        if(peek_trace_state()) { \
+        if(peek_trace_state()) {                       \
             print_enter(__FILE__, __LINE__, __func__); \
         }                                              \
     } while(0)
 
 #define RETURN(...)                                                   \
     do {                                                              \
-        if(peek_trace_state()) {                \
+        if(peek_trace_state()) {                                      \
             print_return(__FILE__, __LINE__, __func__, #__VA_ARGS__); \
         }                                                             \
         return __VA_ARGS__;                                           \
     } while(0)
 
-#define SEPARATOR                                      \
-    do {                                               \
-        if(peek_trace_state()) { \
-            for(int i = 0; i < 80; i++)                \
-                fputc('-', get_trace_handle());        \
-            fputc('\n', get_trace_handle());           \
-        }                                              \
+#define SEPARATOR                               \
+    do {                                        \
+        if(peek_trace_state()) {                \
+            for(int i = 0; i < 80; i++)         \
+                fputc('-', get_trace_handle()); \
+            fputc('\n', get_trace_handle());    \
+        }                                       \
     } while(0)
 
 #define TRACE_HEADER               \

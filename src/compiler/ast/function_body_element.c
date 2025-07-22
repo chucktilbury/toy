@@ -44,17 +44,38 @@ void traverse_function_body_element(ast_function_body_element_t* node) {
         PRINT("token: INLINE {}\n");
     else {
         switch(node->nterm->type) {
-            case AST_ASSIGNMENT: TRAVERSE_NTERM(assignment); break;
-            case AST_COMPOUND_REFERENCE: TRAVERSE_NTERM(compound_reference); break;
-            case AST_DATA_DEFINITION: TRAVERSE_NTERM(data_definition); break;
-            case AST_STRUCT_DEFINITION: TRAVERSE_NTERM(struct_definition); break;
-            case AST_IF_CLAUSE: TRAVERSE_NTERM(if_clause); break;
-            case AST_WHILE_CLAUSE: TRAVERSE_NTERM(while_clause); break;
-            case AST_DO_CLAUSE: TRAVERSE_NTERM(do_clause); break;
-            case AST_FOR_CLAUSE: TRAVERSE_NTERM(for_clause); break;
-            case AST_RETURN_STATEMENT: TRAVERSE_NTERM(return_statement); break;
-            case AST_EXIT_STATEMENT: TRAVERSE_NTERM(exit_statement); break;
-            default: FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
+            case AST_ASSIGNMENT:
+                TRAVERSE_NTERM(assignment);
+                break;
+            case AST_COMPOUND_REFERENCE:
+                TRAVERSE_NTERM(compound_reference);
+                break;
+            case AST_DATA_DEFINITION:
+                TRAVERSE_NTERM(data_definition);
+                break;
+            case AST_STRUCT_DEFINITION:
+                TRAVERSE_NTERM(struct_definition);
+                break;
+            case AST_IF_CLAUSE:
+                TRAVERSE_NTERM(if_clause);
+                break;
+            case AST_WHILE_CLAUSE:
+                TRAVERSE_NTERM(while_clause);
+                break;
+            case AST_DO_CLAUSE:
+                TRAVERSE_NTERM(do_clause);
+                break;
+            case AST_FOR_CLAUSE:
+                TRAVERSE_NTERM(for_clause);
+                break;
+            case AST_RETURN_STATEMENT:
+                TRAVERSE_NTERM(return_statement);
+                break;
+            case AST_EXIT_STATEMENT:
+                TRAVERSE_NTERM(exit_statement);
+                break;
+            default:
+                FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
         }
     }
 

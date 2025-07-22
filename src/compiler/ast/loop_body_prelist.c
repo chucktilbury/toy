@@ -40,9 +40,14 @@ void traverse_loop_body_prelist(ast_loop_body_prelist_t* node) {
         RETURN();
 
     switch(node->nterm->type) {
-        case AST_LOOP_BODY_ELEMENT: TRAVERSE_NTERM(loop_body_element); break;
-        case AST_LOOP_BODY: TRAVERSE_NTERM(loop_body); break;
-        default: FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
+        case AST_LOOP_BODY_ELEMENT:
+            TRAVERSE_NTERM(loop_body_element);
+            break;
+        case AST_LOOP_BODY:
+            TRAVERSE_NTERM(loop_body);
+            break;
+        default:
+            FATAL("internal AST error: Unknown body element type: %d", node->nterm->type);
     }
 
     RETURN();

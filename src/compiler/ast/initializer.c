@@ -48,11 +48,20 @@ void traverse_initializer(ast_initializer_t* node) {
         RETURN();
 
     switch(node->nterm->type) {
-        case AST_EXPRESSION: TRAVERSE_NTERM(expression); break;
-        case AST_LIST_INIT: TRAVERSE_NTERM(list_init); break;
-        case AST_DICT_INIT: TRAVERSE_NTERM(dict_init); break;
-        case AST_STRUCT_INIT: TRAVERSE_NTERM(struct_init); break;
-        default: FATAL("internal AST error: Unknown initializer type: %d", node->nterm->type);
+        case AST_EXPRESSION:
+            TRAVERSE_NTERM(expression);
+            break;
+        case AST_LIST_INIT:
+            TRAVERSE_NTERM(list_init);
+            break;
+        case AST_DICT_INIT:
+            TRAVERSE_NTERM(dict_init);
+            break;
+        case AST_STRUCT_INIT:
+            TRAVERSE_NTERM(struct_init);
+            break;
+        default:
+            FATAL("internal AST error: Unknown initializer type: %d", node->nterm->type);
     }
 
 

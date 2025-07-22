@@ -45,10 +45,9 @@ int main(int argc, char** argv, char** env) {
         if(tok->type == TOK_END_OF_FILE)
             break;
         fprintf(stderr, "%s \"%s\" \"%s\" %d %d\n",
-                    tok_type_to_str(tok), tok_type_to_str(tok),
-                    raw_string(tok->str), tok->line_no, tok->col_no);
+                tok_type_to_str(tok), tok_type_to_str(tok),
+                raw_string(tok->str), tok->line_no, tok->col_no);
         consume_token();
-
     }
 
     return 0;

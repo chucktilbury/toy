@@ -22,7 +22,7 @@ typedef struct _file_t_ {
     int line;
     int column;
     bool is_open;
-    struct yy_buffer_state *buffer;
+    struct yy_buffer_state* buffer;
     struct _file_t_* next;
 } file_t;
 
@@ -110,10 +110,11 @@ void update_numbers(void) {
     if(file_stack != NULL) {
         file_stack->column = yycolno;
         file_stack->line = yylineno;
-        if (yylineno == prev_lineno)
+        if(yylineno == prev_lineno)
             yycolno += yyleng;
         else {
-            for(yycolno = 1; yytext[yyleng - yycolno] != '\n'; ++yycolno) {}
+            for(yycolno = 1; yytext[yyleng - yycolno] != '\n'; ++yycolno) {
+            }
             prev_lineno = yylineno;
         }
     }
